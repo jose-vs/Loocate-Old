@@ -10,3 +10,4 @@ export default{
         measurementId: "G-RG56NPXTR1"
     },
 }
+//google api: AIzaSyBtceNJ9uD04nPUDMBwRV_BB5-ww6v5xbE
