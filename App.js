@@ -5,14 +5,14 @@ import MapScreen from './src/screens/MapScreen';
 
 const navigator = createStackNavigator(
   {
-    Map: MapScreen
+      Map: MapScreen,
   }, 
   { 
-    InitialRouteName: 'Map',
-    headerMode: 'none',
-    navigationOptions: {
-    headerVisible: false,
-    }
+      InitialRouteName: 'Map',
+      headerMode: 'none',
+      navigationOptions: {
+      headerVisible: false,
+      }
   }
 );
 

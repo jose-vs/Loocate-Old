@@ -1,16 +1,49 @@
 import React from 'react'; 
 import { Text, View, Dimensions, StyleSheet} from 'react-native'; 
-import { TouchableOpacity} from 'react-native-gesture-handler'
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import { FontAwesome, MaterialIcons, Entypo } from '@expo/vector-icons';
 import MapView from 'react-native-maps';
+import BottomSheet from 'reanimated-bottom-sheet';
+import Animated from 'react-native-reanimated';
 
 
 const MapScreen = () => { 
 
-    const buttonPressed = () => console.log('Button Pressed');
+    
+    bs = React.createRef();
+    fall = new Animated.Value(1);
+    const buttonPressed = () => this.bs.current.snapTo(1);
 
+    renderContent = () => (
+        <View style = { style.panel }>
+            <View style={{alignItems: 'center'}}>
+                <Text style={style.panelTitle}>JESUS</Text>
+                <Text style={style.panelSubtitle}>this was annoying to code</Text>
+            </View>
+        </View>
+      );
+    
+      renderHeader = () => (
+        <View style={style.header}>
+          <View style={style.panelHeader}>
+            <View style={style.panelHandle} />
+          </View>
+        </View>
+      );
+
+    
     return (
         <View style={style.container}>
+
+            <BottomSheet
+                ref={this.bs}
+                snapPoints={[330, 200,0]}
+                renderContent={this.renderContent}
+                renderHeader={this.renderHeader}
+                initialSnap={1}
+                callbackNode={this.fall}
+                enabledGestureInteraction={true}
+            />
             
             <MapView 
                 style={style.map} 
@@ -51,6 +84,7 @@ const MapScreen = () => {
                 </View>
 
             </View>
+
             
         </View>
     );
@@ -71,6 +105,12 @@ const style = StyleSheet.create({
         flexDirection: 'row', 
         justifyContent: 'space-between',
     },
+    footerContainer: { 
+        backgroundColor: 'red',
+        position: 'absolute', 
+        bottom: 0,
+        alignItems: 'stretch'
+    },
     buttonContainer: { 
         flexDirection: 'row', 
     },
@@ -85,6 +125,63 @@ const style = StyleSheet.create({
         borderRadius: 100 / 2,
         backgroundColor: "#FFFFFA",
     },
+
+    
+      panel: {
+        padding: 20,
+        backgroundColor: '#FFFFFF',
+        paddingTop: 20,
+        // borderTopLeftRadius: 20,
+        // borderTopRightRadius: 20,
+        // shadowColor: '#000000',
+        // shadowOffset: {width: 0, height: 0},
+        // shadowRadius: 5,
+        // shadowOpacity: 0.4,
+      },
+      header: {
+        backgroundColor: '#FFFFFF',
+        shadowColor: '#333333',
+        shadowOffset: {width: -1, height: -3},
+        shadowRadius: 2,
+        shadowOpacity: 0.4,
+        // elevation: 5,
+        paddingTop: 20,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+      },
+      panelHeader: {
+        alignItems: 'center',
+      },
+      panelHandle: {
+        width: 40,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: '#00000040',
+        marginBottom: 10,
+      },
+      panelTitle: {
+        fontSize: 27,
+        height: 35,
+      },
+      panelSubtitle: {
+        fontSize: 14,
+        color: 'gray',
+        height: 30,
+        marginBottom: 10,
+      },
+      panelButton: {
+        padding: 13,
+        borderRadius: 10,
+        backgroundColor: '#FF6347',
+        alignItems: 'center',
+        marginVertical: 7,
+      },
+      panelButtonTitle: {
+        fontSize: 17,
+        fontWeight: 'bold',
+        color: 'white',
+      },
+     
 });
 
 export default MapScreen; 
