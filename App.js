@@ -1,82 +1,63 @@
-import React from "react";
-import MapView from "react-native-maps";
-import { StyleSheet, Text, View, Dimensions } from "react-native";
-import * as Location from "expo-location";
-import * as Permissions from "expo-permissions";
-import Constants from "expo-constants";
+import * as React from 'react'
+import MapView from 'react-native-maps'
+import * as Location from 'expo-location'
+import * as Permissions from 'expo-permissions'
+import { StyleSheet } from 'react-native'
+import { Text } from 'react-native-paper'
 
-export default class App extends Component {
-  state = {
-    mapRegion: {
-      latitude: 37.78825,
-      longitude: -122.4324,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421,
-    },
-    locationResult: null,
-    location: { coords: { latitude: 37.78825, longitude: -122.4324 } },
-  };
-
-  componentDidMount() {
-    this._getLocationAsync();
-  }
-
-  _handleMapRegionChange = (mapRegion) => {
-    this.setState({ mapRegion });
-  };
-
-  _getLocationAsync = async () => {
-    let { status } = await Permissions.askAsync(Permissions.LOCATION);
-    if (status !== "granted") {
-      this.setState({
-        locationResult: "Permission to access location was denied",
-        location,
-      });
-    }
-
-    let location = await Location.getCurrentPositionAsync({});
-    this.setState({ locationResult: JSON.stringify(location), location });
-  };
-
-  render() {
-    return (
-      <View style={styles.container}>
-        <MapView
-          style={{ alignSelf: "stretch", height: 200 }}
-          region={{
-            latitude: this.state.location.coords.latitude,
-            longitude: this.state.location.coords.longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
-          onRegionChange={this._handleMapRegionChange}
-        >
-          <MapView.Marker
-            coordinate={this.state.location.coords}
-            title="My Marker"
-            description="Some description"
-          />
-        </MapView>
-
-        <Text>Location: {this.state.locationResult}</Text>
-      </View>
-    );
-  }
+const { useState, useEffect } = React
+export default function MapScreen() {
+const [ locationResult, setLocation ] = useState( null )
+const [ mapRegion, setRegion ] = useState( null )
+const [ hasLocationPermissions, setLocationPermission ] = useState( false )
+useEffect( () => {
+const getLocationAsync = async () => {
+let { status } = await Permissions.askAsync( Permissions.LOCATION )
+if ( 'granted' !== status ) {
+setLocation( 'Permission to access location was denied' )
+} else {
+setLocationPermission( true );
 }
-
+let { coords: { latitude, longitude } } = await Location.getCurrentPositionAsync({})
+setLocation( JSON.stringify( { latitude, longitude } ) )
+// Center the map on the location we just fetched.
+setRegion( { latitude, longitude, latitudeDelta: 0.0922, longitudeDelta: 0.0421 } );
+}
+getLocationAsync()
+} )
+if ( locationResult === null ) {
+return <Text>Finding your current location...</Text>
+}
+if ( hasLocationPermissions === false ) {
+return <Text>Location permissions are not granted.</Text>
+}
+if ( mapRegion === null ) {
+return <Text>Map region doesn't exist.</Text>
+}
+return (
+<MapView
+style={ styles.container }
+region={ mapRegion }
+initialRegion={{
+"latitude": 39.97343096953564,
+"latitudeDelta": 0.0922,
+"longitude": -75.12520805829233,
+"longitudeDelta": 0.0421,
+}}
+onRegionChange={ region => setRegion( region )}
+>
+<MapView.Marker
+title="YIKES, Inc."
+description="Web Design and Development"
+coordinate={{"latitude":39.969183,"longitude":-75.133308}}
+/>
+</MapView>
+)
+}
+MapScreen.navigationOptions = {
+header: null
+}
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: Constants.statusBarHeight,
-    backgroundColor: "#ecf0f1",
-  },
-  paragraph: {
-    margin: 24,
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-    color: "#34495e",
-  },
-});
+container: {
+flex: 1,
+},
