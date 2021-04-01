@@ -4,7 +4,6 @@ import { TouchableOpacity} from 'react-native-gesture-handler'
 import { FontAwesome, MaterialIcons, Entypo } from '@expo/vector-icons';
 import MapView from 'react-native-maps';
 
-
 const MapScreen = () => { 
 
     const buttonPressed = () => console.log('Button Pressed');
@@ -21,7 +20,7 @@ const MapScreen = () => {
                     latitudeDelta: 0.0922,
                     longitudeDelta: 0.0421,
             }}/>
-
+            {this.mapMarkers()}
 
             <View style={style.topContainer}>
 

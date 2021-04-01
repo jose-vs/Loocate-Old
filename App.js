@@ -1,18 +1,37 @@
-import { StatusBar } from 'expo-status-bar';
-import { createAppContainer } from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
+import { createAppContainer, createStackNavigator } from 'react-navigation';
 import MapScreen from './src/screens/MapScreen';
-import ApiKeys from './constants/ApiKeys';
-import * as firebase from 'firebase'
+import { firebaseConfig } from './config/firebase.js';
+import firebase from 'firebase';
+
+import {
+  API_KEY,
+  AUTH_DOMAIN,
+  DATABASE_URL,
+  PROJECT_ID,
+  STORAGE_BUCKET,
+  MESSAGE_SENDER_ID,
+  APP_ID,
+  MEASUREMENT_ID
+} from 'react-native-dotenv'
+
+const firebaseConfig = {
+  apiKey: API_KEY,
+  authDomain: AUTH_DOMAIN,
+  databaseURL: DATABASE_URL,
+  projectId: PROJECT_ID,
+  storageBucket: STORAGE_BUCKET,
+  messagingSenderId: MESSAGE_SENDER_ID,
+  appId: APP_ID,
+  measurementId:MEASUREMENT_ID
+}
 
 //initalize Firebase 
 if (!firebase.apps.length) { //Checks if firebase has already been initialized
-  firebase.initializeApp(ApiKeys.FirebaseConfig);
+  firebase.initializeApp(firebaseConfig);
 }
-
 const navigator = createStackNavigator(
   {
-    Map: MapScreen
+    Map: MapScreen,
   }, 
   { 
     InitialRouteName: 'Map',
