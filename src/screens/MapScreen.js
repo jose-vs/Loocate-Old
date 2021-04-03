@@ -12,9 +12,9 @@ const MapScreen = () => {
     
     bs = React.createRef();
     fall = new Animated.Value(1);
-    const buttonPressed = () => this.bs.current.snapTo(1);
+    const buttonPressed = () => bs.current.snapTo(1);
 
-    renderContent = () => (
+    renderContentInfo = () => (
         <View style = { style.panel }>
             <View style={{alignItems: 'center'}}>
                 <Text style={style.panelTitle}>JESUS</Text>
@@ -23,7 +23,7 @@ const MapScreen = () => {
         </View>
       );
     
-      renderHeader = () => (
+      renderHeaderInfo = () => (
         <View style={style.header}>
           <View style={style.panelHeader}>
             <View style={style.panelHandle} />
@@ -31,17 +31,18 @@ const MapScreen = () => {
         </View>
       );
 
-    
     return (
+
         <View style={style.container}>
 
+
             <BottomSheet
-                ref={this.bs}
-                snapPoints={[330, 200,0]}
-                renderContent={this.renderContent}
-                renderHeader={this.renderHeader}
+                ref={bs}
+                snapPoints={[500, 200,0]}
+                renderContent={renderContentInfo}
+                renderHeader={renderHeaderInfo}
                 initialSnap={1}
-                callbackNode={this.fall}
+                callbackNode={fall}
                 enabledGestureInteraction={true}
             />
             
@@ -131,6 +132,7 @@ const style = StyleSheet.create({
         padding: 20,
         backgroundColor: '#FFFFFF',
         paddingTop: 20,
+        paddingBottom: 200
         // borderTopLeftRadius: 20,
         // borderTopRightRadius: 20,
         // shadowColor: '#000000',
