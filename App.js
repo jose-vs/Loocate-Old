@@ -53,11 +53,7 @@ export default function MapScreen() {
       }}
       onRegionChange={(region) => setRegion(region)}
     >
-      <MapView.Marker
-        title="YIKES, Inc."
-        description="Web Design and Development"
-        coordinate={{ latitude: 39.969183, longitude: -75.133308 }}
-      />
+      <MapView.Marker title="Test" />
     </MapView>
   );
 }
