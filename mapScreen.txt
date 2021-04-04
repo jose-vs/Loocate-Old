@@ -1,0 +1,75 @@
+
+    const buttonPressed = () => console.log('Button Pressed');
+
+    return (
+        <View style={style.container}>
+            
+            <MapView 
+                provider={PROVIDER_GOOGLE}
+                style={style.map} 
+                initialRegion={{
+                    // Auckland City
+                    latitude: -36.853121304049786,
+                    longitude: 174.76650674225814,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+            }}>
+
+              {/* 
+              write the markers in a separate child component to 
+              duplicate them onto the map 
+              */}
+              <Marker 
+                coordinate = {{ 
+                  latitude: -36.853121304049786,
+                  longitude: 174.76650674225814,
+                }}
+                image = {require('../../assets/pin.png')}
+                title = "Test pin"
+                description = "this is the first pin. hello"
+              >
+
+                <Callout tooltip>
+
+                  <View style = {style.bubble}>
+                    <Text>bruh look at this text</Text>
+                    <Text>yeye brotherman</Text>
+                  </View> 
+
+                </Callout>
+              </Marker>
+
+            </MapView>
+
+
+            <View style={style.topContainer}>
+
+                {/* Hamburger Menu */}
+                <View style={style.hamburgerMenuStyle}>  
+                    <TouchableOpacity onPress = {buttonPressed}>
+                        <Entypo name="menu" size={34} color="black" style = {{opacity: 0.6}}/>
+                    </TouchableOpacity>
+                </View>
+
+                <View style={style.buttonContainer}>
+
+                    {/* Location Search Button */}
+                    <TouchableOpacity onPress = {buttonPressed}>
+                        <View style={style.circleButton}>
+                            <FontAwesome name="search" size={24} color="black" style={{top: 6, left: 8, opacity: 0.6}}/>
+                        </View>
+                    </TouchableOpacity>
+
+                    {/* Map Style Button */}
+                    <TouchableOpacity onPress = {buttonPressed}>
+                        <View style={style.circleButton}>
+                            <MaterialIcons name="layers" size={26} color="black" style={{top: 6, left: 6, opacity: 0.6}}/>
+                        </View>
+                    </TouchableOpacity>
+
+                </View>
+
+            </View>
+            
+        </View>
+    );
