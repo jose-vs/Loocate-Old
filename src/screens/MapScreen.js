@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -11,40 +11,42 @@ import {
   Dimensions,
   Platform,
 } from "react-native";
-import MapView, {PROVIDER_GOOGLE} from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 
-import { FontAwesome, Ionicons, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
+import {
+  FontAwesome,
+  Ionicons,
+  FontAwesome5,
+  MaterialIcons,
+} from "@expo/vector-icons";
 
-import { markers } from './model/MapData';
-import StarRating from './components/StarRating';
-
+import { markers } from "./model/MapData";
+import StarRating from "./components/StarRating";
 
 const { width, height } = Dimensions.get("window");
 const CARD_HEIGHT = 220;
 const CARD_WIDTH = width * 0.8;
 const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
 
-
-const MapScreen = () => { 
-
+const MapScreen = () => {
   const initialMapState = {
     markers,
 
     filter: [
-      { 
-        type: 'nearest', 
+      {
+        type: "nearest",
       },
       {
-        type: 'top-rated',
+        type: "top-rated",
       },
       {
-        type: 'visited',
+        type: "visited",
       },
       {
-        type: 'not-visited',
+        type: "not-visited",
       },
     ],
-    
+
     region: {
       // Auckland City
       latitude: -36.853121304049786,
@@ -53,9 +55,8 @@ const MapScreen = () => {
       longitudeDelta: 0.0421,
     },
 
-    showTopComponents: true, 
+    showTopComponents: true,
     showPublicToilets: true,
-
   };
 
   const [state, setState] = React.useState(initialMapState);
@@ -76,7 +77,7 @@ const MapScreen = () => {
       clearTimeout(regionTimeout);
 
       const regionTimeout = setTimeout(() => {
-        if( mapIndex !== index ) {
+        if (mapIndex !== index) {
           mapIndex = index;
           const { coordinate } = state.markers[index];
           _map.current.animateToRegion(
@@ -96,30 +97,28 @@ const MapScreen = () => {
     const inputRange = [
       (index - 1) * CARD_WIDTH,
       index * CARD_WIDTH,
-      ((index + 1) * CARD_WIDTH),
+      (index + 1) * CARD_WIDTH,
     ];
 
     const scale = mapAnimation.interpolate({
       inputRange,
       outputRange: [1, 1.5, 1],
-      extrapolate: "clamp"
+      extrapolate: "clamp",
     });
 
     return { scale };
   });
 
-
   const onMarkerPress = (mapEventData) => {
     const markerID = mapEventData._targetInst.return.key;
 
-    let x = (markerID * CARD_WIDTH) + (markerID * 20); 
-    if (Platform.OS === 'ios') {
+    let x = markerID * CARD_WIDTH + markerID * 20;
+    if (Platform.OS === "ios") {
       x = x - SPACING_FOR_CARD_INSET;
     }
 
-    _scrollView.current.scrollTo({x: x, y: 0, animated: true});
-  }
-
+    _scrollView.current.scrollTo({ x: x, y: 0, animated: true });
+  };
 
   const _map = React.useRef(null);
   const _scrollView = React.useRef(null);
@@ -131,7 +130,9 @@ const MapScreen = () => {
         initialRegion={state.region}
         style={styles.container}
         provider={PROVIDER_GOOGLE}
-        onPress={(e)=>{console.log("bruh")}}
+        onPress={(e) => {
+          console.log("bruh");
+        }}
       >
         {state.markers.map((marker, index) => {
           const scaleStyle = {
@@ -142,10 +143,14 @@ const MapScreen = () => {
             ],
           };
           return (
-            <MapView.Marker key={index} coordinate={marker.coordinate} onPress={(e)=>onMarkerPress(e)}>
+            <MapView.Marker
+              key={index}
+              coordinate={marker.coordinate}
+              onPress={(e) => onMarkerPress(e)}
+            >
               <Animated.View style={[styles.markerWrap]}>
                 <Animated.Image
-                  source={require('../../assets/pin.png')}
+                  source={require("../../assets/pin.png")}
                   style={[styles.marker, scaleStyle]}
                   resizeMode="cover"
                 />
@@ -155,15 +160,19 @@ const MapScreen = () => {
         })}
       </MapView>
 
-      
       <View style={styles.searchBox}>
-        <TextInput 
+        <TextInput
           placeholder="Search here"
           placeholderTextColor="#777"
           autoCapitalize="none"
           style={styles.searchBoxText}
         />
-        <FontAwesome name="search" size={24} color="black" style={{right: 8, opacity: 0.6}}/>
+        <FontAwesome
+          name="search"
+          size={24}
+          color="black"
+          style={{ right: 8, opacity: 0.6 }}
+        />
       </View>
       <ScrollView
         horizontal
@@ -171,19 +180,24 @@ const MapScreen = () => {
         showsHorizontalScrollIndicator={false}
         height={50}
         style={styles.chipsScrollView}
-        contentInset={{ // iOS only
-          top:0,
-          left:0,
-          bottom:0,
-          right:20
+        contentInset={{
+          // iOS only
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 20,
         }}
         contentContainerStyle={{
-          paddingRight: Platform.OS === 'android' ? 20 : 0
+          paddingRight: Platform.OS === "android" ? 20 : 0,
         }}
       >
-        <TouchableOpacity style = {styles.circleButton}>
-
-          <Ionicons name="filter" size={26} color="black" style ={{top: 7, left: 7, opacity: 0.6}}/> 
+        <TouchableOpacity style={styles.circleButton}>
+          <Ionicons
+            name="filter"
+            size={26}
+            color="black"
+            style={{ top: 7, left: 7, opacity: 0.6 }}
+          />
         </TouchableOpacity>
 
         {state.filter.map((category, index) => (
@@ -194,16 +208,19 @@ const MapScreen = () => {
       </ScrollView>
 
       <View style={styles.buttonContainer}>
-
         {/* Map Style Button */}
         <TouchableOpacity>
-            <View style={styles.circleButton}>
-                <MaterialIcons name="layers" size={26} color="black" style={{top: 6, left: 6, opacity: 0.6}}/>
-            </View>
+          <View style={styles.circleButton}>
+            <MaterialIcons
+              name="layers"
+              size={26}
+              color="black"
+              style={{ top: 6, left: 6, opacity: 0.6 }}
+            />
+          </View>
         </TouchableOpacity>
-
       </View>
-     
+
       <Animated.ScrollView
         ref={_scrollView}
         horizontal
@@ -217,10 +234,11 @@ const MapScreen = () => {
           top: 0,
           left: SPACING_FOR_CARD_INSET,
           bottom: 0,
-          right: SPACING_FOR_CARD_INSET
+          right: SPACING_FOR_CARD_INSET,
         }}
         contentContainerStyle={{
-          paddingHorizontal: Platform.OS === 'android' ? SPACING_FOR_CARD_INSET : 0
+          paddingHorizontal:
+            Platform.OS === "android" ? SPACING_FOR_CARD_INSET : 0,
         }}
         onScroll={Animated.event(
           [
@@ -228,24 +246,28 @@ const MapScreen = () => {
               nativeEvent: {
                 contentOffset: {
                   x: mapAnimation,
-                }
+                },
               },
             },
           ],
-          {useNativeDriver: true}
+          { useNativeDriver: true }
         )}
       >
-        {state.markers.map((marker, index) =>(
+        {state.markers.map((marker, index) => (
           <View style={styles.card} key={index}>
-            <Image 
+            <Image
               source={marker.image}
               style={styles.cardImage}
               resizeMode="cover"
             />
             <View style={styles.textContent}>
-              <Text numberOfLines={1} style={styles.cardtitle}>{marker.title}</Text>
-              <StarRating ratings={marker.rating} reviews={marker.reviews} />
-              <Text numberOfLines={1} style={styles.cardDescription}>{marker.address}</Text>
+              <Text numberOfLines={1} style={styles.cardtitle}>
+                {marker.title}
+              </Text>
+              <StarRating ratings={marker.rating} curated={marker.curated} />
+              <Text numberOfLines={1} style={styles.cardDescription}>
+                {marker.address}
+              </Text>
             </View>
           </View>
         ))}
@@ -259,61 +281,61 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchBox: {
-    position:'absolute', 
-    marginTop: Platform.OS === 'ios' ? 70 : 50, 
-    flexDirection:"row",
-    justifyContent: 'space-between',
-    backgroundColor: '#fff',
-    width: '90%',
-    alignSelf:'center',
+    position: "absolute",
+    marginTop: Platform.OS === "ios" ? 70 : 50,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#fff",
+    width: "90%",
+    alignSelf: "center",
     borderRadius: 25,
     padding: 10,
-    shadowColor: '#ccc',
+    shadowColor: "#ccc",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.5,
     shadowRadius: 5,
     elevation: 10,
   },
-  searchBoxText: { 
+  searchBoxText: {
     paddingLeft: 8,
     paddingRight: 8,
   },
   chipsScrollView: {
-    position:'absolute', 
-    top:Platform.OS === 'ios' ? 120 : 110, 
-    paddingHorizontal:10
+    position: "absolute",
+    top: Platform.OS === "ios" ? 120 : 110,
+    paddingHorizontal: 10,
   },
   chipsIcon: {
     marginRight: 5,
   },
   chipsItem: {
-    flexDirection:"row",
-    backgroundColor:'#fff', 
-    borderRadius:20,
-    padding:8,
-    paddingHorizontal:20, 
-    marginHorizontal:10,
-    height:35,
-    shadowColor: '#ccc',
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 8,
+    paddingHorizontal: 20,
+    marginHorizontal: 10,
+    height: 35,
+    shadowColor: "#ccc",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.5,
     shadowRadius: 5,
     elevation: 10,
   },
-  circleButton: { 
+  circleButton: {
     marginRight: 10,
     marginLeft: 10,
     width: 38,
     height: 38,
-    borderRadius:20,
-    flexDirection:"row",
+    borderRadius: 20,
+    flexDirection: "row",
     backgroundColor: "#FFF",
-    shadowColor: '#ccc',
+    shadowColor: "#ccc",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.5,
     shadowRadius: 5,
     elevation: 10,
-  }, 
+  },
   scrollView: {
     position: "absolute",
     bottom: 0,
@@ -321,12 +343,12 @@ const styles = StyleSheet.create({
     right: 0,
     paddingVertical: 10,
   },
-  buttonContainer: { 
-    position:'absolute', 
-    flexDirection: 'row', 
-    top:Platform.OS === 'ios' ? 170 : 160, 
-    paddingHorizontal:10,
-    alignSelf: 'flex-end',
+  buttonContainer: {
+    position: "absolute",
+    flexDirection: "row",
+    top: Platform.OS === "ios" ? 170 : 160,
+    paddingHorizontal: 10,
+    alignSelf: "flex-end",
   },
   endPadding: {
     paddingRight: width - CARD_WIDTH,
@@ -368,12 +390,12 @@ const styles = StyleSheet.create({
   markerWrap: {
     alignItems: "center",
     justifyContent: "center",
-    width:50,
-    height:50,
+    width: 50,
+    height: 50,
   },
   marker: {
     width: 30,
     height: 30,
   },
 });
-export default MapScreen; 
+export default MapScreen;
