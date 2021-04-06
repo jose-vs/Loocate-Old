@@ -5,7 +5,7 @@ import MapScreen from './src/screens/MapScreen';
 
 const navigator = createStackNavigator(
   {
-    Map: MapScreen
+     Map: MapScreen,
   }, 
   { 
     InitialRouteName: 'Map',
