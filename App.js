@@ -5,7 +5,7 @@ import MapScreen from './src/screens/MapScreen';
 import BottomSheetTest from './src/screens/BottomSheetTest';
 
 const navigator = createStackNavigator(
-  {
+  { 
       Map: MapScreen,
       BottomSheet: BottomSheetTest
   }, 

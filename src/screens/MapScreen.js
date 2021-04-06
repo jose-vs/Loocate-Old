@@ -1,19 +1,76 @@
-import React from 'react'; 
+import React, { useState, useEffect } from 'react'; 
 import { Text, View, Dimensions, StyleSheet} from 'react-native'; 
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { FontAwesome, MaterialIcons, Entypo } from '@expo/vector-icons';
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import BottomSheet from 'reanimated-bottom-sheet';
 import Animated from 'react-native-reanimated';
+import * as Location from 'expo-location';
 
 
 const MapScreen = () => { 
 
-    
     bs = React.createRef();
     fall = new Animated.Value(1);
     const buttonPressed = () => bs.current.snapTo(1);
+    
+    /*let state = { 
+      hasLocationPermission: false,
+      latitude: 0,
+      longitude: 0,
+      toiletList: []
+    } */
 
+    const [location, setLocation] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [gpsLatitude, setgpsLatitude] = useState(null);
+    const [gpsLongitude, setgpsLongitude] = useState(null);
+    const [toilets, setToilets] = useState([]);
+
+    useEffect(() => {
+      (async () => {
+        let { status } = await Location.requestPermissionsAsync();
+        if (status !== 'granted') {
+          setErrorMsg('Permission to access location was denied');
+          return;
+        }
+  
+        let location = await Location.getCurrentPositionAsync({});
+
+        setgpsLatitude(location.coords.latitude);
+        setgpsLongitude(location.coords.longitude);
+        setLocation(location);
+      })();
+    }, []);
+
+    let text = 'Waiting..';
+    if (errorMsg) {
+      text = errorMsg;
+    } else if (location) {
+      text = JSON.stringify(location);
+    }
+    
+    async function toiletSearch() {
+    const url  = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
+    const gpsLocation = `&location=${gpsLatitude},${gpsLongitude}`;
+    const radius = '&radius=5000';
+    const type = '&keyword=toilet';
+    const apikey = '&key=AIzaSyDqitoLWqXRaWLPBRs2KBhgxH3XMytlIGA';
+    const toiletSearchUrl = url + gpsLocation + radius + type + apikey;
+   
+    fetch(toiletSearchUrl).then(response => response.json()).then(result => setToilets(result).catch( e => console.log(e))    )
+   
+    //console.log(gpsLocation)
+   // console.log(toiletSearchUrl)
+    useEffect(() => {
+      toiletSearch();
+    });
+    } 
+
+    function createMapMarkers() {
+      
+    }
+  
     renderContentInfo = () => (
         <View style = { style.panel }>
             <View style={{alignItems: 'center'}}>
@@ -35,7 +92,6 @@ const MapScreen = () => {
 
         <View style={style.container}>
 
-
             <BottomSheet
                 ref={bs}
                 snapPoints={[500, 200,0]}
@@ -54,14 +110,15 @@ const MapScreen = () => {
                     longitude: 174.76650674225814,
                     latitudeDelta: 0.0922,
                     longitudeDelta: 0.0421,
-            }}/>
+
+            }}/>  
 
 
             <View style={style.topContainer}>
 
                 {/* Hamburger Menu */}
                 <View style={style.hamburgerMenuStyle}>  
-                    <TouchableOpacity onPress = {buttonPressed}>
+                    <TouchableOpacity onPress = {toiletSearch}>
                         <Entypo name="menu" size={34} color="black" style = {{opacity: 0.6}}/>
                     </TouchableOpacity>
                 </View>
