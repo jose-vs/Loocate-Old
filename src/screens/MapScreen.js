@@ -126,6 +126,7 @@ const MapScreen = () => {
   return (
     <View style={styles.container}>
       <MapView
+        showsUserLocation
         ref={_map}
         initialRegion={state.region}
         style={styles.container}
