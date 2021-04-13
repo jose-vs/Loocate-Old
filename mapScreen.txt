@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import {
-  Animated,
+  Animated as Action,
   StyleSheet,
   Text,
   TextInput,
@@ -12,9 +12,14 @@ import {
   Platform,
 } from "react-native";
 import MapView, {PROVIDER_GOOGLE} from "react-native-maps";
-
-import * as Animatable from 'react-native-animatable';
-
+import {withTimingTransition} from 'react-native-redash';
+import Animated, {
+   useCode,
+    cond, 
+    eq,
+    set,
+     interpolate
+} from "react-native-reanimated";
 import { 
   FontAwesome, 
   Ionicons, 
@@ -64,13 +69,11 @@ const MapScreen = () => {
     showPublicToilets: true,
 
   };
-  
-  
+
   const [state, setState] = React.useState(initialMapState);
-  
+
   let mapIndex = 0;
-  let mapAnimation = new Animated.Value(0);
-  let scrollViewHeight = new Animated.Value(0)
+  let mapAnimation = new Action.Value(0);
 
   useEffect(() => {
     mapAnimation.addListener(({ value }) => {
@@ -101,22 +104,6 @@ const MapScreen = () => {
     });
   });
 
-  useEffect(() => {
-
-    var toValue = state.showPublicToilets ? 
-    0 : (CARD_HEIGHT + 10);
-
-    Animated.timing(
-      scrollViewHeight, {
-      toValue:  toValue, 
-      duration: 500,
-      useNativeDriver: true,
-    }).start();
-
-    
-
-  }, [state.showPublicToilets]);
-
   const interpolations = state.markers.map((marker, index) => {
     const inputRange = [
       (index - 1) * CARD_WIDTH,
@@ -145,14 +132,20 @@ const MapScreen = () => {
     _scrollView.current.scrollTo({x: x, y: 0, animated: true});
   }
 
-  const hideComponents = () => {
-    if(state.showPublicToilets) {
-      setState({...state, showPublicToilets: false});
-    } else if (!state.showPublicToilets) {
-      setState({...state, showPublicToilets: true});
-    }
-  }
+  const translateY = interpolate(_listAnimation, { 
+    inputRange: [0,1], 
+    outputRange: [height, height - 400],
+  });
 
+  const toiletListY = interpolate(_listAnimation, { 
+    inputRange: [0,1], 
+    outputRange: [400, 0],
+  });
+
+  useCode(() => cond(eq(_list.current, 0), set(_list.current,1)), []);
+
+  const _list = React.useRef(new Animated.Value(0));
+  const _listAnimation = withTimingTransition(_list.current);
   const _map = React.useRef(null);
   const _scrollView = React.useRef(null);
 
@@ -163,29 +156,30 @@ const MapScreen = () => {
         initialRegion={state.region}
         style={styles.container}
         provider={PROVIDER_GOOGLE}
-        onPress={()=>{ hideComponents() }}
+        onPress={(e)=>{console.log("bruh")}}
       >
         {state.markers.map((marker, index) => {
           const scaleStyle = {
             transform: [
               {
-                scale: state.showPublicToilets ? interpolations[index].scale : 1,
+                scale: interpolations[index].scale,
               },
             ],
           };
           return (
             <MapView.Marker key={index} coordinate={marker.coordinate} onPress={(e)=>onMarkerPress(e)}>
-              <Animated.View style={[styles.markerWrap]}>
-                <Animated.Image
+              <Action.View style={[styles.markerWrap]}>
+                <Action.Image
                   source={require('../../assets/pin.png')}
                   style={[styles.marker, scaleStyle]}
                   resizeMode="cover"
                 />
-              </Animated.View>
+              </Action.View>
             </MapView.Marker>
           );
         })}
       </MapView>
+
       
       <View style={styles.searchBox}>
         <TextInput 
@@ -227,7 +221,7 @@ const MapScreen = () => {
       <View style={styles.buttonContainer}>
 
         {/* Map Style Button */}
-        <TouchableOpacity onPress={()=>{}}>
+        <TouchableOpacity>
             <View style={styles.circleButton}>
                 <MaterialIcons name="layers" size={26} color="black" style={{top: 6, left: 6, opacity: 0.6}}/>
             </View>
@@ -235,57 +229,90 @@ const MapScreen = () => {
 
       </View>
 
-        <Animated.ScrollView
-          ref={_scrollView}
-          horizontal
-          pagingEnabled
-          scrollEventThrottle={1}
-          showsHorizontalScrollIndicator={false}
-          snapToInterval={CARD_WIDTH + 20}
-          snapToAlignment="center"
-          style={[styles.scrollView,{translateY: scrollViewHeight}]}
-          contentInset={{
+      <Animated.View
+        style={{
+          backgroundColor: "white",
+          ...StyleSheet.absoluteFill,
+          transform: [{ translateY: height - 400 }],
+        }}
+      >
+        <Animated.View
+          style={{
+            height: 400,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#2289d6",
+            position: "absolute",
             top: 0,
-            left: SPACING_FOR_CARD_INSET,
-            bottom: 0,
-            right: SPACING_FOR_CARD_INSET
+            left: 0,
+            right: 0,
+            borderWidth: 1,
           }}
-          contentContainerStyle={{
-            paddingHorizontal: Platform.OS === 'android' ? SPACING_FOR_CARD_INSET : 0
-          }}
-          onScroll={Animated.event(
-            [
-              {
-                nativeEvent: {
-                  contentOffset: {
-                    x: mapAnimation,
-                  }
-                },
-              },
-            ],
-            {useNativeDriver: true}
-          )}
         >
-          {state.markers.map((marker, index) =>(
-            <Animatable.View 
-              animation="slideInUp" 
-              iterationCount={1}
-              style={styles.card} 
-              key={index}
-            >
-              <Image 
-                source={marker.image}
-                style={styles.cardImage}
-                resizeMode="cover"
-              />
-              <View style={styles.textContent}>
-                <Text numberOfLines={1} style={styles.cardtitle}>{marker.title}</Text>
-                <StarRating ratings={marker.rating} reviews={marker.reviews} />
-                <Text numberOfLines={1} style={styles.cardDescription}>{marker.address}</Text>
-              </View>
-            </Animatable.View>
-          ))}
-        </Animated.ScrollView>
+          <Text>Overlay Bg</Text>
+        </Animated.View>
+        <Animated.View>
+          <Animated.View
+            style={{
+              height: 400,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "white",
+              borderWidth: 1,
+              transform: [{ translateY: toiletListY }],
+            }}
+          >
+            <Text>Login View</Text>
+          </Animated.View>
+        </Animated.View>
+      </Animated.View>
+     
+      <Action.ScrollView
+        ref={_scrollView}
+        horizontal
+        pagingEnabled
+        scrollEventThrottle={1}
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={CARD_WIDTH + 20}
+        snapToAlignment="center"
+        style={styles.scrollView}
+        contentInset={{
+          top: 0,
+          left: SPACING_FOR_CARD_INSET,
+          bottom: 0,
+          right: SPACING_FOR_CARD_INSET
+        }}
+        contentContainerStyle={{
+          paddingHorizontal: Platform.OS === 'android' ? SPACING_FOR_CARD_INSET : 0
+        }}
+        onScroll={Action.event(
+          [
+            {
+              nativeEvent: {
+                contentOffset: {
+                  x: mapAnimation,
+                }
+              },
+            },
+          ],
+          {useNativeDriver: true}
+        )}
+      >
+        {state.markers.map((marker, index) =>(
+          <View style={styles.card} key={index}>
+            <Image 
+              source={marker.image}
+              style={styles.cardImage}
+              resizeMode="cover"
+            />
+            <View style={styles.textContent}>
+              <Text numberOfLines={1} style={styles.cardtitle}>{marker.title}</Text>
+              <StarRating ratings={marker.rating} reviews={marker.reviews} />
+              <Text numberOfLines={1} style={styles.cardDescription}>{marker.address}</Text>
+            </View>
+          </View>
+        ))}
+      </Action.ScrollView>
     </View>
   );
 };
@@ -369,7 +396,7 @@ const styles = StyleSheet.create({
   },
   card: {
     // padding: 10,
-    elevation: 5,
+    elevation: 2,
     backgroundColor: "#FFF",
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
@@ -412,5 +439,4 @@ const styles = StyleSheet.create({
     height: 30,
   },
 });
-
 export default MapScreen; 
