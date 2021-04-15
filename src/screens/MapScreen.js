@@ -145,6 +145,9 @@ const MapScreen = () => {
     _scrollView.current.scrollTo({x: x, y: 0, animated: true});
   }
 
+
+  
+
   const hideComponents = () => {
     if(state.showPublicToilets) {
       setState({...state, showPublicToilets: false});
@@ -412,5 +415,4 @@ const styles = StyleSheet.create({
     height: 30,
   },
 });
-
 export default MapScreen; 
