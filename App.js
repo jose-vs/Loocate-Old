@@ -7,11 +7,11 @@ import TestScreen from './src/Test/TestScreen';
 
 const navigator = createStackNavigator(
   {
-     //Map: MapScreen,
+     Map: MapScreen,
      Test: TestScreen
   }, 
   { 
-    InitialRouteName: 'Test',
+    InitialRouteName: 'Map',
     headerMode: 'none',
     navigationOptions: {
     headerVisible: false,

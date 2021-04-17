@@ -1,76 +1,79 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Animated,
-  StyleSheet,
   Text,
   TextInput,
   View,
   ScrollView,
   Image,
   TouchableOpacity,
-  Dimensions,
   Platform,
 } from "react-native";
-import MapView, {PROVIDER_GOOGLE} from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
+import * as Animatable from "react-native-animatable";
+import {
+  FontAwesome,
+  Ionicons,
+  MaterialIcons,
+} from "@expo/vector-icons";
+import { MAP_API_KEY } from "@env";
+import toiletApi from "../../api/googlePlaces";
+import StarRating from "./components/StarRating";
+import { initialMapState } from "./model/MapData";
+import { styles } from "./model/Styles";
+import {
+  SPACING_FOR_CARD_INSET,
+  CARD_HEIGHT,
+  CARD_WIDTH,
+} from "./model/Constants";
+//import Map_TopMenu from "./components/Map_TopMenu";
 
-import * as Animatable from 'react-native-animatable';
+const MapScreen = () => {
+  const [state, setState] = useState(initialMapState);
+  const [toilets, setToilets] = useState([]);
 
-import { 
-  FontAwesome, 
-  Ionicons, 
-  FontAwesome5, 
-  MaterialIcons 
-} from '@expo/vector-icons';
+  useEffect(() => {
+    toiletApi
+      .get(
+        `&location=
+          ${state.region.latitude}, ${state.region.longitude}
+        &radius=
+          ${state.radius}
+        &keyword=toilet
+        &key=${MAP_API_KEY}`
+      )
+      .then((response) => {
+        setToilets(response.data); 
+        // console.log(toilets.results[0]);  
 
-import { markers } from './model/MapData';
-import StarRating from './components/StarRating';
+        toilets.results.map((toiletData) => {
+          const newToilet = {
+            coordinate: {
+              latitude: toiletData.geometry.location.lat,
+              longitude: toiletData.geometry.location.lng,
+            },
+            title: toiletData.name,
+            address: toiletData.vicinity,
+            image: require("../../assets/ToiletPhotos/toilet1.jpg"),
+            rating: toiletData.rating,
+            reviews: toiletData.user_ratings_total,
+          };
 
+          console.log(newToilet)
+          state.markers.push(newToilet);
+        })
+      })
+        
+      .catch(function (error) {
+        console.log(error);
+      });
+  }, []);
 
-const { width, height } = Dimensions.get("window");
-const CARD_HEIGHT = 220;
-const CARD_WIDTH = width * 0.8;
-const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
-
-
-const MapScreen = () => { 
-
-  const initialMapState = {
-    markers,
-
-    filter: [
-      { 
-        type: 'nearest', 
-      },
-      {
-        type: 'top-rated',
-      },
-      {
-        type: 'visited',
-      },
-      {
-        type: 'not-visited',
-      },
-    ],
-    
-    region: {
-      // Auckland City
-      latitude: -36.853121304049786,
-      longitude: 174.76650674225814,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421,
-    },
-
-    showTopComponents: true, 
-    showPublicToilets: true,
-
-  };
   
-  
-  const [state, setState] = React.useState(initialMapState);
-  
+
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
-  let scrollViewHeight = new Animated.Value(0)
+  let scrollViewHeight = new Animated.Value(0);
 
   useEffect(() => {
     mapAnimation.addListener(({ value }) => {
@@ -85,7 +88,7 @@ const MapScreen = () => {
       clearTimeout(regionTimeout);
 
       const regionTimeout = setTimeout(() => {
-        if( mapIndex !== index ) {
+        if (mapIndex !== index) {
           mapIndex = index;
           const { coordinate } = state.markers[index];
           _map.current.animateToRegion(
@@ -102,32 +105,26 @@ const MapScreen = () => {
   });
 
   useEffect(() => {
+    var toValue = state.showPublicToilets ? 0 : CARD_HEIGHT + 10;
 
-    var toValue = state.showPublicToilets ? 
-    0 : (CARD_HEIGHT + 10);
-
-    Animated.timing(
-      scrollViewHeight, {
-      toValue:  toValue, 
+    Animated.timing(scrollViewHeight, {
+      toValue: toValue,
       duration: 500,
       useNativeDriver: true,
     }).start();
-
-    
-
   }, [state.showPublicToilets]);
 
   const interpolations = state.markers.map((marker, index) => {
     const inputRange = [
       (index - 1) * CARD_WIDTH,
       index * CARD_WIDTH,
-      ((index + 1) * CARD_WIDTH),
+      (index + 1) * CARD_WIDTH,
     ];
 
     const scale = mapAnimation.interpolate({
       inputRange,
       outputRange: [1, 1.5, 1],
-      extrapolate: "clamp"
+      extrapolate: "clamp",
     });
 
     return { scale };
@@ -136,25 +133,21 @@ const MapScreen = () => {
   const onMarkerPress = (mapEventData) => {
     const markerID = mapEventData._targetInst.return.key;
 
-
-    let x = (markerID * CARD_WIDTH) + (markerID * 20); 
-    if (Platform.OS === 'ios') {
+    let x = markerID * CARD_WIDTH + markerID * 20;
+    if (Platform.OS === "ios") {
       x = x - SPACING_FOR_CARD_INSET;
     }
 
-    _scrollView.current.scrollTo({x: x, y: 0, animated: true});
-  }
-
-
-  
+    _scrollView.current.scrollTo({ x: x, y: 0, animated: true });
+  };
 
   const hideComponents = () => {
-    if(state.showPublicToilets) {
-      setState({...state, showPublicToilets: false});
+    if (state.showPublicToilets) {
+      setState({ ...state, showPublicToilets: false });
     } else if (!state.showPublicToilets) {
-      setState({...state, showPublicToilets: true});
+      setState({ ...state, showPublicToilets: true });
     }
-  }
+  };
 
   const _map = React.useRef(null);
   const _scrollView = React.useRef(null);
@@ -166,21 +159,29 @@ const MapScreen = () => {
         initialRegion={state.region}
         style={styles.container}
         provider={PROVIDER_GOOGLE}
-        onPress={()=>{ hideComponents() }}
+        onPress={() => {
+          hideComponents();
+        }}
       >
         {state.markers.map((marker, index) => {
           const scaleStyle = {
             transform: [
               {
-                scale: state.showPublicToilets ? interpolations[index].scale : 1,
+                scale: state.showPublicToilets
+                  ? interpolations[index].scale
+                  : 1,
               },
             ],
           };
           return (
-            <MapView.Marker key={index} coordinate={marker.coordinate} onPress={(e)=>onMarkerPress(e)}>
+            <MapView.Marker
+              key={index}
+              coordinate={marker.coordinate}
+              onPress={(e) => onMarkerPress(e)}
+            >
               <Animated.View style={[styles.markerWrap]}>
                 <Animated.Image
-                  source={require('../../assets/pin.png')}
+                  source={require("../../assets/pin.png")}
                   style={[styles.marker, scaleStyle]}
                   resizeMode="cover"
                 />
@@ -189,15 +190,19 @@ const MapScreen = () => {
           );
         })}
       </MapView>
-      
       <View style={styles.searchBox}>
-        <TextInput 
+        <TextInput
           placeholder="Search here"
           placeholderTextColor="#777"
           autoCapitalize="none"
           style={styles.searchBoxText}
         />
-        <FontAwesome name="search" size={24} color="black" style={{right: 8, opacity: 0.6}}/>
+        <FontAwesome
+          name="search"
+          size={24}
+          color="black"
+          style={{ right: 8, opacity: 0.6 }}
+        />
       </View>
       <ScrollView
         horizontal
@@ -205,19 +210,24 @@ const MapScreen = () => {
         showsHorizontalScrollIndicator={false}
         height={50}
         style={styles.chipsScrollView}
-        contentInset={{ // iOS only
-          top:0,
-          left:0,
-          bottom:0,
-          right:20
+        contentInset={{
+          // iOS only
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 20,
         }}
         contentContainerStyle={{
-          paddingRight: Platform.OS === 'android' ? 20 : 0
+          paddingRight: Platform.OS === "android" ? 20 : 0,
         }}
       >
-        <TouchableOpacity style = {styles.circleButton}>
-
-          <Ionicons name="filter" size={26} color="black" style ={{top: 7, left: 7, opacity: 0.6}}/> 
+        <TouchableOpacity style={styles.circleButton}>
+          <Ionicons
+            name="filter"
+            size={26}
+            color="black"
+            style={{ top: 7, left: 7, opacity: 0.6 }}
+          />
         </TouchableOpacity>
 
         {state.filter.map((category, index) => (
@@ -228,191 +238,77 @@ const MapScreen = () => {
       </ScrollView>
 
       <View style={styles.buttonContainer}>
-
         {/* Map Style Button */}
-        <TouchableOpacity onPress={()=>{}}>
-            <View style={styles.circleButton}>
-                <MaterialIcons name="layers" size={26} color="black" style={{top: 6, left: 6, opacity: 0.6}}/>
-            </View>
+        <TouchableOpacity onPress={() => {}}>
+          <View style={styles.circleButton}>
+            <MaterialIcons
+              name="layers"
+              size={26}
+              color="black"
+              style={{ top: 6, left: 6, opacity: 0.6 }}
+            />
+          </View>
         </TouchableOpacity>
-
       </View>
 
-        <Animated.ScrollView
-          ref={_scrollView}
-          horizontal
-          pagingEnabled
-          scrollEventThrottle={1}
-          showsHorizontalScrollIndicator={false}
-          snapToInterval={CARD_WIDTH + 20}
-          snapToAlignment="center"
-          style={[styles.scrollView,{translateY: scrollViewHeight}]}
-          contentInset={{
-            top: 0,
-            left: SPACING_FOR_CARD_INSET,
-            bottom: 0,
-            right: SPACING_FOR_CARD_INSET
-          }}
-          contentContainerStyle={{
-            paddingHorizontal: Platform.OS === 'android' ? SPACING_FOR_CARD_INSET : 0
-          }}
-          onScroll={Animated.event(
-            [
-              {
-                nativeEvent: {
-                  contentOffset: {
-                    x: mapAnimation,
-                  }
+      <Animated.ScrollView
+        ref={_scrollView}
+        horizontal
+        pagingEnabled
+        scrollEventThrottle={1}
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={CARD_WIDTH + 20}
+        snapToAlignment="center"
+        style={[styles.scrollView, { translateY: scrollViewHeight }]}
+        contentInset={{
+          top: 0,
+          left: SPACING_FOR_CARD_INSET,
+          bottom: 0,
+          right: SPACING_FOR_CARD_INSET,
+        }}
+        contentContainerStyle={{
+          paddingHorizontal:
+            Platform.OS === "android" ? SPACING_FOR_CARD_INSET : 0,
+        }}
+        onScroll={Animated.event(
+          [
+            {
+              nativeEvent: {
+                contentOffset: {
+                  x: mapAnimation,
                 },
               },
-            ],
-            {useNativeDriver: true}
-          )}
-        >
-          {state.markers.map((marker, index) =>(
-            <Animatable.View 
-              animation="slideInUp" 
-              iterationCount={1}
-              style={styles.card} 
-              key={index}
-            >
-              <Image 
-                source={marker.image}
-                style={styles.cardImage}
-                resizeMode="cover"
-              />
-              <View style={styles.textContent}>
-                <Text numberOfLines={1} style={styles.cardtitle}>{marker.title}</Text>
-                <StarRating ratings={marker.rating} reviews={marker.reviews} />
-                <Text numberOfLines={1} style={styles.cardDescription}>{marker.address}</Text>
-              </View>
-            </Animatable.View>
-          ))}
-        </Animated.ScrollView>
+            },
+          ],
+          { useNativeDriver: true }
+        )}
+      >
+        {state.markers.map((marker, index) => (
+          <Animatable.View
+            animation="slideInUp"
+            iterationCount={1}
+            style={styles.card}
+            key={index}
+          >
+            <Image
+              source={marker.image}
+              style={styles.cardImage}
+              resizeMode="cover"
+            />
+            <View style={styles.textContent}>
+              <Text numberOfLines={1} style={styles.cardtitle}>
+                {marker.title}
+              </Text>
+              <StarRating ratings={marker.rating} reviews={marker.reviews} />
+              <Text numberOfLines={1} style={styles.cardDescription}>
+                {marker.address}
+              </Text>
+            </View>
+          </Animatable.View>
+        ))}
+      </Animated.ScrollView>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  searchBox: {
-    position:'absolute', 
-    marginTop: 50, 
-    flexDirection:"row",
-    justifyContent: 'space-between',
-    backgroundColor: '#fff',
-    width: '90%',
-    alignSelf:'center',
-    borderRadius: 25,
-    padding: 10,
-    shadowColor: '#ccc',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
-    elevation: 10,
-  },
-  searchBoxText: { 
-    paddingLeft: 8,
-    paddingRight: 8,
-  },
-  chipsScrollView: {
-    position:'absolute', 
-    top: 110, 
-    paddingHorizontal:10
-  },
-  chipsIcon: {
-    marginRight: 5,
-  },
-  chipsItem: {
-    flexDirection:"row",
-    backgroundColor:'#fff', 
-    borderRadius:20,
-    padding:8,
-    paddingHorizontal:20, 
-    marginHorizontal:10,
-    height:35,
-    shadowColor: '#ccc',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
-    elevation: 10,
-  },
-  circleButton: { 
-    marginRight: 10,
-    marginLeft: 10,
-    width: 38,
-    height: 38,
-    borderRadius:20,
-    flexDirection:"row",
-    backgroundColor: "#FFF",
-    shadowColor: '#ccc',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
-    elevation: 10,
-  }, 
-  scrollView: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingVertical: 10,
-  },
-  buttonContainer: { 
-    position:'absolute', 
-    flexDirection: 'row', 
-    top: 160, 
-    paddingHorizontal:10,
-    alignSelf: 'flex-end',
-  },
-  endPadding: {
-    paddingRight: width - CARD_WIDTH,
-  },
-  card: {
-    // padding: 10,
-    elevation: 5,
-    backgroundColor: "#FFF",
-    borderTopLeftRadius: 5,
-    borderTopRightRadius: 5,
-    marginHorizontal: 10,
-    shadowColor: "#000",
-    shadowRadius: 5,
-    shadowOpacity: 0.3,
-    shadowOffset: { x: 2, y: -2 },
-    height: CARD_HEIGHT,
-    width: CARD_WIDTH,
-    overflow: "hidden",
-  },
-  cardImage: {
-    flex: 3,
-    width: "100%",
-    height: "100%",
-    alignSelf: "center",
-  },
-  textContent: {
-    flex: 2,
-    padding: 10,
-  },
-  cardtitle: {
-    fontSize: 12,
-    // marginTop: 5,
-    fontWeight: "bold",
-  },
-  cardDescription: {
-    fontSize: 12,
-    color: "#444",
-  },
-  markerWrap: {
-    alignItems: "center",
-    justifyContent: "center",
-    width:50,
-    height:50,
-  },
-  marker: {
-    width: 30,
-    height: 30,
-  },
-});
-export default MapScreen; 
+export default MapScreen;
