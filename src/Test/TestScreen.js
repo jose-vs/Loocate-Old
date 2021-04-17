@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react'; 
 import { View, StyleSheet, Text, Button, FlatList } from 'react-native'
 
+import {MAP_API_KEY} from '@env';
 import newsapi from './News';
 import NewsCard from './NewsCard';
 
@@ -17,7 +18,7 @@ const TestScreen = () => {
     //     console.log(response.data)
     // }
     function getNewsFromAPI() { 
-        newsapi.get('&location=-36.853,174.766&radius=500&keyword=toilet&key=AIzaSyBaGbNQSkeUMbZRpoMNSf_DZC0any3wvRs')
+        newsapi.get(`&location=-36.853,174.766&radius=500&keyword=toilet&key=${MAP_API_KEY}`)
         .then(function(response){ 
             setNews(response.data)
             console.log(news);
