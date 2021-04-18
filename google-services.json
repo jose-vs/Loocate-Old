@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "83797559348",
+    "project_id": "loocate-ba926",
+    "storage_bucket": "loocate-ba926.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:83797559348:android:33341da627f0f24977e261",
+        "android_client_info": {
+          "package_name": "com.loocate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "83797559348-404nj9pbg8td1dijsg1bbqefuvs5rhto.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUTkws9SUpPMfz_Vw9kuTLwRh9A3JR4d8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "83797559348-404nj9pbg8td1dijsg1bbqefuvs5rhto.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
