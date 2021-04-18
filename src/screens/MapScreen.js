@@ -11,11 +11,7 @@ import {
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import * as Animatable from "react-native-animatable";
-import {
-  FontAwesome,
-  Ionicons,
-  MaterialIcons,
-} from "@expo/vector-icons";
+import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { MAP_API_KEY } from "@env";
 import toiletApi from "../../api/googlePlaces";
 import StarRating from "./components/StarRating";
@@ -30,7 +26,6 @@ import {
 
 const MapScreen = () => {
   const [state, setState] = useState(initialMapState);
-  const [toilets, setToilets] = useState([]);
 
   useEffect(() => {
     toiletApi
@@ -43,10 +38,7 @@ const MapScreen = () => {
         &key=${MAP_API_KEY}`
       )
       .then((response) => {
-        setToilets(response.data); 
-        // console.log(toilets.results[0]);  
-
-        toilets.results.map((toiletData) => {
+        response.data.results.map((toiletData) => {
           const newToilet = {
             coordinate: {
               latitude: toiletData.geometry.location.lat,
@@ -59,17 +51,14 @@ const MapScreen = () => {
             reviews: toiletData.user_ratings_total,
           };
 
-          console.log(newToilet)
+          console.log(newToilet);
           state.markers.push(newToilet);
-        })
+        });
       })
-        
       .catch(function (error) {
         console.log(error);
       });
   }, []);
-
-  
 
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);

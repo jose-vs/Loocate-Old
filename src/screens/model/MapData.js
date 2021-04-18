@@ -11,7 +11,10 @@ const Images = [
 ];
 
 
-const markers = [];
+const markers = [
+
+
+];
 
 const initialMapState = {
   markers,
@@ -39,7 +42,7 @@ const initialMapState = {
     longitudeDelta: 0.0421,
   },
 
-  radius: 500,
+  radius: 1000,
 
   showTopComponents: true,
   showPublicToilets: true,
