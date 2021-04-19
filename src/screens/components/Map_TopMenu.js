@@ -18,7 +18,7 @@ import { styles } from "../model/Styles";
 
 const Map_TopMenu = ({state}) => {
   return (
-    <View>
+    <View style = {{flex: 1}}>
       <View style={styles.searchBox}>
         <TextInput
           placeholder="Search here"

@@ -27,6 +27,7 @@ import {
 const MapScreen = () => {
   const [state, setState] = useState(initialMapState);
 
+  //fetch the api 
   useEffect(() => {
     toiletApi
       .get(
@@ -38,6 +39,7 @@ const MapScreen = () => {
         &key=${MAP_API_KEY}`
       )
       .then((response) => {
+        console.log(response.data)
         response.data.results.map((toiletData) => {
           const newToilet = {
             coordinate: {
@@ -60,12 +62,14 @@ const MapScreen = () => {
       });
   }, []);
 
-  let mapIndex = 0;
-  let mapAnimation = new Animated.Value(0);
+  let mapIndex = 0; // which map is currently selected in the list
+  let mapAnimation = new Animated.Value(0); 
   let scrollViewHeight = new Animated.Value(0);
 
+  // deals with the animation for the markers 
+  // render each time the dom changes
   useEffect(() => {
-    mapAnimation.addListener(({ value }) => {
+    mapAnimation.addListener(({ value }) => { // value represents the index of the current item
       let index = Math.floor(value / CARD_WIDTH + 0.3); // animate 30% away from landing on the next item
       if (index >= state.markers.length) {
         index = state.markers.length - 1;
@@ -76,10 +80,14 @@ const MapScreen = () => {
 
       clearTimeout(regionTimeout);
 
+      //animate our map to the index position
       const regionTimeout = setTimeout(() => {
+        // animate if it index matches the mapindex
         if (mapIndex !== index) {
           mapIndex = index;
+          //get coordinates from markers from index then animate to that region
           const { coordinate } = state.markers[index];
+
           _map.current.animateToRegion(
             {
               ...coordinate,
@@ -103,6 +111,7 @@ const MapScreen = () => {
     }).start();
   }, [state.showPublicToilets]);
 
+  //animations to each respective map marker 
   const interpolations = state.markers.map((marker, index) => {
     const inputRange = [
       (index - 1) * CARD_WIDTH,
@@ -110,26 +119,30 @@ const MapScreen = () => {
       (index + 1) * CARD_WIDTH,
     ];
 
+    //change the scale of each selected marker
     const scale = mapAnimation.interpolate({
       inputRange,
-      outputRange: [1, 1.5, 1],
+      outputRange: [1, 1.5, 1], //start with a scale of 1 then 1.5 and return to 1
       extrapolate: "clamp",
     });
 
     return { scale };
   });
 
-  const onMarkerPress = (mapEventData) => {
-    const markerID = mapEventData._targetInst.return.key;
+  const onMarkerPress = (mapEventData) => { // get the event data on press
+    const markerID = mapEventData._targetInst.return.key; // get the markerID of the event data
 
-    let x = markerID * CARD_WIDTH + markerID * 20;
+    //position our card elements
+    let x = markerID * CARD_WIDTH + markerID * 20; // fetch the x value of the card element
     if (Platform.OS === "ios") {
-      x = x - SPACING_FOR_CARD_INSET;
+      x = x - SPACING_FOR_CARD_INSET; //update x with the card inset value for ios devices
     }
 
     _scrollView.current.scrollTo({ x: x, y: 0, animated: true });
   };
 
+  //decides which components on the screen to show based on 
+  //the current state when the user clicks anywhere on the map screen
   const hideComponents = () => {
     if (state.showPublicToilets) {
       setState({ ...state, showPublicToilets: false });
@@ -219,7 +232,11 @@ const MapScreen = () => {
           />
         </TouchableOpacity>
 
-        {state.filter.map((category, index) => (
+        {/* 
+          look through every item in the filter and display them 
+          as chip items
+        */}
+        {state.filter.map((category, index) => ( 
           <TouchableOpacity key={index} style={styles.chipsItem}>
             <Text>{category.type}</Text>
           </TouchableOpacity>
@@ -259,19 +276,24 @@ const MapScreen = () => {
           paddingHorizontal:
             Platform.OS === "android" ? SPACING_FOR_CARD_INSET : 0,
         }}
+        
+        // handles animation when scrolling through the list
         onScroll={Animated.event(
           [
             {
               nativeEvent: {
                 contentOffset: {
-                  x: mapAnimation,
+                  x: mapAnimation, 
                 },
               },
             },
           ],
-          { useNativeDriver: true }
+          { useNativeDriver: true } // using native animation
         )}
       >
+        {/* 
+          map through each toilet element and display it 
+        */}
         {state.markers.map((marker, index) => (
           <Animatable.View
             animation="slideInUp"

@@ -11,10 +11,7 @@ const Images = [
 ];
 
 
-const markers = [
-
-
-];
+const markers = [];
 
 const initialMapState = {
   markers,
