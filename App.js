@@ -2,8 +2,9 @@
 //import MapScreen from './src/screens/MapScreen';
 //import { createAppContainer } from 'react-navigation';
 import React, { useEffect, useState } from 'react'
+import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native'
-import { createStackNavigator } from 'react-navigation-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './src/screens/LoginScreen/LoginScreen';
 import HomeScreen from './src/screens/HomeScreen/HomeScreen';
 import RegistrationScreen from './src/screens/RegistrationScreen/RegistrationScreen';
