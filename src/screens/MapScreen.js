@@ -1,246 +1,325 @@
-import React, { useState, useEffect } from 'react'; 
-import { Text, View, Dimensions, StyleSheet} from 'react-native'; 
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { FontAwesome, MaterialIcons, Entypo } from '@expo/vector-icons';
-import MapView, { Marker } from 'react-native-maps';
-import BottomSheet from 'reanimated-bottom-sheet';
-import Animated from 'react-native-reanimated';
-import * as Location from 'expo-location';
+import React, { useEffect, useState } from "react";
+import {
+  Animated,
+  Text,
+  TextInput,
+  View,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
+import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
+import * as Animatable from "react-native-animatable";
+import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { MAP_API_KEY } from "@env";
+import toiletApi from "../../api/googlePlaces";
+import StarRating from "./components/StarRating";
+import { initialMapState } from "./model/MapData";
+import { styles } from "./model/Styles";
+import {
+  SPACING_FOR_CARD_INSET,
+  CARD_HEIGHT,
+  CARD_WIDTH,
+} from "./model/Constants";
+//import Map_TopMenu from "./components/Map_TopMenu";
 
+const MapScreen = () => {
+  const [state, setState] = useState(initialMapState);
 
-const MapScreen = () => { 
+  //fetch the api 
+  useEffect(() => {
+    toiletApi
+      .get(
+        `&location=
+          ${state.region.latitude}, ${state.region.longitude}
+        &radius=
+          ${state.radius}
+        &keyword=toilet
+        &key=${MAP_API_KEY}`
+      )
+      .then((response) => {
+        console.log(response.data)
+        response.data.results.map((toiletData) => {
+          const newToilet = {
+            coordinate: {
+              latitude: toiletData.geometry.location.lat,
+              longitude: toiletData.geometry.location.lng,
+            },
+            title: toiletData.name,
+            address: toiletData.vicinity,
+            image: require("../../assets/ToiletPhotos/toilet1.jpg"),
+            rating: toiletData.rating,
+            reviews: toiletData.user_ratings_total,
+          };
 
-    bs = React.createRef();
-    fall = new Animated.Value(1);
-    const buttonPressed = () => bs.current.snapTo(1);
-    
-    /*let state = { 
-      hasLocationPermission: false,
-      latitude: 0,
-      longitude: 0,
-      toiletList: []
-    } */
+          console.log(newToilet);
+          state.markers.push(newToilet);
+        });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }, []);
 
-    const [location, setLocation] = useState(null);
-    const [errorMsg, setErrorMsg] = useState(null);
-    const [gpsLatitude, setgpsLatitude] = useState(null);
-    const [gpsLongitude, setgpsLongitude] = useState(null);
-    const [toilets, setToilets] = useState([]);
+  let mapIndex = 0; // which map is currently selected in the list
+  let mapAnimation = new Animated.Value(0); 
+  let scrollViewHeight = new Animated.Value(0);
 
-    useEffect(() => {
-      (async () => {
-        let { status } = await Location.requestPermissionsAsync();
-        if (status !== 'granted') {
-          setErrorMsg('Permission to access location was denied');
-          return;
+  // deals with the animation for the markers 
+  // render each time the dom changes
+  useEffect(() => {
+    mapAnimation.addListener(({ value }) => { // value represents the index of the current item
+      let index = Math.floor(value / CARD_WIDTH + 0.3); // animate 30% away from landing on the next item
+      if (index >= state.markers.length) {
+        index = state.markers.length - 1;
+      }
+      if (index <= 0) {
+        index = 0;
+      }
+
+      clearTimeout(regionTimeout);
+
+      //animate our map to the index position
+      const regionTimeout = setTimeout(() => {
+        // animate if it index matches the mapindex
+        if (mapIndex !== index) {
+          mapIndex = index;
+          //get coordinates from markers from index then animate to that region
+          const { coordinate } = state.markers[index];
+
+          _map.current.animateToRegion(
+            {
+              ...coordinate,
+              latitudeDelta: state.region.latitudeDelta,
+              longitudeDelta: state.region.longitudeDelta,
+            },
+            350
+          );
         }
-  
-        let location = await Location.getCurrentPositionAsync({});
-
-        setgpsLatitude(location.coords.latitude);
-        setgpsLongitude(location.coords.longitude);
-        setLocation(location);
-      })();
-    }, []);
-
-    let text = 'Waiting..';
-    if (errorMsg) {
-      text = errorMsg;
-    } else if (location) {
-      text = JSON.stringify(location);
-    }
-    
-    async function toiletSearch() {
-    const url  = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
-    const gpsLocation = `&location=${gpsLatitude},${gpsLongitude}`;
-    const radius = '&radius=5000';
-    const type = '&keyword=toilet';
-    const apikey = '&key=AIzaSyDqitoLWqXRaWLPBRs2KBhgxH3XMytlIGA';
-    const toiletSearchUrl = url + gpsLocation + radius + type + apikey;
-   
-    fetch(toiletSearchUrl).then(response => response.json()).then(result => setToilets(result).catch( e => console.log(e))    )
-   
-    //console.log(gpsLocation)
-   // console.log(toiletSearchUrl)
-    useEffect(() => {
-      toiletSearch();
+      }, 10);
     });
-    } 
+  });
 
-    function createMapMarkers() {
-      
+  useEffect(() => {
+    var toValue = state.showPublicToilets ? 0 : CARD_HEIGHT + 10;
+
+    Animated.timing(scrollViewHeight, {
+      toValue: toValue,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, [state.showPublicToilets]);
+
+  //animations to each respective map marker 
+  const interpolations = state.markers.map((marker, index) => {
+    const inputRange = [
+      (index - 1) * CARD_WIDTH,
+      index * CARD_WIDTH,
+      (index + 1) * CARD_WIDTH,
+    ];
+
+    //change the scale of each selected marker
+    const scale = mapAnimation.interpolate({
+      inputRange,
+      outputRange: [1, 1.5, 1], //start with a scale of 1 then 1.5 and return to 1
+      extrapolate: "clamp",
+    });
+
+    return { scale };
+  });
+
+  const onMarkerPress = (mapEventData) => { // get the event data on press
+    const markerID = mapEventData._targetInst.return.key; // get the markerID of the event data
+
+    //position our card elements
+    let x = markerID * CARD_WIDTH + markerID * 20; // fetch the x value of the card element
+    if (Platform.OS === "ios") {
+      x = x - SPACING_FOR_CARD_INSET; //update x with the card inset value for ios devices
     }
-  
-    renderContentInfo = () => (
-        <View style = { style.panel }>
-            <View style={{alignItems: 'center'}}>
-                <Text style={style.panelTitle}>JESUS</Text>
-                <Text style={style.panelSubtitle}>this was annoying to code</Text>
-            </View>
-        </View>
-      );
-    
-      renderHeaderInfo = () => (
-        <View style={style.header}>
-          <View style={style.panelHeader}>
-            <View style={style.panelHandle} />
-          </View>
-        </View>
-      );
 
-    return (
+    _scrollView.current.scrollTo({ x: x, y: 0, animated: true });
+  };
 
-        <View style={style.container}>
+  //decides which components on the screen to show based on 
+  //the current state when the user clicks anywhere on the map screen
+  const hideComponents = () => {
+    if (state.showPublicToilets) {
+      setState({ ...state, showPublicToilets: false });
+    } else if (!state.showPublicToilets) {
+      setState({ ...state, showPublicToilets: true });
+    }
+  };
 
-            <BottomSheet
-                ref={bs}
-                snapPoints={[500, 200,0]}
-                renderContent={renderContentInfo}
-                renderHeader={renderHeaderInfo}
-                initialSnap={1}
-                callbackNode={fall}
-                enabledGestureInteraction={true}
+  const _map = React.useRef(null);
+  const _scrollView = React.useRef(null);
+
+  return (
+    <View style={styles.container}>
+      <MapView
+        ref={_map}
+        initialRegion={state.region}
+        style={styles.container}
+        provider={PROVIDER_GOOGLE}
+        onPress={() => {
+          hideComponents();
+        }}
+      >
+        {state.markers.map((marker, index) => {
+          const scaleStyle = {
+            transform: [
+              {
+                scale: state.showPublicToilets
+                  ? interpolations[index].scale
+                  : 1,
+              },
+            ],
+          };
+          return (
+            <MapView.Marker
+              key={index}
+              coordinate={marker.coordinate}
+              onPress={(e) => onMarkerPress(e)}
+            >
+              <Animated.View style={[styles.markerWrap]}>
+                <Animated.Image
+                  source={require("../../assets/pin.png")}
+                  style={[styles.marker, scaleStyle]}
+                  resizeMode="cover"
+                />
+              </Animated.View>
+            </MapView.Marker>
+          );
+        })}
+      </MapView>
+      <View style={styles.searchBox}>
+        <TextInput
+          placeholder="Search here"
+          placeholderTextColor="#777"
+          autoCapitalize="none"
+          style={styles.searchBoxText}
+        />
+        <FontAwesome
+          name="search"
+          size={24}
+          color="black"
+          style={{ right: 8, opacity: 0.6 }}
+        />
+      </View>
+      <ScrollView
+        horizontal
+        scrollEventThrottle={1}
+        showsHorizontalScrollIndicator={false}
+        height={50}
+        style={styles.chipsScrollView}
+        contentInset={{
+          // iOS only
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 20,
+        }}
+        contentContainerStyle={{
+          paddingRight: Platform.OS === "android" ? 20 : 0,
+        }}
+      >
+        <TouchableOpacity style={styles.circleButton}>
+          <Ionicons
+            name="filter"
+            size={26}
+            color="black"
+            style={{ top: 7, left: 7, opacity: 0.6 }}
+          />
+        </TouchableOpacity>
+
+        {/* 
+          look through every item in the filter and display them 
+          as chip items
+        */}
+        {state.filter.map((category, index) => ( 
+          <TouchableOpacity key={index} style={styles.chipsItem}>
+            <Text>{category.type}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      <View style={styles.buttonContainer}>
+        {/* Map Style Button */}
+        <TouchableOpacity onPress={() => {}}>
+          <View style={styles.circleButton}>
+            <MaterialIcons
+              name="layers"
+              size={26}
+              color="black"
+              style={{ top: 6, left: 6, opacity: 0.6 }}
             />
-            
-            <MapView 
-                style={style.map} 
-                initialRegion={{
-                    // Auckland City
-                    latitude: -36.853121304049786,
-                    longitude: 174.76650674225814,
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
+          </View>
+        </TouchableOpacity>
+      </View>
 
-            }}/>  
-
-
-            <View style={style.topContainer}>
-
-                {/* Hamburger Menu */}
-                <View style={style.hamburgerMenuStyle}>  
-                    <TouchableOpacity onPress = {toiletSearch}>
-                        <Entypo name="menu" size={34} color="black" style = {{opacity: 0.6}}/>
-                    </TouchableOpacity>
-                </View>
-
-                <View style={style.buttonContainer}>
-
-                    {/* Location Search Button */}
-                    <TouchableOpacity onPress = {buttonPressed}>
-                        <View style={style.circleButton}>
-                            <FontAwesome name="search" size={24} color="black" style={{top: 6, left: 8, opacity: 0.6}}/>
-                        </View>
-                    </TouchableOpacity>
-
-                    {/* Map Style Button */}
-                    <TouchableOpacity onPress = {buttonPressed}>
-                        <View style={style.circleButton}>
-                            <MaterialIcons name="layers" size={26} color="black" style={{top: 6, left: 6, opacity: 0.6}}/>
-                        </View>
-                    </TouchableOpacity>
-
-                </View>
-
+      <Animated.ScrollView
+        ref={_scrollView}
+        horizontal
+        pagingEnabled
+        scrollEventThrottle={1}
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={CARD_WIDTH + 20}
+        snapToAlignment="center"
+        style={[styles.scrollView, { translateY: scrollViewHeight }]}
+        contentInset={{
+          top: 0,
+          left: SPACING_FOR_CARD_INSET,
+          bottom: 0,
+          right: SPACING_FOR_CARD_INSET,
+        }}
+        contentContainerStyle={{
+          paddingHorizontal:
+            Platform.OS === "android" ? SPACING_FOR_CARD_INSET : 0,
+        }}
+        
+        // handles animation when scrolling through the list
+        onScroll={Animated.event(
+          [
+            {
+              nativeEvent: {
+                contentOffset: {
+                  x: mapAnimation, 
+                },
+              },
+            },
+          ],
+          { useNativeDriver: true } // using native animation
+        )}
+      >
+        {/* 
+          map through each toilet element and display it 
+        */}
+        {state.markers.map((marker, index) => (
+          <Animatable.View
+            animation="slideInUp"
+            iterationCount={1}
+            style={styles.card}
+            key={index}
+          >
+            <Image
+              source={marker.image}
+              style={styles.cardImage}
+              resizeMode="cover"
+            />
+            <View style={styles.textContent}>
+              <Text numberOfLines={1} style={styles.cardtitle}>
+                {marker.title}
+              </Text>
+              <StarRating ratings={marker.rating} reviews={marker.reviews} />
+              <Text numberOfLines={1} style={styles.cardDescription}>
+                {marker.address}
+              </Text>
             </View>
-
-            
-        </View>
-    );
+          </Animatable.View>
+        ))}
+      </Animated.ScrollView>
+    </View>
+  );
 };
 
-const style = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
-    map: {
-        position: 'absolute',
-        width: Dimensions.get('window').width,
-        height: Dimensions.get('window').height,
-    },
-    topContainer: { 
-        marginTop: 55,
-        flexDirection: 'row', 
-        justifyContent: 'space-between',
-    },
-    footerContainer: { 
-        backgroundColor: 'red',
-        position: 'absolute', 
-        bottom: 0,
-        alignItems: 'stretch'
-    },
-    buttonContainer: { 
-        flexDirection: 'row', 
-    },
-    hamburgerMenuStyle: { 
-        left: 10,
-    },
-    circleButton: { 
-        marginRight: 10,
-        marginLeft: 10,
-        width: 38,
-        height: 38,
-        borderRadius: 100 / 2,
-        backgroundColor: "#FFFFFA",
-    },
-
-    
-      panel: {
-        padding: 20,
-        backgroundColor: '#FFFFFF',
-        paddingTop: 20,
-        paddingBottom: 200
-        // borderTopLeftRadius: 20,
-        // borderTopRightRadius: 20,
-        // shadowColor: '#000000',
-        // shadowOffset: {width: 0, height: 0},
-        // shadowRadius: 5,
-        // shadowOpacity: 0.4,
-      },
-      header: {
-        backgroundColor: '#FFFFFF',
-        shadowColor: '#333333',
-        shadowOffset: {width: -1, height: -3},
-        shadowRadius: 2,
-        shadowOpacity: 0.4,
-        // elevation: 5,
-        paddingTop: 20,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-      },
-      panelHeader: {
-        alignItems: 'center',
-      },
-      panelHandle: {
-        width: 40,
-        height: 8,
-        borderRadius: 4,
-        backgroundColor: '#00000040',
-        marginBottom: 10,
-      },
-      panelTitle: {
-        fontSize: 27,
-        height: 35,
-      },
-      panelSubtitle: {
-        fontSize: 14,
-        color: 'gray',
-        height: 30,
-        marginBottom: 10,
-      },
-      panelButton: {
-        padding: 13,
-        borderRadius: 10,
-        backgroundColor: '#FF6347',
-        alignItems: 'center',
-        marginVertical: 7,
-      },
-      panelButtonTitle: {
-        fontSize: 17,
-        fontWeight: 'bold',
-        color: 'white',
-      },
-     
-});
-
-export default MapScreen; 
+export default MapScreen;
