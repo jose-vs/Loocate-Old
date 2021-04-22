@@ -24,7 +24,7 @@ import {
 } from "./model/Constants";
 //import Map_TopMenu from "./components/Map_TopMenu";
 
-const MapScreen = () => {
+const MapScreen = (props) => {
   const [state, setState] = useState(initialMapState);
 
   //fetch the api 
@@ -112,6 +112,7 @@ const MapScreen = () => {
   }, [state.showPublicToilets]);
 
   //animations to each respective map marker 
+
   const interpolations = state.markers.map((marker, index) => {
     const inputRange = [
       (index - 1) * CARD_WIDTH,
@@ -130,15 +131,19 @@ const MapScreen = () => {
   });
 
   const onMarkerPress = (mapEventData) => { // get the event data on press
+  
     const markerID = mapEventData._targetInst.return.key; // get the markerID of the event data
-
+    console.log(markerID);
+    let toiletinfo = state.markers[markerID];
+    console.log(toiletinfo);
+    props.navigation.navigate('Toilet', toiletinfo);
     //position our card elements
-    let x = markerID * CARD_WIDTH + markerID * 20; // fetch the x value of the card element
+    /*let x = markerID * CARD_WIDTH + markerID * 20; // fetch the x value of the card element
     if (Platform.OS === "ios") {
       x = x - SPACING_FOR_CARD_INSET; //update x with the card inset value for ios devices
     }
 
-    _scrollView.current.scrollTo({ x: x, y: 0, animated: true });
+    _scrollView.current.scrollTo({ x: x, y: 0, animated: true });*/
   };
 
   //decides which components on the screen to show based on 
@@ -179,7 +184,7 @@ const MapScreen = () => {
             <MapView.Marker
               key={index}
               coordinate={marker.coordinate}
-              onPress={(e) => onMarkerPress(e)}
+              onPress={(e) => {onMarkerPress(e);}}
             >
               <Animated.View style={[styles.markerWrap]}>
                 <Animated.Image
