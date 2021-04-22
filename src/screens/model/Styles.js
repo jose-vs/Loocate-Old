@@ -80,9 +80,32 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10,
     alignSelf: "flex-end",
   },
+  button: {
+    padding: 20,
+  },
+  bottomContainer: {
+    flex: 1,
+  },
+  toiletTitle: {
+    fontSize: 27,
+    height: 35,
+  },
+  toiletSubtitle: {
+    fontSize: 14,
+    color: 'gray',
+    height: 30,
+    marginBottom: 10,
+  },
+  bottomPanel: {
+    padding: 20,
+    backgroundColor: '#FFFFFF',
+    paddingTop: 20,
+    height: "100%",
+  },
   endPadding: {
     paddingRight: width - CARD_WIDTH,
   },
+  
   card: {
     // padding: 10,
     elevation: 5,
@@ -103,6 +126,16 @@ export const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     alignSelf: "center",
+  },
+  panelHeader: {
+    alignItems: 'center',
+  },
+  panelHandle: {
+    width: 40,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#00000040',
+    marginBottom: 10,
   },
   textContent: {
     flex: 2,

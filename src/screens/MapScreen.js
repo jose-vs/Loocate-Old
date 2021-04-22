@@ -22,6 +22,7 @@ import {
   CARD_HEIGHT,
   CARD_WIDTH,
 } from "./model/Constants";
+
 //import Map_TopMenu from "./components/Map_TopMenu";
 
 const MapScreen = (props) => {
@@ -39,7 +40,7 @@ const MapScreen = (props) => {
         &key=${MAP_API_KEY}`
       )
       .then((response) => {
-        console.log(response.data)
+       // console.log(response.data)
         response.data.results.map((toiletData) => {
           const newToilet = {
             coordinate: {
@@ -53,7 +54,7 @@ const MapScreen = (props) => {
             reviews: toiletData.user_ratings_total,
           };
 
-          console.log(newToilet);
+          //console.log(newToilet);
           state.markers.push(newToilet);
         });
       })
@@ -133,9 +134,9 @@ const MapScreen = (props) => {
   const onMarkerPress = (mapEventData) => { // get the event data on press
   
     const markerID = mapEventData._targetInst.return.key; // get the markerID of the event data
-    console.log(markerID);
+    //console.log(markerID);
     let toiletinfo = state.markers[markerID];
-    console.log(toiletinfo);
+   // console.log(toiletinfo);
     props.navigation.navigate('Toilet', toiletinfo);
     //position our card elements
     /*let x = markerID * CARD_WIDTH + markerID * 20; // fetch the x value of the card element
@@ -156,6 +157,7 @@ const MapScreen = (props) => {
     }
   };
 
+  
   const _map = React.useRef(null);
   const _scrollView = React.useRef(null);
 
@@ -211,7 +213,7 @@ const MapScreen = (props) => {
           style={{ right: 8, opacity: 0.6 }}
         />
       </View>
-      <ScrollView
+      <ScrollView 
         horizontal
         scrollEventThrottle={1}
         showsHorizontalScrollIndicator={false}
@@ -227,7 +229,7 @@ const MapScreen = (props) => {
         contentContainerStyle={{
           paddingRight: Platform.OS === "android" ? 20 : 0,
         }}
-      >
+>
         <TouchableOpacity style={styles.circleButton}>
           <Ionicons
             name="filter"
@@ -235,7 +237,7 @@ const MapScreen = (props) => {
             color="black"
             style={{ top: 7, left: 7, opacity: 0.6 }}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> 
 
         {/* 
           look through every item in the filter and display them 
@@ -247,7 +249,6 @@ const MapScreen = (props) => {
           </TouchableOpacity>
         ))}
       </ScrollView>
-
       <View style={styles.buttonContainer}>
         {/* Map Style Button */}
         <TouchableOpacity onPress={() => {}}>
