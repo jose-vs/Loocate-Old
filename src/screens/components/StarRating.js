@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
 		color: '#FFD704'
 	},
 	text: {
-		fontSize: 12,
+		fontSize: 0,
         marginLeft: 5,
         color: '#444',
 	}

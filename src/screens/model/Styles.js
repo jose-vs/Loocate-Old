@@ -87,19 +87,30 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   toiletTitle: {
-    fontSize: 27,
+    paddingLeft: 30,
+    fontSize: 30,
     height: 35,
   },
   toiletSubtitle: {
+    paddingLeft: 31,
     fontSize: 14,
     color: 'gray',
-    height: 30,
-    marginBottom: 10,
+    height: 20,
+  },
+  hairline: {
+    backgroundColor: '#A2A2A2',
+    height: 2,
+    width: 500
+  },
+  textSubheading: {
+    paddingTop: 15,
+    flexDirection: 'row',
+    paddingLeft: 30,
+    fontSize: 22
   },
   bottomPanel: {
-    padding: 20,
     backgroundColor: '#FFFFFF',
-    paddingTop: 20,
+    paddingTop: 5,
     height: "100%",
   },
   endPadding: {

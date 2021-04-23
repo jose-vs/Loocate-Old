@@ -16,10 +16,12 @@ const ToiletScreen = (props) => {
     
     renderInner = () => (
         <View style = {styles.bottomPanel}>
-            <Text style = {styles.toiletTitle}>Title: {props.navigation.getParam('title')}</Text>
-            <Text style = {styles.toiletSubtitle}>Address: {props.navigation.getParam('address')}</Text>
-            <StarRating ratings={props.navigation.getParam('rating')}/>
-            <Text style = {styles.toiletSubtitle}>Reviews: {props.navigation.getParam('reviews')}</Text>
+            <Text style = {styles.toiletTitle}>{props.navigation.getParam('title')}</Text> 
+            <Text style = {styles.toiletSubtitle}>{props.navigation.getParam('address')}</Text>
+            <View style={styles.hairline}/>
+            <Text style = {styles.textSubheading}>Get Directions</Text>
+            <Text style = {styles.textSubheading}>Rating: <StarRating ratings={props.navigation.getParam('rating')}/></Text>
+            <Text style = {styles.textSubheading}>Reviews: {props.navigation.getParam('reviews')}</Text>
         </View>
     );
 
