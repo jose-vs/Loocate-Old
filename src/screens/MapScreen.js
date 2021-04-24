@@ -21,8 +21,8 @@ import {
   MaterialIcons 
 } from '@expo/vector-icons';
 
-import { markers } from './model/MapData';
-import StarRating from './components/StarRating';
+import { markers } from '../model/MapData';
+import StarRating from '../components/StarRating';
 
 
 const { width, height } = Dimensions.get("window");

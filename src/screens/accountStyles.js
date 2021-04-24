@@ -6,13 +6,13 @@ export default StyleSheet.create({
         alignItems: 'center'
     },
     input: {
-        height: 48,
+        height: 25,
         borderRadius: 5,
         overflow: 'hidden',
         backgroundColor: 'white',
         marginTop: 10,
         marginBottom: 10,
-        marginLeft: 30,
+        marginLeft: 15,
         marginRight: 30,
         paddingLeft: 16
     }
