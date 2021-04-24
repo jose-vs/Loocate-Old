@@ -12,7 +12,6 @@ import {
   Platform,
 } from "react-native";
 import MapView, {PROVIDER_GOOGLE} from "react-native-maps";
-
 import * as Animatable from 'react-native-animatable';
 
 import { 
@@ -31,10 +30,10 @@ const CARD_HEIGHT = 220;
 const CARD_WIDTH = width * 0.8;
 const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
 
-export default function MapScreen(navigation) {
+export default function MapScreen({navigation}) {
 
   const goToHomePress = () => {
-    navigation.navigate("Home");
+    navigation.navigate('Home');
 }
 
   const initialMapState = {
