@@ -31,8 +31,11 @@ const CARD_HEIGHT = 220;
 const CARD_WIDTH = width * 0.8;
 const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
 
+export default function MapScreen(navigation) {
 
-const MapScreen = () => { 
+  const goToHomePress = () => {
+    navigation.navigate("Home");
+}
 
   const initialMapState = {
     markers,
@@ -212,8 +215,8 @@ const MapScreen = () => {
           paddingRight: Platform.OS === 'android' ? 20 : 0
         }}
       >
-        <TouchableOpacity style = {styles.circleButton}>
-
+        <TouchableOpacity style = {styles.circleButton} //go to home screen
+          onPress={() => goToHomePress()}> 
           <Ionicons name="filter" size={26} color="black" style ={{top: 7, left: 7, opacity: 0.6}}/> 
         </TouchableOpacity>
 
@@ -413,4 +416,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MapScreen; 
+//export default MapScreen; 
