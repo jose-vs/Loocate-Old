@@ -32,8 +32,8 @@ const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
 
 export default function MapScreen({navigation}) {
 
-  const goToHomePress = () => {
-    navigation.navigate('Home');
+  const goToLoginPress = () => {
+    navigation.navigate('Login');
 }
 
   const initialMapState = {
@@ -214,8 +214,8 @@ export default function MapScreen({navigation}) {
           paddingRight: Platform.OS === 'android' ? 20 : 0
         }}
       >
-        <TouchableOpacity style = {styles.circleButton} //go to home screen
-          onPress={() => goToHomePress()}> 
+        <TouchableOpacity style = {styles.circleButton} //go to login screen
+          onPress={() => goToLoginPress()}> 
           <Ionicons name="filter" size={26} color="black" style ={{top: 7, left: 7, opacity: 0.6}}/> 
         </TouchableOpacity>
 

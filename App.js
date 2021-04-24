@@ -63,9 +63,9 @@ export default function App() {
           </Stack.Screen>
         ) : (
           <>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Registration" component={RegistrationScreen} />
             <Stack.Screen name="Map" component={MapScreen}/> 
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Registration" component={RegistrationScreen} /> 
             <Stack.Screen name="Home" component={HomeScreen}/> 
           </>
         )}
