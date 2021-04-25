@@ -29,7 +29,6 @@ const initialMapState = {
   radius: 2000,
 
   showTopComponents: true,
-  showPublicToilets: true,
 };
 
 export { initialMapState };

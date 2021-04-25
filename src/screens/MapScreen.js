@@ -5,30 +5,28 @@ import {
   TextInput,
   View,
   ScrollView,
-  Image,
   TouchableOpacity,
   Platform,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import * as Animatable from "react-native-animatable";
-import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { MAP_API_KEY } from "@env";
 import toiletApi from "../../api/googlePlaces";
-import StarRating from "./components/StarRating";
 import { initialMapState } from "./model/MapData";
 import { styles } from "./model/Styles";
 import {
-  SPACING_FOR_CARD_INSET,
-  CARD_HEIGHT,
   CARD_WIDTH,
 } from "./model/Constants";
-//import Map_TopMenu from "./components/Map_TopMenu";
 
 const MapScreen = () => {
   const [state, setState] = useState(initialMapState);
+  const [searchNewArea, setNewArea] = useState(false);
+  const [areaLoad, setAreaLoad] = useState(true); 
 
   //fetch the api 
   useEffect(() => {
+    setAreaLoad(current => false);
     toiletApi
       .get(
         `&location=
@@ -60,7 +58,25 @@ const MapScreen = () => {
       .catch(function (error) {
         console.log(error);
       });
-  }, [state.markers]);
+  }, [areaLoad]);
+
+  let searchHereAnimation = new Animated.Value(0);
+
+  useEffect(() => { 
+    setNewArea(current => true);
+  }, [state.region])
+
+  useEffect(() => { 
+    console.log(searchNewArea)
+  }, [searchNewArea])
+
+  const onAreaSearchPress = () => { 
+    setState({...state, markers: []});
+    setNewArea(current => false);
+    setAreaLoad(current => true);
+    console.log("Change please")
+    console.log(state.markers)
+  }
 
   let mapAnimation = new Animated.Value(0); 
 
@@ -93,66 +109,21 @@ const MapScreen = () => {
             },
             350
           );
-        
       }, 10);
     });
   });
 
-  // useEffect(() => {
-  //   var toValue = state.showPublicToilets ? 0 : CARD_HEIGHT + 10;
-
-  //   Animated.timing(scrollViewHeight, {
-  //     toValue: toValue,
-  //     duration: 500,
-  //     useNativeDriver: true,
-  //   }).start();
-  // }, [state.showPublicToilets]);
-
-  // //animations to each respective map marker 
-  // const interpolations = state.markers.map((marker, index) => {
-  //   const inputRange = [
-  //     (index - 1) * CARD_WIDTH,
-  //     index * CARD_WIDTH,
-  //     (index + 1) * CARD_WIDTH,
-  //   ];
-
-  //   //change the scale of each selected marker
-  //   const scale = mapAnimation.interpolate({
-  //     inputRange,
-  //     outputRange: [1, 1.5, 1], //start with a scale of 1 then 1.5 and return to 1
-  //     extrapolate: "clamp",
-  //   });
-
-  //   return { scale };
-  // });
+ 
 
   const onMarkerPress = (mapEventData) => { // get the event data on press
     const markerID = mapEventData._targetInst.return.key; // get the markerID of the event data
     console.log(state.markers[markerID])
     
-    // //position our card elements
-    // let x = markerID * CARD_WIDTH + markerID * 20; // fetch the x value of the card element
-    // if (Platform.OS === "ios") {
-    //   x = x - SPACING_FOR_CARD_INSET; //update x with the card inset value for ios devices
-    // }
-
-    // _scrollView.current.scrollTo({ x: x, y: 0, animated: true });
+    
   };
 
-  //decides which components on the screen to show based on 
-  //the current state when the user clicks anywhere on the map screen
-  // const hideComponents = () => {
-  //   if (state.showPublicToilets) {
-  //     setState({ ...state, showPublicToilets: false });
-  //   } else if (!state.showPublicToilets) {
-  //     setState({ ...state, showPublicToilets: true });
-  //   }
-
-  //   console.log(state.region);
-  // };
 
   const _map = React.useRef(null);
-  // const _scrollView = React.useRef(null);
 
   return (
     <View style={styles.container}>
@@ -200,43 +171,14 @@ const MapScreen = () => {
           style={{ right: 8, opacity: 0.6 }}
         />
       </View>
-      <ScrollView
-        horizontal
-        scrollEventThrottle={1}
-        showsHorizontalScrollIndicator={false}
-        height={50}
-        style={styles.chipsScrollView}
-        contentInset={{
-          // iOS only
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 20,
-        }}
-        contentContainerStyle={{
-          paddingRight: Platform.OS === "android" ? 20 : 0,
-        }}
-      >
-        <TouchableOpacity style={styles.circleButton}>
-          <Ionicons
-            name="filter"
-            size={26}
-            color="black"
-            style={{ top: 7, left: 7, opacity: 0.6 }}
-          />
+      {/* <Animatable.View
+            animation="slideInUp"
+      > */}
+        <TouchableOpacity style={styles.searchHere} onPress={() => {onAreaSearchPress()}}>
+              <Text style={styles.searchHereText}>Search this area</Text> 
         </TouchableOpacity>
-
-        {/* 
-          look through every item in the filter and display them 
-          as chip items
-        */}
-        {state.filter.map((category, index) => ( 
-          <TouchableOpacity key={index} style={styles.chipsItem}>
-            <Text>{category.type}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
+      {/* </Animatable.View> */}
+    
       <View style={styles.buttonContainer}>
         {/* Map Style Button */}
         <TouchableOpacity onPress={() => {}}>
@@ -250,68 +192,6 @@ const MapScreen = () => {
           </View>
         </TouchableOpacity>
       </View>
-
-      {/* <Animated.ScrollView
-        ref={_scrollView}
-        horizontal
-        pagingEnabled
-        scrollEventThrottle={1}
-        showsHorizontalScrollIndicator={false}
-        snapToInterval={CARD_WIDTH + 20}
-        snapToAlignment="center"
-        style={[styles.scrollView, { translateY: scrollViewHeight }]}
-        contentInset={{
-          top: 0,
-          left: SPACING_FOR_CARD_INSET,
-          bottom: 0,
-          right: SPACING_FOR_CARD_INSET,
-        }}
-        contentContainerStyle={{
-          paddingHorizontal:
-            Platform.OS === "android" ? SPACING_FOR_CARD_INSET : 0,
-        }}
-        
-        // handles animation when scrolling through the list
-        onScroll={Animated.event(
-          [
-            {
-              nativeEvent: {
-                contentOffset: {
-                  x: mapAnimation, 
-                },
-              },
-            },
-          ],
-          { useNativeDriver: true } // using native animation
-        )}
-      > */}
-        {/* 
-          map through each toilet element and display it 
-        */}
-        {/* {state.markers.map((marker, index) => (
-          <Animatable.View
-            animation="slideInUp"
-            iterationCount={1}
-            style={styles.card}
-            key={index}
-          >
-            <Image
-              source={marker.image}
-              style={styles.cardImage}
-              resizeMode="cover"
-            />
-            <View style={styles.textContent}>
-              <Text numberOfLines={1} style={styles.cardtitle}>
-                {marker.title}
-              </Text>
-              <StarRating ratings={marker.rating} reviews={marker.reviews} />
-              <Text numberOfLines={1} style={styles.cardDescription}>
-                {marker.address}
-              </Text>
-            </View>
-          </Animatable.View>
-        ))}
-      </Animated.ScrollView> */}
     </View>
   );
 };
