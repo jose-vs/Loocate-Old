@@ -10,23 +10,21 @@ import {
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import * as Animatable from "react-native-animatable";
-import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome, MaterialIcons, Entypo } from "@expo/vector-icons";
 import { MAP_API_KEY } from "@env";
 import toiletApi from "../../api/googlePlaces";
 import { initialMapState } from "./model/MapData";
 import { styles } from "./model/Styles";
-import {
-  CARD_WIDTH,
-} from "./model/Constants";
+import { CARD_WIDTH } from "./model/Constants";
 
 const MapScreen = () => {
   const [state, setState] = useState(initialMapState);
   const [searchNewArea, setNewArea] = useState(false);
-  const [areaLoad, setAreaLoad] = useState(true); 
+  const [areaLoad, setAreaLoad] = useState(true);
 
-  //fetch the api 
+  //fetch the api
   useEffect(() => {
-    setAreaLoad(current => false);
+    setAreaLoad((current) => false);
     toiletApi
       .get(
         `&location=
@@ -60,30 +58,23 @@ const MapScreen = () => {
       });
   }, [areaLoad]);
 
-  let searchHereAnimation = new Animated.Value(0);
+  useEffect(() => {
+    setNewArea((current) => true);
+  }, [state.region]);
 
-  useEffect(() => { 
-    setNewArea(current => true);
-  }, [state.region])
+  const onAreaSearchPress = () => {
+    setState({ ...state, markers: [] });
+    setNewArea((current) => false);
+    setAreaLoad((current) => true);
+  };
 
-  useEffect(() => { 
-    console.log(searchNewArea)
-  }, [searchNewArea])
+  let mapAnimation = new Animated.Value(0);
 
-  const onAreaSearchPress = () => { 
-    setState({...state, markers: []});
-    setNewArea(current => false);
-    setAreaLoad(current => true);
-    console.log("Change please")
-    console.log(state.markers)
-  }
-
-  let mapAnimation = new Animated.Value(0); 
-
-  // deals with the animation for the markers 
+  // deals with the animation for the markers
   // render each time the dom changes
   useEffect(() => {
-    mapAnimation.addListener(({ value }) => { // value represents the index of the current item
+    mapAnimation.addListener(({ value }) => {
+      // value represents the index of the current item
       let index = Math.floor(value / CARD_WIDTH + 0.3); // animate 30% away from landing on the next item
       if (index >= state.markers.length) {
         index = state.markers.length - 1;
@@ -97,31 +88,36 @@ const MapScreen = () => {
       //animate our map to the index position
       const regionTimeout = setTimeout(() => {
         // animate if it index matches the mapindex
-    
-          //get coordinates from markers from index then animate to that region
-          const { coordinate } = state.markers[index];
 
-          _map.current.animateToRegion(
-            {
-              ...coordinate,
-              latitudeDelta: state.region.latitudeDelta,
-              longitudeDelta: state.region.longitudeDelta,
-            },
-            350
-          );
+        //get coordinates from markers from index then animate to that region
+        const { coordinate } = state.markers[index];
+
+        _map.current.animateToRegion(
+          {
+            ...coordinate,
+            latitudeDelta: state.region.latitudeDelta,
+            longitudeDelta: state.region.longitudeDelta,
+          },
+          350
+        );
       }, 10);
     });
   });
 
- 
-
-  const onMarkerPress = (mapEventData) => { // get the event data on press
+  const onMarkerPress = (mapEventData) => {
+    // get the event data on press
     const markerID = mapEventData._targetInst.return.key; // get the markerID of the event data
-    console.log(state.markers[markerID])
-    
-    
+    console.log(state.markers[markerID]);
   };
+  
+  const onMapStyleButtonPress = () => { 
+    if (state.mapType == "standard") { 
+      setState({...state, mapType: "satellite"})
+    } else if (state.mapType == "satellite") {
+      setState({...state, mapType: "standard"})
+    }
 
+  }
 
   const _map = React.useRef(null);
 
@@ -130,15 +126,15 @@ const MapScreen = () => {
       <MapView
         ref={_map}
         initialRegion={state.region}
+        mapType= {state.mapType}
         style={styles.container}
         provider={PROVIDER_GOOGLE}
-        onRegionChangeComplete={region => setState({...state, region: region})}
-        onPress={() => {
-          
-        }}
+        onRegionChangeComplete={(region) =>
+          setState({ ...state, region: region })
+        }
+        onPress={() => {}}
       >
         {state.markers.map((marker, index) => {
-          
           return (
             <MapView.Marker
               key={index}
@@ -171,17 +167,19 @@ const MapScreen = () => {
           style={{ right: 8, opacity: 0.6 }}
         />
       </View>
-      {/* <Animatable.View
-            animation="slideInUp"
-      > */}
-        <TouchableOpacity style={styles.searchHere} onPress={() => {onAreaSearchPress()}}>
-              <Text style={styles.searchHereText}>Search this area</Text> 
+      <Animatable.View style={styles.searchHere} animation="fadeInLeft">
+        <TouchableOpacity
+          onPress={() => {
+            onAreaSearchPress();
+          }}
+        >
+          <Text style={styles.searchHereText}>Search this area</Text>
         </TouchableOpacity>
-      {/* </Animatable.View> */}
-    
+      </Animatable.View>
+
       <View style={styles.buttonContainer}>
         {/* Map Style Button */}
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={() => {onMapStyleButtonPress()}}>
           <View style={styles.circleButton}>
             <MaterialIcons
               name="layers"
@@ -190,6 +188,17 @@ const MapScreen = () => {
               style={{ top: 6, left: 6, opacity: 0.6 }}
             />
           </View>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.footer}>
+        <TouchableOpacity onPress={() => {}}>
+          <Entypo name="map" size={24} color="white" style={styles.footerButton}/>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => {}}>
+          <Entypo name="list" size={24} color="white" style={styles.footerButton}/>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => {}}>
+          <FontAwesome name="user" size={24} color="white" style={styles.footerButton}/>
         </TouchableOpacity>
       </View>
     </View>

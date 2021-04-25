@@ -32,10 +32,11 @@ export const styles = StyleSheet.create({
   },
   searchHere: { 
     position: "absolute",
-    alignSelf: "center",
-    top: 110,
+    bottom:80,
+    right: 10,
     backgroundColor: "#fff",
-    borderRadius: 20,
+    borderRadius: 25,
+    marginLeft: 20,
     padding: 8,
     paddingHorizontal: 15,
     marginHorizontal: 10,
@@ -84,4 +85,15 @@ export const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
+  footer: { 
+    position: "relative",
+    flexDirection: "row",
+    alignSelf: "stretch",
+    backgroundColor: "#007965",
+    padding: 20,
+    justifyContent: "space-between"
+  },
+  footerButton: { 
+    paddingHorizontal: 50
+  }
 });

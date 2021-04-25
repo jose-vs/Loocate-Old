@@ -29,6 +29,7 @@ const initialMapState = {
   radius: 2000,
 
   showTopComponents: true,
+  mapType: "standard"
 };
 
 export { initialMapState };
