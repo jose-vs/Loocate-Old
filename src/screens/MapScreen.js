@@ -12,7 +12,6 @@ import {
   Platform,
 } from "react-native";
 import MapView, {PROVIDER_GOOGLE} from "react-native-maps";
-
 import * as Animatable from 'react-native-animatable';
 
 import { 
@@ -22,8 +21,8 @@ import {
   MaterialIcons 
 } from '@expo/vector-icons';
 
-import { markers } from './model/MapData';
-import StarRating from './components/StarRating';
+import { markers } from '../model/MapData';
+import StarRating from '../components/StarRating';
 
 
 const { width, height } = Dimensions.get("window");
@@ -31,8 +30,11 @@ const CARD_HEIGHT = 220;
 const CARD_WIDTH = width * 0.8;
 const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
 
+export default function MapScreen({navigation}) {
 
-const MapScreen = () => { 
+  const goToLoginPress = () => {
+    navigation.navigate('Login');
+}
 
   const initialMapState = {
     markers,
@@ -212,8 +214,8 @@ const MapScreen = () => {
           paddingRight: Platform.OS === 'android' ? 20 : 0
         }}
       >
-        <TouchableOpacity style = {styles.circleButton}>
-
+        <TouchableOpacity style = {styles.circleButton} //go to login screen
+          onPress={() => goToLoginPress()}> 
           <Ionicons name="filter" size={26} color="black" style ={{top: 7, left: 7, opacity: 0.6}}/> 
         </TouchableOpacity>
 
@@ -413,4 +415,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MapScreen; 
+//export default MapScreen; 
