@@ -39,7 +39,7 @@ const MapScreen = () => {
         &key=${MAP_API_KEY}`
       )
       .then((response) => {
-        console.log(response.data)
+        //console.log(response.data)
         response.data.results.map((toiletData) => {
           const newToilet = {
             coordinate: {
@@ -53,18 +53,16 @@ const MapScreen = () => {
             reviews: toiletData.user_ratings_total,
           };
 
-          console.log(newToilet);
+          //console.log(newToilet);
           state.markers.push(newToilet);
         });
       })
       .catch(function (error) {
         console.log(error);
       });
-  }, []);
+  }, [state.markers]);
 
-  let mapIndex = 0; // which map is currently selected in the list
   let mapAnimation = new Animated.Value(0); 
-  let scrollViewHeight = new Animated.Value(0);
 
   // deals with the animation for the markers 
   // render each time the dom changes
@@ -83,8 +81,7 @@ const MapScreen = () => {
       //animate our map to the index position
       const regionTimeout = setTimeout(() => {
         // animate if it index matches the mapindex
-        if (mapIndex !== index) {
-          mapIndex = index;
+    
           //get coordinates from markers from index then animate to that region
           const { coordinate } = state.markers[index];
 
@@ -96,63 +93,66 @@ const MapScreen = () => {
             },
             350
           );
-        }
+        
       }, 10);
     });
   });
 
-  useEffect(() => {
-    var toValue = state.showPublicToilets ? 0 : CARD_HEIGHT + 10;
+  // useEffect(() => {
+  //   var toValue = state.showPublicToilets ? 0 : CARD_HEIGHT + 10;
 
-    Animated.timing(scrollViewHeight, {
-      toValue: toValue,
-      duration: 500,
-      useNativeDriver: true,
-    }).start();
-  }, [state.showPublicToilets]);
+  //   Animated.timing(scrollViewHeight, {
+  //     toValue: toValue,
+  //     duration: 500,
+  //     useNativeDriver: true,
+  //   }).start();
+  // }, [state.showPublicToilets]);
 
-  //animations to each respective map marker 
-  const interpolations = state.markers.map((marker, index) => {
-    const inputRange = [
-      (index - 1) * CARD_WIDTH,
-      index * CARD_WIDTH,
-      (index + 1) * CARD_WIDTH,
-    ];
+  // //animations to each respective map marker 
+  // const interpolations = state.markers.map((marker, index) => {
+  //   const inputRange = [
+  //     (index - 1) * CARD_WIDTH,
+  //     index * CARD_WIDTH,
+  //     (index + 1) * CARD_WIDTH,
+  //   ];
 
-    //change the scale of each selected marker
-    const scale = mapAnimation.interpolate({
-      inputRange,
-      outputRange: [1, 1.5, 1], //start with a scale of 1 then 1.5 and return to 1
-      extrapolate: "clamp",
-    });
+  //   //change the scale of each selected marker
+  //   const scale = mapAnimation.interpolate({
+  //     inputRange,
+  //     outputRange: [1, 1.5, 1], //start with a scale of 1 then 1.5 and return to 1
+  //     extrapolate: "clamp",
+  //   });
 
-    return { scale };
-  });
+  //   return { scale };
+  // });
 
   const onMarkerPress = (mapEventData) => { // get the event data on press
     const markerID = mapEventData._targetInst.return.key; // get the markerID of the event data
+    console.log(state.markers[markerID])
+    
+    // //position our card elements
+    // let x = markerID * CARD_WIDTH + markerID * 20; // fetch the x value of the card element
+    // if (Platform.OS === "ios") {
+    //   x = x - SPACING_FOR_CARD_INSET; //update x with the card inset value for ios devices
+    // }
 
-    //position our card elements
-    let x = markerID * CARD_WIDTH + markerID * 20; // fetch the x value of the card element
-    if (Platform.OS === "ios") {
-      x = x - SPACING_FOR_CARD_INSET; //update x with the card inset value for ios devices
-    }
-
-    _scrollView.current.scrollTo({ x: x, y: 0, animated: true });
+    // _scrollView.current.scrollTo({ x: x, y: 0, animated: true });
   };
 
   //decides which components on the screen to show based on 
   //the current state when the user clicks anywhere on the map screen
-  const hideComponents = () => {
-    if (state.showPublicToilets) {
-      setState({ ...state, showPublicToilets: false });
-    } else if (!state.showPublicToilets) {
-      setState({ ...state, showPublicToilets: true });
-    }
-  };
+  // const hideComponents = () => {
+  //   if (state.showPublicToilets) {
+  //     setState({ ...state, showPublicToilets: false });
+  //   } else if (!state.showPublicToilets) {
+  //     setState({ ...state, showPublicToilets: true });
+  //   }
+
+  //   console.log(state.region);
+  // };
 
   const _map = React.useRef(null);
-  const _scrollView = React.useRef(null);
+  // const _scrollView = React.useRef(null);
 
   return (
     <View style={styles.container}>
@@ -161,30 +161,24 @@ const MapScreen = () => {
         initialRegion={state.region}
         style={styles.container}
         provider={PROVIDER_GOOGLE}
+        onRegionChangeComplete={region => setState({...state, region: region})}
         onPress={() => {
-          hideComponents();
+          
         }}
       >
         {state.markers.map((marker, index) => {
-          const scaleStyle = {
-            transform: [
-              {
-                scale: state.showPublicToilets
-                  ? interpolations[index].scale
-                  : 1,
-              },
-            ],
-          };
+          
           return (
             <MapView.Marker
               key={index}
+              tracksViewChanges={false}
               coordinate={marker.coordinate}
               onPress={(e) => onMarkerPress(e)}
             >
               <Animated.View style={[styles.markerWrap]}>
                 <Animated.Image
                   source={require("../../assets/pin.png")}
-                  style={[styles.marker, scaleStyle]}
+                  style={styles.marker}
                   resizeMode="cover"
                 />
               </Animated.View>
@@ -257,7 +251,7 @@ const MapScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <Animated.ScrollView
+      {/* <Animated.ScrollView
         ref={_scrollView}
         horizontal
         pagingEnabled
@@ -290,11 +284,11 @@ const MapScreen = () => {
           ],
           { useNativeDriver: true } // using native animation
         )}
-      >
+      > */}
         {/* 
           map through each toilet element and display it 
         */}
-        {state.markers.map((marker, index) => (
+        {/* {state.markers.map((marker, index) => (
           <Animatable.View
             animation="slideInUp"
             iterationCount={1}
@@ -317,7 +311,7 @@ const MapScreen = () => {
             </View>
           </Animatable.View>
         ))}
-      </Animated.ScrollView>
+      </Animated.ScrollView> */}
     </View>
   );
 };
