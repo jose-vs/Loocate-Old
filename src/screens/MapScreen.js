@@ -22,6 +22,7 @@ import {
   CARD_HEIGHT,
   CARD_WIDTH,
 } from "./model/Constants";
+import BottomSheet from 'reanimated-bottom-sheet';
 
 //import Map_TopMenu from "./components/Map_TopMenu";
 
@@ -135,9 +136,10 @@ const MapScreen = (props) => {
   
     const markerID = mapEventData._targetInst.return.key; // get the markerID of the event data
     //console.log(markerID);
-    let toiletinfo = state.markers[markerID];
+    //let toiletinfo = state.markers[markerID];
    // console.log(toiletinfo);
-    props.navigation.navigate('Toilet', toiletinfo);
+   bs.current.snapTo(0);
+   //props.navigation.navigate('Toilet', toiletinfo);
     //position our card elements
     /*let x = markerID * CARD_WIDTH + markerID * 20; // fetch the x value of the card element
     if (Platform.OS === "ios") {
@@ -156,6 +158,24 @@ const MapScreen = (props) => {
       setState({ ...state, showPublicToilets: true });
     }
   };
+
+  const bs = React.createRef();
+  renderHeader = () => (
+      <View style={styles.panelHeader}>
+        <View style={styles.panelHandle} />
+      </View>
+  );   
+  
+  renderInner = () => (
+      <View style = {styles.bottomPanel}>
+          <Text style = {styles.toiletTitle}>{props.navigation.getParam('title')}</Text> 
+          <Text style = {styles.toiletSubtitle}>{props.navigation.getParam('address')}</Text>
+          <View style={styles.hairline}/>
+          <Text style = {styles.textSubheading}>Get Directions</Text>
+          <Text style = {styles.textSubheading}>Rating: <StarRating ratings={props.navigation.getParam('rating')}/></Text>
+          <Text style = {styles.textSubheading}>Reviews: {props.navigation.getParam('reviews')}</Text>
+      </View>
+  );
 
   
   const _map = React.useRef(null);
@@ -324,6 +344,16 @@ const MapScreen = (props) => {
           </Animatable.View>
         ))}
       </Animated.ScrollView>
+            <BottomSheet 
+            ref = {bs}
+            snapPoints={[420, 0]}
+            renderContent={renderInner}
+            renderHeader={renderHeader}
+            borderRadius={10}
+            initialSnap={1}
+            borderRadius={10}
+            enabledGestureInteraction={true}
+            />
     </View>
   );
 };

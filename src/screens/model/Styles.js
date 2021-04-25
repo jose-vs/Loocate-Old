@@ -84,6 +84,7 @@ export const styles = StyleSheet.create({
     padding: 20,
   },
   bottomContainer: {
+    position: "absolute",
     flex: 1,
   },
   toiletTitle: {
@@ -116,7 +117,6 @@ export const styles = StyleSheet.create({
   endPadding: {
     paddingRight: width - CARD_WIDTH,
   },
-  
   card: {
     // padding: 10,
     elevation: 5,
