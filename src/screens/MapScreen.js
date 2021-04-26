@@ -17,7 +17,7 @@ import { MAP_API_KEY } from "@env";
 import toiletApi from "../../api/googlePlaces";
 import StarRating from "./components/StarRating";
 import { initialMapState } from "./model/MapData";
-import { styles } from "./model/Styles";
+import { styles } from "./model/MapStyles";
 import {
   SPACING_FOR_CARD_INSET,
   CARD_HEIGHT,
