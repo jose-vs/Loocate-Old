@@ -1,9 +1,10 @@
 import * as firebase from 'firebase';
 import '@firebase/auth';
 import '@firebase/firestore';
+import { MAP_API_KEY } from "@env";
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyATae8ngLuOkMgrH0pgORK43el03rNENxc',
+  apiKey: MAP_API_KEY,
   //authDomain: 'your-auth-domain-b1234.firebaseapp.com', not needed for firestore
   //databaseURL: 'https://your-database-name.firebaseio.com', not needed for firestore
   projectId: 'ejectloocate',
