@@ -257,7 +257,6 @@ const MapScreen = (props) => {
           </View>
         </TouchableOpacity>
       </View>
-
             <BottomSheet 
             ref = {bs}
             snapPoints={[320, 0]}
