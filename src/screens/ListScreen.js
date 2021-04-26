@@ -8,10 +8,19 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { FontAwesome, Entypo, Ionicons } from "@expo/vector-icons";
+import ToiletCard from './components/ToiletCard'
 import styles from "./model/ListStyles";
 import { filter } from "./model/MapData";
+import { Item } from "native-base";
 
 export default ListScreen = ({ navigation  }) => {
+    const testList = [
+        'bruh', 
+        'bruhbruh', 
+        'bruhbruhbruh',
+        'gilfoyle'
+    ]
+
   return (
     <View style={styles.container}>
       <View style={styles.searchBox}>
@@ -62,10 +71,14 @@ export default ListScreen = ({ navigation  }) => {
       </ScrollView>
 
       <View style = {styles.listContainer}>
-            <Text>hello</Text>
-            <FlatList 
-            
-            />
+            {testList.map((item, index) => { 
+                return (
+                    <ToiletCard
+                        key={index}
+                        text={item}
+                    />
+                )
+            })}
       </View>
 
 
