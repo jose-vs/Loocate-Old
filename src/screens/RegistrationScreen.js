@@ -92,7 +92,7 @@ export default function RegistrationScreen({ navigation }) {
                     underlineColorAndroid="transparent"
                     autoCapitalize="none"
                 />
-                <TouchableOpacity
+                   <TouchableOpacity
                     style={styles.button}
                     onPress={() => onRegisterPress()}>
                     <Text style={styles.buttonTitle}>Create account</Text>
@@ -102,7 +102,5 @@ export default function RegistrationScreen({ navigation }) {
                 </View>
             </KeyboardAwareScrollView>
         </View>
-      </KeyboardAwareScrollView>
-    </View>
-  );
+    )
 }
