@@ -1,9 +1,9 @@
 const Images = [
-    { image: require("../../../assets/ToiletPhotos/toilet1.jpg") },
-    { image: require("../../../assets/ToiletPhotos/toilet2.jpg") },
-    { image: require("../../../assets/ToiletPhotos/toilet3.jpg") },
-    { image: require("../../../assets/ToiletPhotos/toilet4.jpg") },
-    { image: require("../../../assets/ToiletPhotos/toilet5.jpg") }
+    { image: require("../../assets/ToiletPhotos/toilet1.jpg") },
+    { image: require("../../assets/ToiletPhotos/toilet2.jpg") },
+    { image: require("../../assets/ToiletPhotos/toilet3.jpg") },
+    { image: require("../../assets/ToiletPhotos/toilet4.jpg") },
+    { image: require("../../assets/ToiletPhotos/toilet5.jpg") }
 ];
 
 export const markers = [
