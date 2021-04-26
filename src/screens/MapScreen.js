@@ -19,7 +19,7 @@ import BottomSheet from "reanimated-bottom-sheet";
 
 //import Map_TopMenu from "./components/Map_TopMenu";
 
-export default function MapScreen({navigation}) {
+export default MapScreen = ({ navigation }) => {
   const [state, setState] = useState(initialMapState);
   const [searchNewArea, setNewArea] = useState(false);
   const [areaLoad, setAreaLoad] = useState(true);
@@ -236,9 +236,8 @@ export default function MapScreen({navigation}) {
             />
           </View>
         </TouchableOpacity>
-
-        {/* FOOTER */}
       </View>
+      {/* FOOTER */}
       <View style={styles.footer}>
         {/* MAP BUTTON */}
         <TouchableOpacity onPress={() => {}}>
@@ -250,7 +249,12 @@ export default function MapScreen({navigation}) {
           />
         </TouchableOpacity>
         {/* LIST SCREEN */}
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity
+          onPress={() => {
+            //navigates to listscreen when pressed
+            navigation.navigate("List");
+          }}
+        >
           <Entypo
             name="list"
             size={24}
@@ -286,5 +290,3 @@ export default function MapScreen({navigation}) {
     </View>
   );
 };
-
-
