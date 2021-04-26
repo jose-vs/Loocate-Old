@@ -1,6 +1,6 @@
-//import { StatusBar } from 'expo-status-bar';
-//import { createAppContainer } from 'react-navigation';
-import React, { useEffect, useState } from 'react'
+import { StatusBar } from 'expo-status-bar';
+import { createAppContainer } from 'react-navigation';
+ import React, { useEffect, useState } from 'react'
 import 'react-native-gesture-handler';
 import { firebase } from './src/firebase/config'
 import { NavigationContainer } from '@react-navigation/native';
@@ -56,7 +56,12 @@ export default function App() {
   //janky workaround for home screen...had to add it as a default screen in the else section.
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions = {{
+          headerShown: false
+        }}
+      >
+        
         { user ? (
           <Stack.Screen name="Account" component={AccountScreen}>
             {props => <MapScreen {...props} extraData={user} />}

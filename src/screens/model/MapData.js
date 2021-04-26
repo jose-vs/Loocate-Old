@@ -1,20 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { MAP_API_KEY } from "@env";
-import toiletApi from "../../../api/googlePlaces";
 
-const Images = [
-  { image: require("../../../assets/ToiletPhotos/toilet1.jpg") },
-  { image: require("../../../assets/ToiletPhotos/toilet2.jpg") },
-  { image: require("../../../assets/ToiletPhotos/toilet3.jpg") },
-  { image: require("../../../assets/ToiletPhotos/toilet4.jpg") },
-  { image: require("../../../assets/ToiletPhotos/toilet5.jpg") },
-];
-
-
-const markers = [];
 
 const initialMapState = {
-  markers,
+  markers: [],
 
   filter: [
     {
@@ -39,10 +26,10 @@ const initialMapState = {
     longitudeDelta: 0.0421,
   },
 
-  radius: 1000,
+  radius: 2000,
 
   showTopComponents: true,
-  showPublicToilets: true,
+  mapType: "standard"
 };
 
-export { initialMapState, markers };
+export { initialMapState };

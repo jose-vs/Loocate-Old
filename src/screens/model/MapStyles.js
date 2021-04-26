@@ -30,20 +30,15 @@ export const styles = StyleSheet.create({
     paddingLeft: 8,
     paddingRight: 8,
   },
-  chipsScrollView: {
+  searchHere: { 
     position: "absolute",
-    top: 110,
-    paddingHorizontal: 10,
-  },
-  chipsIcon: {
-    marginRight: 5,
-  },
-  chipsItem: {
-    flexDirection: "row",
+    bottom:80,
+    right: 10,
     backgroundColor: "#fff",
-    borderRadius: 20,
+    borderRadius: 25,
+    marginLeft: 20,
     padding: 8,
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
     marginHorizontal: 10,
     height: 35,
     shadowColor: "#ccc",
@@ -51,6 +46,9 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 5,
     elevation: 10,
+  },
+  searchHereText: { 
+    color: "#385c59",
   },
   circleButton: {
     marginRight: 10,
@@ -66,17 +64,10 @@ export const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 10,
   },
-  scrollView: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingVertical: 10,
-  },
   buttonContainer: {
     position: "absolute",
     flexDirection: "row",
-    top: 160,
+    top: 110,
     paddingHorizontal: 10,
     alignSelf: "flex-end",
   },
@@ -117,50 +108,6 @@ export const styles = StyleSheet.create({
   endPadding: {
     paddingRight: width - CARD_WIDTH,
   },
-  card: {
-    // padding: 10,
-    elevation: 5,
-    backgroundColor: "#FFF",
-    borderTopLeftRadius: 5,
-    borderTopRightRadius: 5,
-    marginHorizontal: 10,
-    shadowColor: "#000",
-    shadowRadius: 5,
-    shadowOpacity: 0.3,
-    shadowOffset: { x: 2, y: -2 },
-    height: CARD_HEIGHT,
-    width: CARD_WIDTH,
-    overflow: "hidden",
-  },
-  cardImage: {
-    flex: 3,
-    width: "100%",
-    height: "100%",
-    alignSelf: "center",
-  },
-  panelHeader: {
-    alignItems: 'center',
-  },
-  panelHandle: {
-    width: 40,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#00000040',
-    marginBottom: 10,
-  },
-  textContent: {
-    flex: 2,
-    padding: 10,
-  },
-  cardtitle: {
-    fontSize: 12,
-    // marginTop: 5,
-    fontWeight: "bold",
-  },
-  cardDescription: {
-    fontSize: 12,
-    color: "#444",
-  },
   markerWrap: {
     alignItems: "center",
     justifyContent: "center",
@@ -171,4 +118,15 @@ export const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
+  footer: { 
+    position: "relative",
+    flexDirection: "row",
+    alignSelf: "stretch",
+    backgroundColor: "#007965",
+    padding: 20,
+    justifyContent: "space-between"
+  },
+  footerButton: { 
+    paddingHorizontal: 50
+  }
 });
