@@ -56,7 +56,7 @@ const MapScreen = (props) => {
             reviews: toiletData.user_ratings_total,
           };
 
-          //console.log(newToilet);
+          console.log(newToilet);
           state.markers.push(newToilet);
         });
       })
