@@ -9,6 +9,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './src/screens/LoginScreen';
 import AccountScreen from './src/screens/AccountScreen';
 import RegistrationScreen from './src/screens/RegistrationScreen';
+import UserLocationScreen from './src/screens/UserLocationScreen';
 import MapScreen from './src/screens/MapScreen';
 import {decode, encode} from 'base-64'
 if (!global.btoa) {  global.btoa = encode }
@@ -17,7 +18,6 @@ if (!global.atob) { global.atob = decode }
 const Stack = createStackNavigator();
 
 export default function App() {
-
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
 
@@ -64,6 +64,7 @@ export default function App() {
           </Stack.Screen>
         ) : (
           <>
+            <Stack.Screen name="Location" component={UserLocationScreen}/>
             <Stack.Screen name="Map" component={MapScreen}/> 
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Registration" component={RegistrationScreen} /> 
