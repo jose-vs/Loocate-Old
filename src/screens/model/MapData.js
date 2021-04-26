@@ -1,5 +1,3 @@
-
-
 const initialMapState = {
   markers: [],
 
@@ -29,7 +27,7 @@ const initialMapState = {
   radius: 2000,
 
   showTopComponents: true,
-  mapType: "standard"
+  mapType: "standard",
 };
 
 export { initialMapState };

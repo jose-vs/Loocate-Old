@@ -138,7 +138,8 @@ export default function MapScreen({navigation}) {
 
   renderInner = () => (
     <View style={styles.bottomPanel}>
-      {marker && marker.length && ( //check for null in useState otherwise crash on startup as undefined
+      {marker &&
+        marker.length && ( //check for null in useState otherwise crash on startup as undefined
           <Text style={styles.toiletTitle}>{state.markers[marker].title}</Text>
         )}
       {marker && marker.length && (
@@ -222,7 +223,7 @@ export default function MapScreen({navigation}) {
           <Text style={styles.searchHereText}>Search this area</Text>
         </TouchableOpacity>
       </Animatable.View>
-          
+
       <View style={styles.buttonContainer}>
         {/* Map Style Button */}
         <TouchableOpacity
@@ -257,7 +258,11 @@ export default function MapScreen({navigation}) {
             style={styles.footerButton}
           />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("Login");
+          }}
+        >
           <FontAwesome
             name="user"
             size={24}

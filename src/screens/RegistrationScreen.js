@@ -1,49 +1,49 @@
-import React, { useState } from 'react'
-import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import styles from './model/RegistrationStyles';
-import { firebase } from '../firebase/config';
+import React, { useState } from "react";
+import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import styles from "./model/RegistrationStyles";
+import { firebase } from "../firebase/config";
 
-export default function RegistrationScreen({navigation}) {
-    const [fullName, setFullName] = useState('')
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [confirmPassword, setConfirmPassword] = useState('')
+export default function RegistrationScreen({ navigation }) {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-    const onFooterLinkPress = () => {
-        navigation.navigate('Login')
+  const onFooterLinkPress = () => {
+    navigation.navigate("Login");
+  };
+
+  const onRegisterPress = () => {
+    if (password !== confirmPassword) {
+      alert("Passwords don't match.");
+      return;
     }
-
-    const onRegisterPress = () => {
-        if (password !== confirmPassword) {
-            alert("Passwords don't match.")
-            return
-        }
-        firebase
-            .auth()
-            .createUserWithEmailAndPassword(email, password)
-            .then((response) => {
-                const uid = response.user.uid
-                const data = {
-                    id: uid,
-                    email,
-                    fullName,
-                };
-                const usersRef = firebase.firestore().collection('users')
-                usersRef
-                    .doc(uid)
-                    .set(data)
-                    .then(() => {
-                        navigation.navigate("Account", {user: data})
-                    })
-                    .catch((error) => {
-                        alert(error)
-                    });
-            })
-            .catch((error) => {
-                alert(error)
-        });
-    }
+    firebase
+      .auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then((response) => {
+        const uid = response.user.uid;
+        const data = {
+          id: uid,
+          email,
+          fullName,
+        };
+        const usersRef = firebase.firestore().collection("users");
+        usersRef
+          .doc(uid)
+          .set(data)
+          .then(() => {
+            navigation.navigate("Account", { user: data });
+          })
+          .catch((error) => {
+            alert(error);
+          });
+      })
+      .catch((error) => {
+        alert(error);
+      });
+  };
 
     return (
         <View style={styles.container}>
@@ -102,5 +102,7 @@ export default function RegistrationScreen({navigation}) {
                 </View>
             </KeyboardAwareScrollView>
         </View>
-    )
+      </KeyboardAwareScrollView>
+    </View>
+  );
 }
