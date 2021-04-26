@@ -71,10 +71,43 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10,
     alignSelf: "flex-end",
   },
+  button: {
+    padding: 20,
+  },
+  bottomContainer: {
+    position: "absolute",
+    flex: 1,
+  },
+  toiletTitle: {
+    paddingLeft: 30,
+    fontSize: 30,
+    height: 35,
+  },
+  toiletSubtitle: {
+    paddingLeft: 31,
+    fontSize: 14,
+    color: 'gray',
+    height: 20,
+  },
+  hairline: {
+    backgroundColor: '#A2A2A2',
+    height: 2,
+    width: 500
+  },
+  textSubheading: {
+    paddingTop: 15,
+    flexDirection: 'row',
+    paddingLeft: 30,
+    fontSize: 22
+  },
+  bottomPanel: {
+    backgroundColor: '#FFFFFF',
+    paddingTop: 5,
+    height: "100%",
+  },
   endPadding: {
     paddingRight: width - CARD_WIDTH,
   },
- 
   markerWrap: {
     alignItems: "center",
     justifyContent: "center",

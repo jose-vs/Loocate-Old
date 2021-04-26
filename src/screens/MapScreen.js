@@ -4,9 +4,7 @@ import {
   Text,
   TextInput,
   View,
-  ScrollView,
   TouchableOpacity,
-  Platform,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import * as Animatable from "react-native-animatable";
@@ -14,10 +12,14 @@ import { FontAwesome, MaterialIcons, Entypo } from "@expo/vector-icons";
 import { MAP_API_KEY } from "@env";
 import toiletApi from "../../api/googlePlaces";
 import { initialMapState } from "./model/MapData";
-import { styles } from "./model/Styles";
+import { styles } from "./model/MapStyles";
+import StarRating from "./components/StarRating";
 import { CARD_WIDTH } from "./model/Constants";
+import BottomSheet from "reanimated-bottom-sheet";
 
-const MapScreen = () => {
+//import Map_TopMenu from "./components/Map_TopMenu";
+
+const MapScreen = (props) => {
   const [state, setState] = useState(initialMapState);
   const [searchNewArea, setNewArea] = useState(false);
   const [areaLoad, setAreaLoad] = useState(true);
@@ -104,20 +106,58 @@ const MapScreen = () => {
     });
   });
 
+  const [marker, setMarker] = useState();
+
   const onMarkerPress = (mapEventData) => {
     // get the event data on press
     const markerID = mapEventData._targetInst.return.key; // get the markerID of the event data
     console.log(state.markers[markerID]);
+    setMarker(markerID);
+    bs.current.snapTo(0);
   };
-  
-  const onMapStyleButtonPress = () => { 
-    if (state.mapType == "standard") { 
-      setState({...state, mapType: "satellite"})
-    } else if (state.mapType == "satellite") {
-      setState({...state, mapType: "standard"})
-    }
 
-  }
+  const onMapStyleButtonPress = () => {
+    if (state.mapType == "standard") {
+      setState({ ...state, mapType: "satellite" });
+    } else if (state.mapType == "satellite") {
+      setState({ ...state, mapType: "standard" });
+    }
+  };
+
+  //creates bottomsheet content
+  const bs = React.createRef();
+  renderHeader = () => (
+    <View style={styles.panelHeader}>
+      <View style={styles.panelHandle} />
+    </View>
+  );
+
+  renderInner = () => (
+    <View style={styles.bottomPanel}>
+      {marker && marker.length && ( //check for null in useState otherwise crash on startup as undefined
+          <Text style={styles.toiletTitle}>{state.markers[marker].title}</Text>
+        )}
+      {marker && marker.length && (
+        <Text style={styles.toiletSubtitle}>
+          {state.markers[marker].address}
+        </Text>
+      )}
+      <View style={styles.hairline} />
+      {marker && marker.length && (
+        <Text style={styles.textSubheading}>Get Directions</Text>
+      )}
+      {marker && marker.length && (
+        <Text style={styles.textSubheading}>
+          Rating: <StarRating ratings={state.markers[marker].rating} />
+        </Text>
+      )}
+      {marker && marker.length && (
+        <Text style={styles.textSubheading}>
+          Reviews: {state.markers[marker].reviews}
+        </Text>
+      )}
+    </View>
+  );
 
   const _map = React.useRef(null);
 
@@ -126,7 +166,7 @@ const MapScreen = () => {
       <MapView
         ref={_map}
         initialRegion={state.region}
-        mapType= {state.mapType}
+        mapType={state.mapType}
         style={styles.container}
         provider={PROVIDER_GOOGLE}
         onRegionChangeComplete={(region) =>
@@ -140,7 +180,9 @@ const MapScreen = () => {
               key={index}
               tracksViewChanges={false}
               coordinate={marker.coordinate}
-              onPress={(e) => onMarkerPress(e)}
+              onPress={(e) => {
+                onMarkerPress(e);
+              }}
             >
               <Animated.View style={[styles.markerWrap]}>
                 <Animated.Image
@@ -176,10 +218,14 @@ const MapScreen = () => {
           <Text style={styles.searchHereText}>Search this area</Text>
         </TouchableOpacity>
       </Animatable.View>
-
+          
       <View style={styles.buttonContainer}>
         {/* Map Style Button */}
-        <TouchableOpacity onPress={() => {onMapStyleButtonPress()}}>
+        <TouchableOpacity
+          onPress={() => {
+            onMapStyleButtonPress();
+          }}
+        >
           <View style={styles.circleButton}>
             <MaterialIcons
               name="layers"
@@ -192,15 +238,40 @@ const MapScreen = () => {
       </View>
       <View style={styles.footer}>
         <TouchableOpacity onPress={() => {}}>
-          <Entypo name="map" size={24} color="white" style={styles.footerButton}/>
+          <Entypo
+            name="map"
+            size={24}
+            color="white"
+            style={styles.footerButton}
+          />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => {}}>
-          <Entypo name="list" size={24} color="white" style={styles.footerButton}/>
+          <Entypo
+            name="list"
+            size={24}
+            color="white"
+            style={styles.footerButton}
+          />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => {}}>
-          <FontAwesome name="user" size={24} color="white" style={styles.footerButton}/>
+          <FontAwesome
+            name="user"
+            size={24}
+            color="white"
+            style={styles.footerButton}
+          />
         </TouchableOpacity>
       </View>
+      <BottomSheet
+        ref={bs}
+        snapPoints={[320, 0]}
+        renderContent={renderInner}
+        renderHeader={renderHeader}
+        borderRadius={10}
+        initialSnap={1}
+        borderRadius={10}
+        enabledGestureInteraction={true}
+      />
     </View>
   );
 };
