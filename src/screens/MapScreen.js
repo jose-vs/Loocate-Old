@@ -19,10 +19,14 @@ import BottomSheet from "reanimated-bottom-sheet";
 
 //import Map_TopMenu from "./components/Map_TopMenu";
 
-const MapScreen = (props) => {
+export default function MapScreen({navigation}) {
   const [state, setState] = useState(initialMapState);
   const [searchNewArea, setNewArea] = useState(false);
   const [areaLoad, setAreaLoad] = useState(true);
+
+  const MapToLoginPress = () => { //when user button is pressed...
+    navigation.navigate("Login");
+  }
 
   //fetch the api
   useEffect(() => {
@@ -259,6 +263,7 @@ const MapScreen = (props) => {
             size={24}
             color="white"
             style={styles.footerButton}
+            onPress={() => MapToLoginPress()}
           />
         </TouchableOpacity>
       </View>
@@ -276,4 +281,4 @@ const MapScreen = (props) => {
   );
 };
 
-export default MapScreen;
+

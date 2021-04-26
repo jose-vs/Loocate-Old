@@ -3,6 +3,7 @@ import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import styles from './model/LoginStyles';
 import { firebase } from '../firebase/config';
+import {Dimensions} from 'react-native'
 
 export default function LoginScreen({navigation}) {
     const [email, setEmail] = useState('')
@@ -46,7 +47,8 @@ export default function LoginScreen({navigation}) {
                 keyboardShouldPersistTaps="always">
                 <Image
                     style={styles.logo}
-                    source={require('../../assets/pancake.jpg')}
+                    source={require('../../assets/loocate_icon.png')}
+                    tintColor='grey'
                 />
                 <TextInput
                     style={styles.input}

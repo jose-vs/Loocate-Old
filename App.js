@@ -1,6 +1,4 @@
-import { StatusBar } from 'expo-status-bar';
-import { createAppContainer } from 'react-navigation';
- import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import 'react-native-gesture-handler';
 import { firebase } from './src/firebase/config'
 import { NavigationContainer } from '@react-navigation/native';
