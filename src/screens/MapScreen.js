@@ -8,6 +8,7 @@ import {
   Image,
   TouchableOpacity,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import * as Animatable from "react-native-animatable";
@@ -131,13 +132,14 @@ const MapScreen = (props) => {
 
     return { scale };
   });
-
+  const [marker, setMarker] = useState();
+  
   const onMarkerPress = (mapEventData) => { // get the event data on press
   
-    const markerID = mapEventData._targetInst.return.key; // get the markerID of the event data
-    //console.log(markerID);
+  const markerID = mapEventData._targetInst.return.key; // get the markerID of the event data
     //let toiletinfo = state.markers[markerID];
    // console.log(toiletinfo);
+   setMarker(markerID);
    bs.current.snapTo(0);
    //props.navigation.navigate('Toilet', toiletinfo);
     //position our card elements
@@ -148,7 +150,6 @@ const MapScreen = (props) => {
 
     _scrollView.current.scrollTo({ x: x, y: 0, animated: true });*/
   };
-
   //decides which components on the screen to show based on 
   //the current state when the user clicks anywhere on the map screen
   const hideComponents = () => {
@@ -159,6 +160,7 @@ const MapScreen = (props) => {
     }
   };
 
+  //creates bottomsheet content
   const bs = React.createRef();
   renderHeader = () => (
       <View style={styles.panelHeader}>
@@ -168,16 +170,25 @@ const MapScreen = (props) => {
   
   renderInner = () => (
       <View style = {styles.bottomPanel}>
-          <Text style = {styles.toiletTitle}>{props.navigation.getParam('title')}</Text> 
-          <Text style = {styles.toiletSubtitle}>{props.navigation.getParam('address')}</Text>
+        { marker && marker.length && //check for null in useState otherwise crash on startup as undefined
+          <Text style = {styles.toiletTitle}>{state.markers[marker].title}</Text> 
+        }
+        { marker && marker.length && 
+          <Text style = {styles.toiletSubtitle}>{state.markers[marker].address}</Text>
+        }
           <View style={styles.hairline}/>
+        { marker && marker.length &&   
           <Text style = {styles.textSubheading}>Get Directions</Text>
-          <Text style = {styles.textSubheading}>Rating: <StarRating ratings={props.navigation.getParam('rating')}/></Text>
-          <Text style = {styles.textSubheading}>Reviews: {props.navigation.getParam('reviews')}</Text>
+        }
+        { marker && marker.length && 
+          <Text style = {styles.textSubheading}>Rating: <StarRating ratings={state.markers[marker].rating}/></Text>
+        }
+        { marker && marker.length && 
+          <Text style = {styles.textSubheading}>Reviews: {state.markers[marker].reviews}</Text>
+        }
       </View>
   );
 
-  
   const _map = React.useRef(null);
   const _scrollView = React.useRef(null);
 
@@ -233,42 +244,6 @@ const MapScreen = (props) => {
           style={{ right: 8, opacity: 0.6 }}
         />
       </View>
-      <ScrollView 
-        horizontal
-        scrollEventThrottle={1}
-        showsHorizontalScrollIndicator={false}
-        height={50}
-        style={styles.chipsScrollView}
-        contentInset={{
-          // iOS only
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 20,
-        }}
-        contentContainerStyle={{
-          paddingRight: Platform.OS === "android" ? 20 : 0,
-        }}
->
-        <TouchableOpacity style={styles.circleButton}>
-          <Ionicons
-            name="filter"
-            size={26}
-            color="black"
-            style={{ top: 7, left: 7, opacity: 0.6 }}
-          />
-        </TouchableOpacity> 
-
-        {/* 
-          look through every item in the filter and display them 
-          as chip items
-        */}
-        {state.filter.map((category, index) => ( 
-          <TouchableOpacity key={index} style={styles.chipsItem}>
-            <Text>{category.type}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
       <View style={styles.buttonContainer}>
         {/* Map Style Button */}
         <TouchableOpacity onPress={() => {}}>
@@ -283,70 +258,9 @@ const MapScreen = (props) => {
         </TouchableOpacity>
       </View>
 
-      <Animated.ScrollView
-        ref={_scrollView}
-        horizontal
-        pagingEnabled
-        scrollEventThrottle={1}
-        showsHorizontalScrollIndicator={false}
-        snapToInterval={CARD_WIDTH + 20}
-        snapToAlignment="center"
-        style={[styles.scrollView, { translateY: scrollViewHeight }]}
-        contentInset={{
-          top: 0,
-          left: SPACING_FOR_CARD_INSET,
-          bottom: 0,
-          right: SPACING_FOR_CARD_INSET,
-        }}
-        contentContainerStyle={{
-          paddingHorizontal:
-            Platform.OS === "android" ? SPACING_FOR_CARD_INSET : 0,
-        }}
-        
-        // handles animation when scrolling through the list
-        onScroll={Animated.event(
-          [
-            {
-              nativeEvent: {
-                contentOffset: {
-                  x: mapAnimation, 
-                },
-              },
-            },
-          ],
-          { useNativeDriver: true } // using native animation
-        )}
-      >
-        {/* 
-          map through each toilet element and display it 
-        */}
-        {state.markers.map((marker, index) => (
-          <Animatable.View
-            animation="slideInUp"
-            iterationCount={1}
-            style={styles.card}
-            key={index}
-          >
-            <Image
-              source={marker.image}
-              style={styles.cardImage}
-              resizeMode="cover"
-            />
-            <View style={styles.textContent}>
-              <Text numberOfLines={1} style={styles.cardtitle}>
-                {marker.title}
-              </Text>
-              <StarRating ratings={marker.rating} reviews={marker.reviews} />
-              <Text numberOfLines={1} style={styles.cardDescription}>
-                {marker.address}
-              </Text>
-            </View>
-          </Animatable.View>
-        ))}
-      </Animated.ScrollView>
             <BottomSheet 
             ref = {bs}
-            snapPoints={[420, 0]}
+            snapPoints={[320, 0]}
             renderContent={renderInner}
             renderHeader={renderHeader}
             borderRadius={10}
