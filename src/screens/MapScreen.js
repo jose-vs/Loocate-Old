@@ -24,10 +24,6 @@ export default function MapScreen({navigation}) {
   const [searchNewArea, setNewArea] = useState(false);
   const [areaLoad, setAreaLoad] = useState(true);
 
-  const MapToLoginPress = () => { //when user button is pressed...
-    navigation.navigate("Login");
-  }
-
   //fetch the api
   useEffect(() => {
     setAreaLoad((current) => false);
@@ -240,8 +236,11 @@ export default function MapScreen({navigation}) {
             />
           </View>
         </TouchableOpacity>
+
+        {/* FOOTER */}
       </View>
       <View style={styles.footer}>
+        {/* MAP BUTTON */}
         <TouchableOpacity onPress={() => {}}>
           <Entypo
             name="map"
@@ -250,6 +249,7 @@ export default function MapScreen({navigation}) {
             style={styles.footerButton}
           />
         </TouchableOpacity>
+        {/* LIST SCREEN */}
         <TouchableOpacity onPress={() => {}}>
           <Entypo
             name="list"
@@ -258,8 +258,10 @@ export default function MapScreen({navigation}) {
             style={styles.footerButton}
           />
         </TouchableOpacity>
+        {/* USER SCREEN */}
         <TouchableOpacity
           onPress={() => {
+            //navigates to loginscreen when pressed
             navigation.navigate("Login");
           }}
         >
@@ -268,7 +270,6 @@ export default function MapScreen({navigation}) {
             size={24}
             color="white"
             style={styles.footerButton}
-            onPress={() => MapToLoginPress()}
           />
         </TouchableOpacity>
       </View>
