@@ -19,7 +19,7 @@ import BottomSheet from "reanimated-bottom-sheet";
 
 //import Map_TopMenu from "./components/Map_TopMenu";
 
-const MapScreen = (props) => {
+const MapScreen = ({ navigation }) => {
   const [state, setState] = useState(initialMapState);
   const [searchNewArea, setNewArea] = useState(false);
   const [areaLoad, setAreaLoad] = useState(true);
@@ -134,7 +134,8 @@ const MapScreen = (props) => {
 
   renderInner = () => (
     <View style={styles.bottomPanel}>
-      {marker && marker.length && ( //check for null in useState otherwise crash on startup as undefined
+      {marker &&
+        marker.length && ( //check for null in useState otherwise crash on startup as undefined
           <Text style={styles.toiletTitle}>{state.markers[marker].title}</Text>
         )}
       {marker && marker.length && (
@@ -218,7 +219,7 @@ const MapScreen = (props) => {
           <Text style={styles.searchHereText}>Search this area</Text>
         </TouchableOpacity>
       </Animatable.View>
-          
+
       <View style={styles.buttonContainer}>
         {/* Map Style Button */}
         <TouchableOpacity
@@ -253,7 +254,11 @@ const MapScreen = (props) => {
             style={styles.footerButton}
           />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("Login");
+          }}
+        >
           <FontAwesome
             name="user"
             size={24}

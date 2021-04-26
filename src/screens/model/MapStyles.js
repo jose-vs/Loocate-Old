@@ -1,10 +1,6 @@
+import { StyleSheet } from "react-native";
 
-import {StyleSheet} from 'react-native';
-
-import { 
-    width, 
-    CARD_HEIGHT, CARD_WIDTH
-} from './Constants';
+import { width, CARD_HEIGHT, CARD_WIDTH } from "./Constants";
 
 export const styles = StyleSheet.create({
   container: {
@@ -30,9 +26,9 @@ export const styles = StyleSheet.create({
     paddingLeft: 8,
     paddingRight: 8,
   },
-  searchHere: { 
+  searchHere: {
     position: "absolute",
-    bottom:80,
+    bottom: 80,
     right: 10,
     backgroundColor: "#fff",
     borderRadius: 25,
@@ -47,7 +43,7 @@ export const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 10,
   },
-  searchHereText: { 
+  searchHereText: {
     color: "#385c59",
   },
   circleButton: {
@@ -86,22 +82,22 @@ export const styles = StyleSheet.create({
   toiletSubtitle: {
     paddingLeft: 31,
     fontSize: 14,
-    color: 'gray',
+    color: "gray",
     height: 20,
   },
   hairline: {
-    backgroundColor: '#A2A2A2',
+    backgroundColor: "#A2A2A2",
     height: 2,
-    width: 500
+    width: 500,
   },
   textSubheading: {
     paddingTop: 15,
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingLeft: 30,
-    fontSize: 22
+    fontSize: 22,
   },
   bottomPanel: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     paddingTop: 5,
     height: "100%",
   },
@@ -118,15 +114,15 @@ export const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
-  footer: { 
+  footer: {
     position: "relative",
     flexDirection: "row",
     alignSelf: "stretch",
     backgroundColor: "#007965",
     padding: 20,
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
-  footerButton: { 
-    paddingHorizontal: 50
-  }
+  footerButton: {
+    paddingHorizontal: 50,
+  },
 });
