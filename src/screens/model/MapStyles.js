@@ -125,4 +125,8 @@ export const styles = StyleSheet.create({
   footerButton: {
     paddingHorizontal: 50,
   },
+  loadScreen: { 
+    flex: 1,
+    backgroundColor: '#75CFB8'
+  },
 });

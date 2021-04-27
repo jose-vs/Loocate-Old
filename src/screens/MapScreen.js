@@ -37,6 +37,7 @@ export default MapScreen = ({ navigation }) => {
         return;
       }
       let location = await Location.getCurrentPositionAsync({});
+      
       setPerms(true);
       setLocation(location);
     })();
@@ -187,135 +188,152 @@ export default MapScreen = ({ navigation }) => {
   const _map = React.useRef(null);
   console.log(grantedPerms);
 
-  return (
-    <View style={styles.container}>
-      <MapView
-        ref={_map}
-        showuserLocation={true}
-        initialRegion={state.region}
-        mapType={state.mapType}
-        style={styles.container}
-        provider={PROVIDER_GOOGLE}
-        showsUserLocation={grantedPerms}
-        onRegionChangeComplete={(region) =>
-          setState({ ...state, region: region })
-        }
-        onPress={() => {}}
-      >
-        {state.markers.map((marker, index) => {
-          return (
-            <MapView.Marker
-              key={index}
-              tracksViewChanges={false}
-              coordinate={marker.coordinate}
-              onPress={(e) => {
-                onMarkerPress(e);
-              }}
-            >
-              <Animated.View style={[styles.markerWrap]}>
-                <Animated.Image
-                  source={require("../../assets/pin.png")}
-                  style={styles.marker}
-                  resizeMode="cover"
-                />
-              </Animated.View>
-            </MapView.Marker>
-          );
-        })}
-      </MapView>
-      <View style={styles.searchBox}>
-        <TextInput
-          placeholder="Search here"
-          placeholderTextColor="#777"
-          autoCapitalize="none"
-          style={styles.searchBoxText}
-        />
-        <FontAwesome
-          name="search"
-          size={24}
-          color="black"
-          style={{ right: 8, opacity: 0.6 }}
-        />
-      </View>
-      <Animatable.View style={styles.searchHere} animation="fadeInLeft">
-        <TouchableOpacity
-          onPress={() => {
-            onAreaSearchPress();
+  if (location) { 
+    return (
+      <View style={styles.container}>
+        <MapView
+          ref={_map}
+          showuserLocation={true}
+          initialRegion={{
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
           }}
+          mapType={state.mapType}
+          style={styles.container}
+          provider={PROVIDER_GOOGLE}
+          showsUserLocation={grantedPerms}
+          onRegionChangeComplete={(region) =>
+            setState({ ...state, region: region })
+          }
+          onPress={() => {}}
         >
-          <Text style={styles.searchHereText}>Search this area</Text>
-        </TouchableOpacity>
-      </Animatable.View>
-
-      <View style={styles.buttonContainer}>
-        {/* Map Style Button */}
-        <TouchableOpacity
-          onPress={() => {
-            onMapStyleButtonPress();
-          }}
-        >
-          <View style={styles.circleButton}>
-            <MaterialIcons
-              name="layers"
-              size={26}
-              color="black"
-              style={{ top: 6, left: 6, opacity: 0.6 }}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
-      {/* FOOTER */}
-      <View style={styles.footer}>
-        {/* MAP BUTTON */}
-        <TouchableOpacity onPress={() => {}}>
-          <Entypo
-            name="map"
-            size={24}
-            color="white"
-            style={styles.footerButton}
+          {state.markers.map((marker, index) => {
+            return (
+              <MapView.Marker
+                key={index}
+                tracksViewChanges={false}
+                coordinate={marker.coordinate}
+                onPress={(e) => {
+                  onMarkerPress(e);
+                }}
+              >
+                <Animated.View style={[styles.markerWrap]}>
+                  <Animated.Image
+                    source={require("../../assets/pin.png")}
+                    style={styles.marker}
+                    resizeMode="cover"
+                  />
+                </Animated.View>
+              </MapView.Marker>
+            );
+          })}
+        </MapView>
+        <View style={styles.searchBox}>
+          <TextInput
+            placeholder="Search here"
+            placeholderTextColor="#777"
+            autoCapitalize="none"
+            style={styles.searchBoxText}
           />
-        </TouchableOpacity>
-        {/* LIST SCREEN */}
-        <TouchableOpacity
-          onPress={() => {
-            //navigates to listscreen when pressed
-            navigation.navigate("List", state.markers);
-          }}
-        >
-          <Entypo
-            name="list"
-            size={24}
-            color="white"
-            style={styles.footerButton}
-          />
-        </TouchableOpacity>
-        {/* USER SCREEN */}
-        <TouchableOpacity
-          onPress={() => {
-            //navigates to loginscreen when pressed
-            navigation.navigate("Login");
-          }}
-        >
           <FontAwesome
-            name="user"
+            name="search"
             size={24}
-            color="white"
-            style={styles.footerButton}
+            color="black"
+            style={{ right: 8, opacity: 0.6 }}
           />
-        </TouchableOpacity>
+        </View>
+        <Animatable.View style={styles.searchHere} animation="fadeInLeft">
+          <TouchableOpacity
+            onPress={() => {
+              onAreaSearchPress();
+            }}
+          >
+            <Text style={styles.searchHereText}>Search this area</Text>
+          </TouchableOpacity>
+        </Animatable.View>
+  
+        <View style={styles.buttonContainer}>
+          {/* Map Style Button */}
+          <TouchableOpacity
+            onPress={() => {
+              onMapStyleButtonPress();
+            }}
+          >
+            <View style={styles.circleButton}>
+              <MaterialIcons
+                name="layers"
+                size={26}
+                color="black"
+                style={{ top: 6, left: 6, opacity: 0.6 }}
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
+        {/* FOOTER */}
+        <View style={styles.footer}>
+          {/* MAP BUTTON */}
+          <TouchableOpacity onPress={() => {}}>
+            <Entypo
+              name="map"
+              size={24}
+              color="white"
+              style={styles.footerButton}
+            />
+          </TouchableOpacity>
+          {/* LIST SCREEN */}
+          <TouchableOpacity
+            onPress={() => {
+              //navigates to listscreen when pressed
+              navigation.navigate("List", state.markers);
+            }}
+          >
+            <Entypo
+              name="list"
+              size={24}
+              color="white"
+              style={styles.footerButton}
+            />
+          </TouchableOpacity>
+          {/* USER SCREEN */}
+          <TouchableOpacity
+            onPress={() => {
+              //navigates to loginscreen when pressed
+              navigation.navigate("Login");
+            }}
+          >
+            <FontAwesome
+              name="user"
+              size={24}
+              color="white"
+              style={styles.footerButton}
+            />
+          </TouchableOpacity>
+        </View>
+        <BottomSheet
+          ref={bs}
+          snapPoints={[320, 0]}
+          renderContent={renderInner}
+          renderHeader={renderHeader}
+          borderRadius={10}
+          initialSnap={1}
+          borderRadius={10}
+          enabledGestureInteraction={true}
+        />
       </View>
-      <BottomSheet
-        ref={bs}
-        snapPoints={[320, 0]}
-        renderContent={renderInner}
-        renderHeader={renderHeader}
-        borderRadius={10}
-        initialSnap={1}
-        borderRadius={10}
-        enabledGestureInteraction={true}
-      />
-    </View>
-  );
+    );
+  } else { 
+    return ( 
+      <View style={styles.loadScreen}>
+        <Text> 
+          Poopy
+        </Text>
+      </View>
+    )
+  }
+
+  
 
 };
 
