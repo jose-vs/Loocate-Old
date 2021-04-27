@@ -17,7 +17,7 @@ import StarRating from "./components/StarRating";
 import { CARD_WIDTH } from "./model/Constants";
 import BottomSheet from "reanimated-bottom-sheet";
 import * as Location from 'expo-location';
-
+import MapViewDirections from 'react-native-maps-directions';
 
 //import Map_TopMenu from "./components/Map_TopMenu";
 
@@ -28,6 +28,9 @@ export default MapScreen = ({ navigation }) => {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [grantedPerms, setPerms] = useState(null);
+  //const [origin, setOrigin] = useState(null);
+  const origin = {latitude: -36.8515387, longitude: 174.7599935};
+  const destination = {latitude: -36.8585384, longitude: 174.7509757};
 
   useEffect(() => {
     (async () => {
@@ -45,9 +48,9 @@ export default MapScreen = ({ navigation }) => {
   if (errorMsg) {
     console.log(errorMsg);
   } else if (location) {
-    console.log(location.coords.latitude); //get latitude 
-    console.log(location.coords.longitude); //get longitude
+    console.log(location.coords.latitude, location.coords.longitude); //get latitude 
   };
+
   //fetch the api
   useEffect(() => {
     setAreaLoad((current) => false);
@@ -222,6 +225,14 @@ export default MapScreen = ({ navigation }) => {
             </MapView.Marker>
           );
         })}
+        
+        <MapViewDirections //directions that take in origin/destination coords
+        origin = {origin}
+        destination = {destination}
+        apikey={MAP_API_KEY}
+        strokeWidth={4}
+        strokeColor="blue"
+        />
       </MapView>
       <View style={styles.searchBox}>
         <TextInput
