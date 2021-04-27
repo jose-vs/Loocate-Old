@@ -70,16 +70,13 @@ export default StyleSheet.create({
   },
   listContainer: { 
     position: "relative",
-    backgroundColor: 'red',
-    top: 160
+    top: 160,
+    marginBottom:160
   },
   footer: {
     // needs changing as the footer box is visible when navigating
     // to other screens
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    left: 0,
+    position: "relative",
     flexDirection: "row",
     alignSelf: "stretch",
     backgroundColor: "#007965",

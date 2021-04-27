@@ -12,10 +12,8 @@ import ToiletCard from "./components/ToiletCard";
 import styles from "./model/ListStyles";
 import { filter } from "./model/MapData";
 
-export default ListScreen = ({ route,  navigation }) => {
-  const testList = ["bruh", "bruhbruh", "bruhbruhbruh", "gilfoyle"];
-
-  const [toilets, setToilets] = useState(route)
+export default ListScreen = ({ route, navigation }) => {
+  const [toilets, setToilets] = useState(route.params);
 
   return (
     <View style={styles.container}>
@@ -70,12 +68,11 @@ export default ListScreen = ({ route,  navigation }) => {
         vertical
         scrollEventThrottle={1}
         showsVerticalScrollIndicator={true}
-         style={styles.listContainer}>
-        {testList.map((item, index) => {
-          return <ToiletCard key={index} text={item} />;
+        style={styles.listContainer}
+      >
+        {toilets.map((item, index) => {
+          return <ToiletCard key={index} text={JSON.stringify(item.address)} />;
         })}
-
-        <Text>{JSON.stringify(toilets)}</Text>
       </ScrollView>
 
       {/* FOOTER */}
