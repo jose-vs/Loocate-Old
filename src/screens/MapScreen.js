@@ -252,7 +252,7 @@ export default MapScreen = ({ navigation }) => {
         <TouchableOpacity
           onPress={() => {
             //navigates to listscreen when pressed
-            navigation.navigate("List");
+            navigation.navigate("List", state.markers);
           }}
         >
           <Entypo

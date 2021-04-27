@@ -8,18 +8,14 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { FontAwesome, Entypo, Ionicons } from "@expo/vector-icons";
-import ToiletCard from './components/ToiletCard'
+import ToiletCard from "./components/ToiletCard";
 import styles from "./model/ListStyles";
 import { filter } from "./model/MapData";
-import { Item } from "native-base";
 
-export default ListScreen = ({ navigation  }) => {
-    const testList = [
-        'bruh', 
-        'bruhbruh', 
-        'bruhbruhbruh',
-        'gilfoyle'
-    ]
+export default ListScreen = ({ route,  navigation }) => {
+  const testList = ["bruh", "bruhbruh", "bruhbruhbruh", "gilfoyle"];
+
+  const [toilets, setToilets] = useState(route)
 
   return (
     <View style={styles.container}>
@@ -70,17 +66,17 @@ export default ListScreen = ({ navigation  }) => {
         ))}
       </ScrollView>
 
-      <View style = {styles.listContainer}>
-            {testList.map((item, index) => { 
-                return (
-                    <ToiletCard
-                        key={index}
-                        text={item}
-                    />
-                )
-            })}
-      </View>
+      <ScrollView
+        vertical
+        scrollEventThrottle={1}
+        showsVerticalScrollIndicator={true}
+         style={styles.listContainer}>
+        {testList.map((item, index) => {
+          return <ToiletCard key={index} text={item} />;
+        })}
 
+        <Text>{JSON.stringify(toilets)}</Text>
+      </ScrollView>
 
       {/* FOOTER */}
       <View style={styles.footer}>
