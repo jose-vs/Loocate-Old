@@ -16,6 +16,8 @@ import { styles } from "./model/MapStyles";
 import StarRating from "./components/StarRating";
 import { CARD_WIDTH } from "./model/Constants";
 import BottomSheet from "reanimated-bottom-sheet";
+import * as Location from 'expo-location';
+
 
 //import Map_TopMenu from "./components/Map_TopMenu";
 
@@ -23,7 +25,29 @@ export default MapScreen = ({ navigation }) => {
   const [state, setState] = useState(initialMapState);
   const [searchNewArea, setNewArea] = useState(false);
   const [areaLoad, setAreaLoad] = useState(true);
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [grantedPerms, setPerms] = useState(null);
 
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+      let location = await Location.getCurrentPositionAsync({});
+      setPerms(true);
+      setLocation(location);
+    })();
+  }, []);
+
+  if (errorMsg) {
+    console.log(errorMsg);
+  } else if (location) {
+    console.log(location.coords.latitude); //get latitude 
+    console.log(location.coords.longitude); //get longitude
+  };
   //fetch the api
   useEffect(() => {
     setAreaLoad((current) => false);
@@ -37,7 +61,7 @@ export default MapScreen = ({ navigation }) => {
         &key=${MAP_API_KEY}`
       )
       .then((response) => {
-        //console.log(response.data)
+       // console.log(response.data)
         response.data.results.map((toiletData) => {
           const newToilet = {
             coordinate: {
@@ -161,15 +185,18 @@ export default MapScreen = ({ navigation }) => {
   );
 
   const _map = React.useRef(null);
+  console.log(grantedPerms);
 
   return (
     <View style={styles.container}>
       <MapView
         ref={_map}
+        showuserLocation={true}
         initialRegion={state.region}
         mapType={state.mapType}
         style={styles.container}
         provider={PROVIDER_GOOGLE}
+        showsUserLocation={grantedPerms}
         onRegionChangeComplete={(region) =>
           setState({ ...state, region: region })
         }
@@ -289,4 +316,6 @@ export default MapScreen = ({ navigation }) => {
       />
     </View>
   );
+
 };
+

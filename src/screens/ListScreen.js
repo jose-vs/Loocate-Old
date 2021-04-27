@@ -71,7 +71,15 @@ export default ListScreen = ({ route, navigation }) => {
         style={styles.listContainer}
       >
         {toilets.map((item, index) => {
-          return <ToiletCard key={index} text={JSON.stringify(item.address)} />;
+          return (
+          <ToiletCard 
+            key={index}
+            title ={item.title}
+            address={item.address}
+            ratings={item.rating}
+            reviews={item.reviews}
+          />
+          )
         })}
       </ScrollView>
 

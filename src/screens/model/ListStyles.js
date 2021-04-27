@@ -25,6 +25,13 @@ export default StyleSheet.create({
     paddingLeft: 8,
     paddingRight: 8,
   },
+  textContent: {
+    flex: 2,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 15,
+    backgroundColor: "#FFF",
+  },
   chipsScrollView: {
     position: "absolute",
     top: 110,
@@ -61,6 +68,41 @@ export default StyleSheet.create({
     shadowRadius: 5,
     elevation: 1,
   },
+  listTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  listAddress: {
+    fontSize: 15,
+    fontStyle: "italic",
+  },
+  listButton: {
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: "bold",
+    textTransform: "uppercase"
+  },
+  button: {
+    alignItems: "center",
+    backgroundColor: "#DDDDDD",
+    padding: 10
+  },
+  appButtonContainer: {
+    width: 120,
+    elevation: 8,
+    backgroundColor: "#009688",
+    borderRadius: 15,
+    alignSelf: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+  appButtonText: {
+    fontSize: 10,
+    color: "#fff",
+    alignSelf: 'center',
+    fontWeight: "bold",
+    textTransform: "uppercase"
+  },
   scrollView: {
     position: "absolute",
     bottom: 0,
@@ -72,6 +114,12 @@ export default StyleSheet.create({
     position: "relative",
     top: 160,
     marginBottom:160
+  },
+  hairline: {
+    backgroundColor: "#A2A2A2",
+    height: 2,
+    alignSelf: 'center',
+    width: 350,
   },
   footer: {
     // needs changing as the footer box is visible when navigating
