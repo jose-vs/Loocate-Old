@@ -5,25 +5,10 @@ export default StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
-  title: {},
-  logo: { //using
-    flex: 1,
-    height: 130,
-    width: 110,
-    alignSelf: "center",
-    margin: 30,
+  title: {
+    textAlign:"center",
   },
-  button: { //using for log out
-    backgroundColor: "red",
-    marginLeft: 30,
-    marginRight: 30,
-    marginTop: 30,
-    height: 48,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonTwo: { //using for view reviews
+  buttonTwo: { //using for back button
     backgroundColor: "#788eec",
     marginLeft: 30,
     marginRight: 30,
@@ -37,6 +22,17 @@ export default StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  textInput: {
+    height: 48,
+    borderRadius: 5,
+    overflow: "hidden",
+    backgroundColor: "white",
+    marginTop: 10,
+    marginBottom: 10,
+    marginLeft: 30,
+    marginRight: 30,
+    paddingLeft: 16,
   },
   titleText: {
     marginTop: -30,

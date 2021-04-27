@@ -16,6 +16,7 @@ import { styles } from "./model/MapStyles";
 import StarRating from "./components/StarRating";
 import { CARD_WIDTH } from "./model/Constants";
 import BottomSheet from "reanimated-bottom-sheet";
+import { firebase } from '../firebase/config';
 
 //import Map_TopMenu from "./components/Map_TopMenu";
 
@@ -24,6 +25,16 @@ export default function MapScreen({navigation}) {
   const [searchNewArea, setNewArea] = useState(false);
   const [areaLoad, setAreaLoad] = useState(true);
 
+  const user = firebase.auth().currentUser; //will be equal to null if no one is logged in
+
+  const onLoginPress = () => { 
+    if (user != null) {    //check if user logged in
+      navigation.navigate("Account")  
+  } 
+  else{
+    navigation.navigate("Login")
+  } 
+}
   //fetch the api
   useEffect(() => {
     setAreaLoad((current) => false);
@@ -262,7 +273,7 @@ export default function MapScreen({navigation}) {
         <TouchableOpacity
           onPress={() => {
             //navigates to loginscreen when pressed
-            navigation.navigate("Login");
+            onLoginPress();
           }}
         >
           <FontAwesome

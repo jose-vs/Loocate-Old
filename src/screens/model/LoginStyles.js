@@ -8,8 +8,8 @@ export default StyleSheet.create({
   title: {},
   logo: {
     flex: 1,
-    height: 120,
-    width: 90,
+    height: 130,
+    width: 110,
     alignSelf: "center",
     margin: 30,
   },
@@ -33,6 +33,16 @@ export default StyleSheet.create({
     borderRadius: 5,
     alignItems: "center",
     justifyContent: "center",
+  },
+  buttonTwo: {
+    backgroundColor: "#788eec",
+    marginLeft: 30,
+    marginRight: 30,
+    marginTop: 200,
+    height: 48,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center", 
   },
   buttonTitle: {
     color: "white",
