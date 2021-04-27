@@ -41,7 +41,6 @@ export const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.5,
     shadowRadius: 5,
-    elevation: 10,
   },
   searchHereText: {
     color: "#385c59",

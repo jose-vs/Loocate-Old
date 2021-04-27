@@ -16,15 +16,13 @@ import { styles } from "./model/MapStyles";
 import StarRating from "./components/StarRating";
 import { CARD_WIDTH } from "./model/Constants";
 import BottomSheet from "reanimated-bottom-sheet";
-import * as Location from 'expo-location';
-
+import * as Location from "expo-location";
 
 //import Map_TopMenu from "./components/Map_TopMenu";
 
 export default MapScreen = ({ navigation }) => {
   const [state, setState] = useState(initialMapState);
-  const [searchNewArea, setNewArea] = useState(false);
-  const [areaLoad, setAreaLoad] = useState(true);
+  const [areaLoad, setAreaLoad] = useState(false);
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [grantedPerms, setPerms] = useState(null);
@@ -32,66 +30,62 @@ export default MapScreen = ({ navigation }) => {
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
         return;
       }
       let location = await Location.getCurrentPositionAsync({});
-      
+
       setPerms(true);
       setLocation(location);
     })();
   }, []);
 
-  if (errorMsg) {
-    console.log(errorMsg);
-  } else if (location) {
-    console.log(location.coords.latitude); //get latitude 
-    console.log(location.coords.longitude); //get longitude
-  };
   //fetch the api
   useEffect(() => {
-    setAreaLoad((current) => false);
-    toiletApi
-      .get(
-        `&location=
-          ${state.region.latitude}, ${state.region.longitude}
-        &radius=
-          ${state.radius}
-        &keyword=toilet
-        &key=${MAP_API_KEY}`
-      )
-      .then((response) => {
-       // console.log(response.data)
-        response.data.results.map((toiletData) => {
-          const newToilet = {
-            coordinate: {
-              latitude: toiletData.geometry.location.lat,
-              longitude: toiletData.geometry.location.lng,
-            },
-            title: toiletData.name,
-            address: toiletData.vicinity,
-            image: require("../../assets/ToiletPhotos/toilet1.jpg"),
-            rating: toiletData.rating,
-            reviews: toiletData.user_ratings_total,
-          };
+    if (location) {
+      const lat = areaLoad ? state.region.latitude : location.coords.latitude;
+      const lng = areaLoad ? state.region.longitude : location.coords.longitude;
+      console.log(state.region);
+      toiletApi
+        .get(
+          `&location=
+            ${lat}, ${lng}
+          &radius=
+            ${state.radius}
+          &keyword=toilet
+          &key=${MAP_API_KEY}`
+        )
+        .then((response) => {
+          // console.log(response.data)
+          response.data.results.map((toiletData) => {
+            const newToilet = {
+              coordinate: {
+                latitude: toiletData.geometry.location.lat,
+                longitude: toiletData.geometry.location.lng,
+              },
+              title: toiletData.name,
+              address: toiletData.vicinity,
+              image: require("../../assets/ToiletPhotos/toilet1.jpg"),
+              rating: toiletData.rating,
+              reviews: toiletData.user_ratings_total,
+            };
 
-          //console.log(newToilet);
-          state.markers.push(newToilet);
+            console.log(newToilet);
+            state.markers.push(newToilet);
+          });
+        })
+        .catch(function (error) {
+          console.log(error);
         });
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }, [areaLoad]);
-
-  useEffect(() => {
-    setNewArea((current) => true);
-  }, [state.region]);
+      setAreaLoad((current) => false);
+    } else {
+      console.log("bruh");
+    }
+  }, [areaLoad, location]);
 
   const onAreaSearchPress = () => {
     setState({ ...state, markers: [] });
-    setNewArea((current) => false);
     setAreaLoad((current) => true);
   };
 
@@ -188,7 +182,7 @@ export default MapScreen = ({ navigation }) => {
   const _map = React.useRef(null);
   console.log(grantedPerms);
 
-  if (location) { 
+  if (location) {
     return (
       <View style={styles.container}>
         <MapView
@@ -207,7 +201,6 @@ export default MapScreen = ({ navigation }) => {
           onRegionChangeComplete={(region) =>
             setState({ ...state, region: region })
           }
-          onPress={() => {}}
         >
           {state.markers.map((marker, index) => {
             return (
@@ -253,7 +246,7 @@ export default MapScreen = ({ navigation }) => {
             <Text style={styles.searchHereText}>Search this area</Text>
           </TouchableOpacity>
         </Animatable.View>
-  
+
         <View style={styles.buttonContainer}>
           {/* Map Style Button */}
           <TouchableOpacity
@@ -323,17 +316,11 @@ export default MapScreen = ({ navigation }) => {
         />
       </View>
     );
-  } else { 
-    return ( 
+  } else {
+    return (
       <View style={styles.loadScreen}>
-        <Text> 
-          Poopy
-        </Text>
+        <Text>Poopy</Text>
       </View>
-    )
+    );
   }
-
-  
-
 };
-
