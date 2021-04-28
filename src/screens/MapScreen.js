@@ -126,12 +126,24 @@ export default MapScreen = ({ navigation }) => {
   });
 
   const [marker, setMarker] = useState();
+  const [title, setTitle] = useState();
+  const [address, setAddress] = useState();
+  const [ratings, setRatings] = useState();
+  const [reviews, setReviews] = useState();
 
   const onMarkerPress = (mapEventData) => {
     // get the event data on press
-    const markerID = mapEventData._targetInst.return.key; // get the markerID of the event data
+    const markerID = mapEventData._targetInst.return.key; 
+    console.log(false);// get the markerID of the event data
+    console.log(markerID);
     console.log(state.markers[markerID]);
+   // console.log(state.markers[markerID].title);
     setMarker(markerID);
+    setTitle(state.markers[markerID].title);
+    setAddress(state.markers[markerID].address);
+    setRatings(state.markers[markerID].rating);
+    setReviews(state.markers[markerID].reviews);
+
     bs.current.snapTo(0);
   };
 
@@ -153,30 +165,30 @@ export default MapScreen = ({ navigation }) => {
 
   renderInner = () => (
     <View style={styles.bottomPanel}>
-      {marker &&
-        marker.length && ( //check for null in useState otherwise crash on startup as undefined
-          <Text style={styles.toiletTitle}>{state.markers[marker].title}</Text>
-        )}
-      {marker && marker.length && (
-        <Text style={styles.toiletSubtitle}>
-          {state.markers[marker].address}
-        </Text>
+    {marker &&
+      marker.length && ( //check for null in useState otherwise crash on startup as undefined
+        <Text style={styles.toiletTitle}>{title}</Text>
       )}
-      <View style={styles.hairline} />
-      {marker && marker.length && (
-        <Text style={styles.textSubheading}>Get Directions</Text>
-      )}
-      {marker && marker.length && (
-        <Text style={styles.textSubheading}>
-          Rating: <StarRating ratings={state.markers[marker].rating} />
-        </Text>
-      )}
-      {marker && marker.length && (
-        <Text style={styles.textSubheading}>
-          Reviews: {state.markers[marker].reviews}
-        </Text>
-      )}
-    </View>
+    {marker && marker.length && (
+      <Text style={styles.toiletSubtitle}>
+        {address}
+      </Text>
+    )}
+    <View style={styles.hairline} />
+    {marker && marker.length && (
+      <TouchableOpacity><Text style={styles.textSubheading}>Get Directions</Text></TouchableOpacity>
+    )}
+    {marker && marker.length && (
+      <Text style={styles.textSubheading}>
+        Rating: <StarRating ratings={ratings} />
+      </Text>
+    )}
+    {marker && marker.length && (
+      <Text style={styles.textSubheading}>
+        Reviews: {reviews}
+      </Text>
+    )}
+  </View>
   );
 
   const _map = React.useRef(null);
