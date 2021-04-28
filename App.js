@@ -10,6 +10,7 @@ import AccountScreen from "./src/screens/AccountScreen";
 import RegistrationScreen from "./src/screens/RegistrationScreen";
 import ListScreen from "./src/screens/ListScreen";
 import MapScreen from "./src/screens/MapScreen";
+import ReviewTypeScreen from './src/screens/ReviewTypeScreen';
 
 const Stack = createStackNavigator();
 
