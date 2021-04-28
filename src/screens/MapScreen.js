@@ -27,6 +27,8 @@ export default MapScreen = ({ navigation }) => {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [grantedPerms, setPerms] = useState(null);
+  const [userLat, setUserLat] = useState(null);
+  const [userLong, setUserLong] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -35,8 +37,10 @@ export default MapScreen = ({ navigation }) => {
         setErrorMsg("Permission to access location was denied");
         return;
       }
-      let location = await Location.getCurrentPositionAsync({});
 
+      let location = await Location.getCurrentPositionAsync({accuracy: Location.Accuracy.High});
+      setUserLat(location.coords.latitude);
+      setUserLong(location.coords.longitude);
       setPerms(true);
       setLocation(location);
     })();
@@ -48,8 +52,8 @@ export default MapScreen = ({ navigation }) => {
   }, [areaLoad, location]);
 
   const apiFetch = async () => {
-    var lat = areaLoad ? state.region.latitude : location.coords.latitude;
-    var lng = areaLoad ? state.region.longitude : location.coords.longitude;
+    var lat = areaLoad ? state.region.latitude : userLat;
+    var lng = areaLoad ? state.region.longitude : userLong;
     await toiletApi
       .get(
         `&location=
