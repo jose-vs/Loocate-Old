@@ -4,6 +4,7 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: '#75CFB8'
   },
   title: {},
   logo: { //using
@@ -42,6 +43,6 @@ export default StyleSheet.create({
     marginTop: -30,
     fontSize: 25,
     textAlign:"center",
-    color: "#2e2e2d",
+    color: "white",
   },
 });

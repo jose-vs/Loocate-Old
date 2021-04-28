@@ -4,6 +4,7 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: '#75CFB8',
   },
   title: {},
   logo: {
@@ -46,7 +47,7 @@ export default StyleSheet.create({
   },
   footerText: {
     fontSize: 16,
-    color: "#2e2e2d",
+    color: "#fefffc",
   },
   footerLink: {
     color: "#788eec",

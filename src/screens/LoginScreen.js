@@ -41,12 +41,12 @@ export default function LoginScreen({navigation}) {
     return (
         <View style={styles.container}>
             <KeyboardAwareScrollView
-                style={{ flex: 1, width: '100%' }}
+                style={{ flex: 1, width: '100%', backgroundColor: '#75CFB8' }}
                 keyboardShouldPersistTaps="always">
                 <Image
                     style={styles.logo}
                     source={require('../../assets/loocate_icon.png')}
-                    tintColor='grey'
+                    tintColor='white'
                 />
                 <TextInput
                     style={styles.input}

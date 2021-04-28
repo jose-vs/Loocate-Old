@@ -29,7 +29,7 @@ export default function AccountScreen({ navigation }) {
         <Image
         style={styles.logo}
         source={require('../../assets/loocate_icon.png')}
-        tintColor='grey'/>
+        tintColor='white'/>
       <Text style={styles.titleText}>
       Your Account, retrieve user's name from database
       </Text>

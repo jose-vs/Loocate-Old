@@ -19,6 +19,7 @@ import { CARD_WIDTH } from "./model/Constants";
 import BottomSheet from "reanimated-bottom-sheet";
 import * as Location from "expo-location";
 import { firebase } from '../firebase/config';
+import MapViewDirections from 'react-native-maps-directions'
 
 //import Map_TopMenu from "./components/Map_TopMenu";
 
@@ -30,6 +31,14 @@ export default MapScreen = ({ navigation }) => {
   const [grantedPerms, setPerms] = useState(null);
   const [userLat, setUserLat] = useState(null);
   const [userLong, setUserLong] = useState(null);
+  const [destinationLat, setDestinationLat] = useState(null);
+  const [destinationLong, setDestinationLong] = useState(null);
+
+  //const destination = {latitude: 37.771707, longitude: -122.4053769};
+  //let origin = {setUserLat, setUserLong}
+
+  const origin = {latitude: userLat, longitude: userLong};
+  let destination = {latitude: destinationLat, longitude: destinationLong};
 
   useEffect(() => {
     (async () => {
@@ -47,13 +56,17 @@ export default MapScreen = ({ navigation }) => {
     })();
   }, []);
 
-  const user = firebase.auth().currentUser; //will be equal to null if no one is logged in
+  let user = firebase.auth().currentUser; //will be equal to null if no one is logged in, not working properly atm
 
   const onLoginPress = () => { 
     if (user != null) {    //check if user logged in
-      navigation.navigate("Account")  
+      console.log(user);
+      console.log("1");
+      navigation.navigate("Account")       
   } 
   else{
+    console.log(user);
+    console.log("2");
     navigation.navigate("Login")
   } 
 }
@@ -88,9 +101,9 @@ export default MapScreen = ({ navigation }) => {
             rating: toiletData.rating,
             reviews: toiletData.user_ratings_total,
           };
-
-          console.log(newToilet);
-          state.markers.push(newToilet);
+          //need to get coords from inside newtoilet...which is put inside a marker. Go to onmarkerpress...
+          console.log(newToilet);      
+          state.markers.push(newToilet)  
         });
       })
       .catch((err) => console.log("Error:", err));
@@ -157,6 +170,11 @@ export default MapScreen = ({ navigation }) => {
     setRatings(state.markers[markerID].rating);
     setReviews(state.markers[markerID].reviews);
 
+    //DIRECTIONS SET TO COORDS WHEN MARKER PRESSED
+    //sets destination
+    setDestinationLat(state.markers[markerID].coordinate.latitude);
+    setDestinationLong(state.markers[markerID].coordinate.longitude);
+    console.log(destination)
     bs.current.snapTo(0);
   };
 
@@ -235,6 +253,14 @@ export default MapScreen = ({ navigation }) => {
             setState({ ...state, region: region })
           }
         >
+        <MapViewDirections
+          origin={origin}
+          destination={destination}
+          apikey={MAP_API_KEY}
+          strokeWidth={5}
+          strokeColor="hotpink"
+          mode="WALKING"
+        />
           {state.markers.map((marker, index) => {
             return (
               <Marker
@@ -266,7 +292,7 @@ export default MapScreen = ({ navigation }) => {
         {/* USER SCREEN */}
         <TouchableOpacity
           onPress={() => {
-            //navigates to loginscreen when pressed
+            //navigates to loginscreen or accountscreen when pressed
             onLoginPress();
           }}          
         >
@@ -332,10 +358,10 @@ export default MapScreen = ({ navigation }) => {
           </TouchableOpacity>
           {/* USER SCREEN */}
           <TouchableOpacity
-            onPress={() => {
-              //navigates to loginscreen when pressed
-              navigation.navigate("Login");
-            }}
+          onPress={() => {
+            //navigates to loginscreen or accountscreen when pressed
+            onLoginPress();
+            }} 
           >
             <FontAwesome
               name="user"
