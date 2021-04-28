@@ -5,8 +5,9 @@ import {
   TextInput,
   View,
   TouchableOpacity,
+  Image,
 } from "react-native";
-import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import * as Animatable from "react-native-animatable";
 import { FontAwesome, MaterialIcons, Entypo } from "@expo/vector-icons";
 import { MAP_API_KEY } from "@env";
@@ -43,46 +44,43 @@ export default MapScreen = ({ navigation }) => {
 
   //fetch the api
   useEffect(() => {
-    if (location) {
-      const lat = areaLoad ? state.region.latitude : location.coords.latitude;
-      const lng = areaLoad ? state.region.longitude : location.coords.longitude;
-      console.log(state.region);
-      toiletApi
-        .get(
-          `&location=
+    apiFetch();
+  }, [areaLoad, location]);
+
+  const apiFetch = async () => {
+    var lat = areaLoad ? state.region.latitude : location.coords.latitude;
+    var lng = areaLoad ? state.region.longitude : location.coords.longitude;
+    await toiletApi
+      .get(
+        `&location=
             ${lat}, ${lng}
           &radius=
             ${state.radius}
           &keyword=toilet
           &key=${MAP_API_KEY}`
-        )
-        .then((response) => {
-          // console.log(response.data)
-          response.data.results.map((toiletData) => {
-            const newToilet = {
-              coordinate: {
-                latitude: toiletData.geometry.location.lat,
-                longitude: toiletData.geometry.location.lng,
-              },
-              title: toiletData.name,
-              address: toiletData.vicinity,
-              image: require("../../assets/ToiletPhotos/toilet1.jpg"),
-              rating: toiletData.rating,
-              reviews: toiletData.user_ratings_total,
-            };
+      )
+      .then((response) => {
+        // console.log(response.data)
+        response.data.results.map((toiletData) => {
+          const newToilet = {
+            coordinate: {
+              latitude: toiletData.geometry.location.lat,
+              longitude: toiletData.geometry.location.lng,
+            },
+            title: toiletData.name,
+            address: toiletData.vicinity,
+            image: require("../../assets/ToiletPhotos/toilet1.jpg"),
+            rating: toiletData.rating,
+            reviews: toiletData.user_ratings_total,
+          };
 
-            console.log(newToilet);
-            state.markers.push(newToilet);
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
+          console.log(newToilet);
+          state.markers.push(newToilet);
         });
-      setAreaLoad((current) => false);
-    } else {
-      console.log("bruh");
-    }
-  }, [areaLoad, location]);
+      })
+      .catch((err) => console.log("Error:", err));
+    setAreaLoad((current) => false);
+  };
 
   const onAreaSearchPress = () => {
     setState({ ...state, markers: [] });
@@ -133,11 +131,11 @@ export default MapScreen = ({ navigation }) => {
 
   const onMarkerPress = (mapEventData) => {
     // get the event data on press
-    const markerID = mapEventData._targetInst.return.key; 
-    console.log(false);// get the markerID of the event data
+    const markerID = mapEventData._targetInst.return.key;
+    console.log(false); // get the markerID of the event data
     console.log(markerID);
     console.log(state.markers[markerID]);
-   // console.log(state.markers[markerID].title);
+    // console.log(state.markers[markerID].title);
     setMarker(markerID);
     setTitle(state.markers[markerID].title);
     setAddress(state.markers[markerID].address);
@@ -165,30 +163,33 @@ export default MapScreen = ({ navigation }) => {
 
   renderInner = () => (
     <View style={styles.bottomPanel}>
-    {marker &&
-      marker.length && ( //check for null in useState otherwise crash on startup as undefined
-        <Text style={styles.toiletTitle}>{title}</Text>
+      {marker && marker.length && (
+        <Text
+          style={
+            styles.toiletTitle //check for null in useState otherwise crash on startup as undefined
+          }
+        >
+          {title}
+        </Text>
       )}
-    {marker && marker.length && (
-      <Text style={styles.toiletSubtitle}>
-        {address}
-      </Text>
-    )}
-    <View style={styles.hairline} />
-    {marker && marker.length && (
-      <TouchableOpacity><Text style={styles.textSubheading}>Get Directions</Text></TouchableOpacity>
-    )}
-    {marker && marker.length && (
-      <Text style={styles.textSubheading}>
-        Rating: <StarRating ratings={ratings} />
-      </Text>
-    )}
-    {marker && marker.length && (
-      <Text style={styles.textSubheading}>
-        Reviews: {reviews}
-      </Text>
-    )}
-  </View>
+      {marker && marker.length && (
+        <Text style={styles.toiletSubtitle}>{address}</Text>
+      )}
+      <View style={styles.hairline} />
+      {marker && marker.length && (
+        <TouchableOpacity>
+          <Text style={styles.textSubheading}>Get Directions</Text>
+        </TouchableOpacity>
+      )}
+      {marker && marker.length && (
+        <Text style={styles.textSubheading}>
+          Rating: <StarRating ratings={ratings} />
+        </Text>
+      )}
+      {marker && marker.length && (
+        <Text style={styles.textSubheading}>Reviews: {reviews}</Text>
+      )}
+    </View>
   );
 
   const _map = React.useRef(null);
@@ -200,6 +201,11 @@ export default MapScreen = ({ navigation }) => {
         <MapView
           ref={_map}
           showuserLocation={true}
+          loadingEnabled={true}
+          loadingIndicatorColor="#75CFB8"
+          loadingBackgroundColor="#fff"
+          showsCompass={false}
+          showsPointsOfInterest={false}
           initialRegion={{
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
@@ -216,7 +222,8 @@ export default MapScreen = ({ navigation }) => {
         >
           {state.markers.map((marker, index) => {
             return (
-              <MapView.Marker
+              <Marker
+                onLoad={() => this.forceUpdate()}
                 key={index}
                 tracksViewChanges={false}
                 coordinate={marker.coordinate}
@@ -224,14 +231,13 @@ export default MapScreen = ({ navigation }) => {
                   onMarkerPress(e);
                 }}
               >
-                <Animated.View style={[styles.markerWrap]}>
-                  <Animated.Image
+                <View style={styles.markerWrap}>
+                  <Image
                     source={require("../../assets/pin.png")}
                     style={styles.marker}
-                    resizeMode="cover"
                   />
-                </Animated.View>
-              </MapView.Marker>
+                </View>
+              </Marker>
             );
           })}
         </MapView>
@@ -331,7 +337,11 @@ export default MapScreen = ({ navigation }) => {
   } else {
     return (
       <View style={styles.loadScreen}>
-        <Text>Poopy</Text>
+        <Image
+          source={require("../../assets/loocate_icon.png")}
+          style={styles.icon}
+          resizeMode="cover"
+        />
       </View>
     );
   }

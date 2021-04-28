@@ -128,4 +128,11 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#75CFB8'
   },
+  icon: { 
+    top: 200,
+    position: 'relative',
+    alignSelf: 'center',
+    height: 292,
+    width: 261
+  }
 });
