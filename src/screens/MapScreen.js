@@ -16,57 +16,76 @@ import { styles } from "./model/MapStyles";
 import StarRating from "./components/StarRating";
 import { CARD_WIDTH } from "./model/Constants";
 import BottomSheet from "reanimated-bottom-sheet";
+import * as Location from "expo-location";
 
 //import Map_TopMenu from "./components/Map_TopMenu";
 
-export default function MapScreen({navigation}) {
+export default MapScreen = ({ navigation }) => {
   const [state, setState] = useState(initialMapState);
-  const [searchNewArea, setNewArea] = useState(false);
-  const [areaLoad, setAreaLoad] = useState(true);
+  const [areaLoad, setAreaLoad] = useState(false);
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [grantedPerms, setPerms] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+      let location = await Location.getCurrentPositionAsync({});
+
+      setPerms(true);
+      setLocation(location);
+    })();
+  }, []);
 
   //fetch the api
   useEffect(() => {
-    setAreaLoad((current) => false);
-    toiletApi
-      .get(
-        `&location=
-          ${state.region.latitude}, ${state.region.longitude}
-        &radius=
-          ${state.radius}
-        &keyword=toilet
-        &key=${MAP_API_KEY}`
-      )
-      .then((response) => {
-        //console.log(response.data)
-        response.data.results.map((toiletData) => {
-          const newToilet = {
-            coordinate: {
-              latitude: toiletData.geometry.location.lat,
-              longitude: toiletData.geometry.location.lng,
-            },
-            title: toiletData.name,
-            address: toiletData.vicinity,
-            image: require("../../assets/ToiletPhotos/toilet1.jpg"),
-            rating: toiletData.rating,
-            reviews: toiletData.user_ratings_total,
-          };
+    if (location) {
+      const lat = areaLoad ? state.region.latitude : location.coords.latitude;
+      const lng = areaLoad ? state.region.longitude : location.coords.longitude;
+      console.log(state.region);
+      toiletApi
+        .get(
+          `&location=
+            ${lat}, ${lng}
+          &radius=
+            ${state.radius}
+          &keyword=toilet
+          &key=${MAP_API_KEY}`
+        )
+        .then((response) => {
+          // console.log(response.data)
+          response.data.results.map((toiletData) => {
+            const newToilet = {
+              coordinate: {
+                latitude: toiletData.geometry.location.lat,
+                longitude: toiletData.geometry.location.lng,
+              },
+              title: toiletData.name,
+              address: toiletData.vicinity,
+              image: require("../../assets/ToiletPhotos/toilet1.jpg"),
+              rating: toiletData.rating,
+              reviews: toiletData.user_ratings_total,
+            };
 
-          //console.log(newToilet);
-          state.markers.push(newToilet);
+            console.log(newToilet);
+            state.markers.push(newToilet);
+          });
+        })
+        .catch(function (error) {
+          console.log(error);
         });
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }, [areaLoad]);
-
-  useEffect(() => {
-    setNewArea((current) => true);
-  }, [state.region]);
+      setAreaLoad((current) => false);
+    } else {
+      console.log("bruh");
+    }
+  }, [areaLoad, location]);
 
   const onAreaSearchPress = () => {
     setState({ ...state, markers: [] });
-    setNewArea((current) => false);
     setAreaLoad((current) => true);
   };
 
@@ -161,130 +180,147 @@ export default function MapScreen({navigation}) {
   );
 
   const _map = React.useRef(null);
+  console.log(grantedPerms);
 
-  return (
-    <View style={styles.container}>
-      <MapView
-        ref={_map}
-        initialRegion={state.region}
-        mapType={state.mapType}
-        style={styles.container}
-        provider={PROVIDER_GOOGLE}
-        onRegionChangeComplete={(region) =>
-          setState({ ...state, region: region })
-        }
-        onPress={() => {}}
-      >
-        {state.markers.map((marker, index) => {
-          return (
-            <MapView.Marker
-              key={index}
-              tracksViewChanges={false}
-              coordinate={marker.coordinate}
-              onPress={(e) => {
-                onMarkerPress(e);
-              }}
-            >
-              <Animated.View style={[styles.markerWrap]}>
-                <Animated.Image
-                  source={require("../../assets/pin.png")}
-                  style={styles.marker}
-                  resizeMode="cover"
-                />
-              </Animated.View>
-            </MapView.Marker>
-          );
-        })}
-      </MapView>
-      <View style={styles.searchBox}>
-        <TextInput
-          placeholder="Search here"
-          placeholderTextColor="#777"
-          autoCapitalize="none"
-          style={styles.searchBoxText}
-        />
-        <FontAwesome
-          name="search"
-          size={24}
-          color="black"
-          style={{ right: 8, opacity: 0.6 }}
-        />
-      </View>
-      <Animatable.View style={styles.searchHere} animation="fadeInLeft">
-        <TouchableOpacity
-          onPress={() => {
-            onAreaSearchPress();
+  if (location) {
+    return (
+      <View style={styles.container}>
+        <MapView
+          ref={_map}
+          showuserLocation={true}
+          initialRegion={{
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
           }}
+          mapType={state.mapType}
+          style={styles.container}
+          provider={PROVIDER_GOOGLE}
+          showsUserLocation={grantedPerms}
+          onRegionChangeComplete={(region) =>
+            setState({ ...state, region: region })
+          }
         >
-          <Text style={styles.searchHereText}>Search this area</Text>
-        </TouchableOpacity>
-      </Animatable.View>
-
-      <View style={styles.buttonContainer}>
-        {/* Map Style Button */}
-        <TouchableOpacity
-          onPress={() => {
-            onMapStyleButtonPress();
-          }}
-        >
-          <View style={styles.circleButton}>
-            <MaterialIcons
-              name="layers"
-              size={26}
-              color="black"
-              style={{ top: 6, left: 6, opacity: 0.6 }}
-            />
-          </View>
-        </TouchableOpacity>
-
-        {/* FOOTER */}
-      </View>
-      <View style={styles.footer}>
-        {/* MAP BUTTON */}
-        <TouchableOpacity onPress={() => {}}>
-          <Entypo
-            name="map"
-            size={24}
-            color="white"
-            style={styles.footerButton}
+          {state.markers.map((marker, index) => {
+            return (
+              <MapView.Marker
+                key={index}
+                tracksViewChanges={false}
+                coordinate={marker.coordinate}
+                onPress={(e) => {
+                  onMarkerPress(e);
+                }}
+              >
+                <Animated.View style={[styles.markerWrap]}>
+                  <Animated.Image
+                    source={require("../../assets/pin.png")}
+                    style={styles.marker}
+                    resizeMode="cover"
+                  />
+                </Animated.View>
+              </MapView.Marker>
+            );
+          })}
+        </MapView>
+        <View style={styles.searchBox}>
+          <TextInput
+            placeholder="Search here"
+            placeholderTextColor="#777"
+            autoCapitalize="none"
+            style={styles.searchBoxText}
           />
-        </TouchableOpacity>
-        {/* LIST SCREEN */}
-        <TouchableOpacity onPress={() => {}}>
-          <Entypo
-            name="list"
-            size={24}
-            color="white"
-            style={styles.footerButton}
-          />
-        </TouchableOpacity>
-        {/* USER SCREEN */}
-        <TouchableOpacity
-          onPress={() => {
-            //navigates to loginscreen when pressed
-            navigation.navigate("Login");
-          }}
-        >
           <FontAwesome
-            name="user"
+            name="search"
             size={24}
-            color="white"
-            style={styles.footerButton}
+            color="black"
+            style={{ right: 8, opacity: 0.6 }}
           />
-        </TouchableOpacity>
+        </View>
+        <Animatable.View style={styles.searchHere} animation="fadeInLeft">
+          <TouchableOpacity
+            onPress={() => {
+              onAreaSearchPress();
+            }}
+          >
+            <Text style={styles.searchHereText}>Search this area</Text>
+          </TouchableOpacity>
+        </Animatable.View>
+
+        <View style={styles.buttonContainer}>
+          {/* Map Style Button */}
+          <TouchableOpacity
+            onPress={() => {
+              onMapStyleButtonPress();
+            }}
+          >
+            <View style={styles.circleButton}>
+              <MaterialIcons
+                name="layers"
+                size={26}
+                color="black"
+                style={{ top: 6, left: 6, opacity: 0.6 }}
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
+        {/* FOOTER */}
+        <View style={styles.footer}>
+          {/* MAP BUTTON */}
+          <TouchableOpacity onPress={() => {}}>
+            <Entypo
+              name="map"
+              size={24}
+              color="white"
+              style={styles.footerButton}
+            />
+          </TouchableOpacity>
+          {/* LIST SCREEN */}
+          <TouchableOpacity
+            onPress={() => {
+              //navigates to listscreen when pressed
+              navigation.navigate("List", state.markers);
+            }}
+          >
+            <Entypo
+              name="list"
+              size={24}
+              color="white"
+              style={styles.footerButton}
+            />
+          </TouchableOpacity>
+          {/* USER SCREEN */}
+          <TouchableOpacity
+            onPress={() => {
+              //navigates to loginscreen when pressed
+              navigation.navigate("Login");
+            }}
+          >
+            <FontAwesome
+              name="user"
+              size={24}
+              color="white"
+              style={styles.footerButton}
+            />
+          </TouchableOpacity>
+        </View>
+        <BottomSheet
+          ref={bs}
+          snapPoints={[320, 0]}
+          renderContent={renderInner}
+          renderHeader={renderHeader}
+          borderRadius={10}
+          initialSnap={1}
+          borderRadius={10}
+          enabledGestureInteraction={true}
+        />
       </View>
-      <BottomSheet
-        ref={bs}
-        snapPoints={[320, 0]}
-        renderContent={renderInner}
-        renderHeader={renderHeader}
-        borderRadius={10}
-        initialSnap={1}
-        borderRadius={10}
-        enabledGestureInteraction={true}
-      />
-    </View>
-  );
+    );
+  } else {
+    return (
+      <View style={styles.loadScreen}>
+        <Text>Poopy</Text>
+      </View>
+    );
+  }
 };
-
-

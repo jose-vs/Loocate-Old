@@ -1,21 +1,6 @@
 const initialMapState = {
   markers: [],
 
-  filter: [
-    {
-      type: "nearest",
-    },
-    {
-      type: "top-rated",
-    },
-    {
-      type: "visited",
-    },
-    {
-      type: "not-visited",
-    },
-  ],
-
   region: {
     // Auckland City
     latitude: -36.853121304049786,
@@ -30,4 +15,19 @@ const initialMapState = {
   mapType: "standard",
 };
 
-export { initialMapState };
+const filter = [
+  {
+    type: "nearest",
+  },
+  {
+    type: "top-rated",
+  },
+  {
+    type: "visited",
+  },
+  {
+    type: "not-visited",
+  },
+];
+
+export { initialMapState, filter };
