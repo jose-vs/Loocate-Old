@@ -33,12 +33,17 @@ export default MapScreen = ({ navigation }) => {
   const [userLong, setUserLong] = useState(null);
   const [destinationLat, setDestinationLat] = useState(null);
   const [destinationLong, setDestinationLong] = useState(null);
+  const [tempLat, setTempLat] = useState(null);
+  const [tempLong, setTempLong] = useState(null);
 
-  //const destination = {latitude: 37.771707, longitude: -122.4053769};
-  //let origin = {setUserLat, setUserLong}
-
+  //directions
   const origin = {latitude: userLat, longitude: userLong};
-  let destination = {latitude: destinationLat, longitude: destinationLong};
+  const destination = {latitude: destinationLat, longitude: destinationLong};
+
+  const onGetDirectionsPress = () => {
+    setDestinationLat(tempLat);
+    setDestinationLong(tempLong);
+  }
 
   useEffect(() => {
     (async () => {
@@ -170,11 +175,17 @@ export default MapScreen = ({ navigation }) => {
     setRatings(state.markers[markerID].rating);
     setReviews(state.markers[markerID].reviews);
 
-    //DIRECTIONS SET TO COORDS WHEN MARKER PRESSED
+    //DIRECTIONS SET TO COORDS OF MARKER WHEN MARKER PRESSED
     //sets destination
-    setDestinationLat(state.markers[markerID].coordinate.latitude);
-    setDestinationLong(state.markers[markerID].coordinate.longitude);
-    console.log(destination)
+    //setDestinationLat(state.markers[markerID].coordinate.latitude);
+    //setDestinationLong(state.markers[markerID].coordinate.longitude);
+    //console.log(destination)     
+
+    setTempLat(state.markers[markerID].coordinate.latitude);
+    setTempLong(state.markers[markerID].coordinate.longitude);
+    //setDestinationLat(tempLat);
+    //setDestinationLong(tempLong);
+
     bs.current.snapTo(0);
   };
 
@@ -210,7 +221,8 @@ export default MapScreen = ({ navigation }) => {
       )}
       <View style={styles.hairline} />
       {marker && marker.length && (
-        <TouchableOpacity>
+        <TouchableOpacity
+        onPress={() => onGetDirectionsPress()}>
           <Text style={styles.textSubheading}>Get Directions</Text>
         </TouchableOpacity>
       )}
@@ -258,7 +270,7 @@ export default MapScreen = ({ navigation }) => {
           destination={destination}
           apikey={MAP_API_KEY}
           strokeWidth={5}
-          strokeColor="hotpink"
+          strokeColor="#00ced1"
           mode="WALKING"
         />
           {state.markers.map((marker, index) => {
@@ -380,6 +392,7 @@ export default MapScreen = ({ navigation }) => {
           initialSnap={1}
           borderRadius={10}
           enabledGestureInteraction={true}
+          enabledContentGestureInteraction={false} //this line needed to be added to make markers in bottomsheet respond to onpress
         />
       </View>
     );
