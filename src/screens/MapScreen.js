@@ -31,8 +31,8 @@ export default MapScreen = ({ navigation }) => {
   const [grantedPerms, setPerms] = useState(null);
   const [userLat, setUserLat] = useState(null);
   const [userLong, setUserLong] = useState(null);
-  const [destinationLat, setDestinationLat] = useState(null);
-  const [destinationLong, setDestinationLong] = useState(null);
+  const [destinationLat, setDestinationLat] = useState(userLat);
+  const [destinationLong, setDestinationLong] = useState(userLong);
   const [tempLat, setTempLat] = useState(null);
   const [tempLong, setTempLong] = useState(null);
 
