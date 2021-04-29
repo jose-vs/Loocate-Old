@@ -31,11 +31,35 @@ export default MapScreen = ({ navigation }) => {
   const [grantedPerms, setPerms] = useState(null);
   const [userLat, setUserLat] = useState(null);
   const [userLong, setUserLong] = useState(null);
-  const [destinationLat, setDestinationLat] = useState(userLat);
-  const [destinationLong, setDestinationLong] = useState(userLong);
+  const [destinationLat, setDestinationLat] = useState(null);
+  const [destinationLong, setDestinationLong] = useState(null);
   const [tempLat, setTempLat] = useState(null);
   const [tempLong, setTempLong] = useState(null);
 
+  //login screen transition...check if user is already logged in or not.
+  const onLoginPress = () => { 
+    //if there is a user logged in, retrieve them and skip having to go through login screen again
+    
+    firebase.auth().onAuthStateChanged(user => {
+    if (user) { //if user is signed in
+      const usersRef = firebase.firestore().collection('users'); //get user collection from firestore
+      usersRef //call the database of user data (NOT the users in auth())
+        .doc(user.uid)
+        .get()
+        .then((document) => {
+          const data = document.data() //this is the specific data (not userAuth, but the data I made in the users collection) of the user
+          console.log("existing user go st8 to acc");
+          console.log(data)
+          navigation.navigate("Account", {user: data})
+        }
+        );
+    } else {
+      console.log("no acc 4 u sry, login time");
+      navigation.navigate("Login")
+    }
+  })
+}
+  
   //directions
   const origin = {latitude: userLat, longitude: userLong};
   const destination = {latitude: destinationLat, longitude: destinationLong};
@@ -45,6 +69,24 @@ export default MapScreen = ({ navigation }) => {
     setDestinationLong(tempLong);
   }
 
+  //direction
+  useEffect(() => {
+    (async () => {
+      let { destination } = await renderInner();
+      if (destinationLat === null) {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({accuracy: Location.Accuracy.High});
+      setUserLat(location.coords.latitude);
+      setUserLong(location.coords.longitude);
+      setPerms(true);
+      setLocation(location);
+    })();
+  }, []);
+
+  //user location
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -61,20 +103,6 @@ export default MapScreen = ({ navigation }) => {
     })();
   }, []);
 
-  let user = firebase.auth().currentUser; //will be equal to null if no one is logged in, not working properly atm
-
-  const onLoginPress = () => { 
-    if (user != null) {    //check if user logged in
-      console.log(user);
-      console.log("1");
-      navigation.navigate("Account")       
-  } 
-  else{
-    console.log(user);
-    console.log("2");
-    navigation.navigate("Login")
-  } 
-}
   //fetch the api
   useEffect(() => {
     apiFetch();
@@ -271,8 +299,10 @@ export default MapScreen = ({ navigation }) => {
           apikey={MAP_API_KEY}
           strokeWidth={5}
           strokeColor="#00ced1"
-          mode="WALKING"
-        />
+          optimizeWaypoints={true}
+          mode = "WALKING"  
+          
+          />
           {state.markers.map((marker, index) => {
             return (
               <Marker
@@ -392,7 +422,7 @@ export default MapScreen = ({ navigation }) => {
           initialSnap={1}
           borderRadius={10}
           enabledGestureInteraction={true}
-          enabledContentGestureInteraction={false} //this line needed to be added to make markers in bottomsheet respond to onpress
+          enabledContentTapInteraction={false} //this line needed to be added to make markers in bottomsheet respond to onpress
         />
       </View>
     );

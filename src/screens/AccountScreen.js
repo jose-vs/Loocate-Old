@@ -4,14 +4,15 @@ import styles from "./model/AccountStyles.js";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { firebase } from "../firebase/config";
 
-export default function AccountScreen({ navigation }) {
+export default function AccountScreen({ route, navigation}) {
 
-  const onLogOutPress = () => {
-    var user = firebase.auth().currentUser;
-    console.log(user); //print user details to console, mainly for testing purposes
-    firebase.auth().signOut(); //sign out user not working at the moment
-    navigation.navigate("Map");
-  };
+  const {userData} = route.params;
+
+  const onLogOutPress = () => {    
+    firebase.auth().signOut()
+    navigation.navigate("Login");
+  }
+
 
   const viewMyReviewsPress = () => {
     //go to reviews, use scrollview maybe
@@ -31,7 +32,7 @@ export default function AccountScreen({ navigation }) {
         source={require('../../assets/loocate_icon.png')}
         tintColor='white'/>
       <Text style={styles.titleText}>
-      Your Account, retrieve user's name from database
+      Your Account
       </Text>
         <TouchableOpacity style={styles.buttonTwo} onPress={() => viewMyReviewsPress()}>
           <Text style={styles.buttonTitle}>View my reviews</Text>

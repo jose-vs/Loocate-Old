@@ -18,8 +18,8 @@ export default function ReviewTypeScreen({ navigation }) {
 
     return (
         <>
-          <TextInput onChangeText={() => {}}
-            style={styles.input}
+          <TextInput onChangeText={() => {}}        
+            style={styles.textInput}
             placeholder='Write your review here:'
             placeholderTextColor="#aaaaaa"
              onChangeText={(text) => setReview(text)}
