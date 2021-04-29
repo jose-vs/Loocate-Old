@@ -4,6 +4,7 @@ export { default as AccounteScreen } from './src/screens/AccountScreen'
 export { default as MapScreen } from './src/screens/MapScreen'
 export { default as RegistrationScreen } from './src/screens/RegistrationScreen'
 export { default as ReviewTypeScreen } from './src/screens/ReviewTypeScreen'
+export { default as DisplayReviewsScreen} from './src/screens/DisplayReviewsScreen'
 import App from './App';
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);

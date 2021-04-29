@@ -4,18 +4,19 @@ import styles from "./model/AccountStyles.js";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { firebase } from "../firebase/config";
 
-export default function AccountScreen({ route, navigation}) {
+export default function AccountScreen({ route, navigation }) {
 
-  const {userData} = route.params;
+  const {dat} = route.params;
 
   const onLogOutPress = () => {    
     firebase.auth().signOut()
     navigation.navigate("Login");
   }
 
-
+  
   const viewMyReviewsPress = () => {
-    //go to reviews, use scrollview maybe
+
+    navigation.navigate("DisplayReviews");
   }
 
   const createReviewsPress = () => {

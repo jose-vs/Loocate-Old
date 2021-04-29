@@ -48,13 +48,11 @@ export default MapScreen = ({ navigation }) => {
         .get()
         .then((document) => {
           const data = document.data() //this is the specific data (not userAuth, but the data I made in the users collection) of the user
-          console.log("existing user go st8 to acc");
           console.log(data)
           navigation.navigate("Account", {user: data})
         }
         );
     } else {
-      console.log("no acc 4 u sry, login time");
       navigation.navigate("Login")
     }
   })
