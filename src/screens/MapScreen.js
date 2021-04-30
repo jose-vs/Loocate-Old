@@ -60,7 +60,8 @@ export default MapScreen = ({ navigation }) => {
 
   //directions
   const origin = { latitude: userLat, longitude: userLong };
-  const destination = { latitude: destinationLat, longitude: destinationLong };
+  const destination = { latitude: parseFloat(destinationLat), longitude: parseFloat(destinationLong) };
+  //prevents destination prop type error by parsing to float rather than having the value be a string. Still having issue because the default destination values aren't a valid address. 
 
   const onGetDirectionsPress = () => {
     setDestinationLat(tempLat);
