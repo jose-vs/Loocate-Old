@@ -14,8 +14,9 @@ export default ToiletCard = (props) => {
             <Text numberOfLine={1} style = {styles.listTitle}>{props.title}</Text>
             <Text numberOfLine={1} style = {styles.listAddress}>{props.address}</Text>
             <Text><StarRating ratings={props.ratings}/>{props.ratings}</Text>
-            <TouchableOpacity style={styles.appButtonContainer}>
-                <Text style={styles.appButtonText}>Directions</Text>
+            <TouchableOpacity
+                style={styles.appButtonContainer}>
+                <Text style={styles.appButtonText}>TBC</Text> 
             </TouchableOpacity>
            </View>
             <View style={styles.hairline}/>

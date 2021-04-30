@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 import { NavigationContainer } from "@react-navigation/native";
 import { 
     createStackNavigator, 
@@ -11,11 +11,14 @@ import RegistrationScreen from "./src/screens/RegistrationScreen";
 import ListScreen from "./src/screens/ListScreen";
 import MapScreen from "./src/screens/MapScreen";
 import ReviewTypeScreen from './src/screens/ReviewTypeScreen';
+import DisplayReviewsScreen from './src/screens/DisplayReviewsScreen';
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs() 
 
-const Stack = createStackNavigator();
-
+const Stack = createStackNavigator(); 
 
 export default function App() {
+
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -33,6 +36,7 @@ export default function App() {
         <Stack.Screen name="Registration" component={RegistrationScreen} />
         <Stack.Screen name="Account" component={AccountScreen} />
         <Stack.Screen name="ReviewType" component={ReviewTypeScreen} />
+        <Stack.Screen name="DisplayReviews" component={DisplayReviewsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
     

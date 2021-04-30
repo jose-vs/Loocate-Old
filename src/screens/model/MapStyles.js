@@ -128,6 +128,16 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#75CFB8'
   },
+  buttonTwo: { //using for directions screen
+    backgroundColor: "#788eec",
+    marginLeft: 30,
+    marginRight: 30,
+    marginTop: 30,
+    height: 48,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center", 
+  },
   icon: { 
     top: 200,
     position: 'relative',
