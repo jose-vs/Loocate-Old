@@ -65,6 +65,7 @@ export default MapScreen = ({ navigation }) => {
   const onGetDirectionsPress = () => {
     setDestinationLat(tempLat);
     setDestinationLong(tempLong);
+    bs.current.snapTo(1);
   };
 
   //direction
