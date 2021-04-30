@@ -49,7 +49,7 @@ export default MapScreen = ({ navigation }) => {
           .get()
           .then((document) => {
             const data = document.data(); //this is the specific data (not userAuth, but the data I made in the users collection) of the user
-            console.log(data);
+            //console.log(data);
             navigation.navigate("Account", { user: data });
           });
       } else {
@@ -108,18 +108,6 @@ export default MapScreen = ({ navigation }) => {
 
   let user = firebase.auth().currentUser; //will be equal to null if no one is logged in, not working properly atm
 
-  const onLoginPress = () => {
-    if (user != null) {
-      //check if user logged in
-      console.log(user);
-      console.log("1");
-      navigation.navigate("Account");
-    } else {
-      console.log(user);
-      console.log("2");
-      navigation.navigate("Login");
-    }
-  };
   //fetch the api
   useEffect(() => {
     apiFetch();
@@ -152,7 +140,7 @@ export default MapScreen = ({ navigation }) => {
             reviews: toiletData.user_ratings_total,
           };
           //need to get coords from inside newtoilet...which is put inside a marker. Go to onmarkerpress...
-          console.log(newToilet);
+         // console.log(newToilet);
           state.markers.push(newToilet);
         });
       })
@@ -210,9 +198,9 @@ export default MapScreen = ({ navigation }) => {
   const onMarkerPress = (mapEventData) => {
     // get the event data on press
     const markerID = mapEventData._targetInst.return.key;
-    console.log(false); // get the markerID of the event data
-    console.log(markerID);
-    console.log(state.markers[markerID]);
+   // console.log(false); // get the markerID of the event data
+    //console.log(markerID);
+   // console.log(state.markers[markerID]);
     // console.log(state.markers[markerID].title);
     setMarker(markerID);
     setTitle(state.markers[markerID].title);
@@ -282,7 +270,7 @@ export default MapScreen = ({ navigation }) => {
   );
 
   const _map = React.useRef(null);
-  console.log(grantedPerms);
+  //console.log(grantedPerms);
 
   if (location) {
     return (
