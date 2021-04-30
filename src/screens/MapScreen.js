@@ -33,13 +33,58 @@ export default MapScreen = ({ navigation }) => {
   const [userLong, setUserLong] = useState(null);
   const [destinationLat, setDestinationLat] = useState(null);
   const [destinationLong, setDestinationLong] = useState(null);
+  const [tempLat, setTempLat] = useState(null);
+  const [tempLong, setTempLong] = useState(null);
 
-  //const destination = {latitude: 37.771707, longitude: -122.4053769};
-  //let origin = {setUserLat, setUserLong}
-
+  //login screen transition...check if user is already logged in or not.
+  const onLoginPress = () => { 
+    //if there is a user logged in, retrieve them and skip having to go through login screen again
+    
+    firebase.auth().onAuthStateChanged(user => {
+    if (user) { //if user is signed in
+      const usersRef = firebase.firestore().collection('users'); //get user collection from firestore
+      usersRef //call the database of user data (NOT the users in auth())
+        .doc(user.uid)
+        .get()
+        .then((document) => {
+          const data = document.data() //this is the specific data (not userAuth, but the data I made in the users collection) of the user
+          console.log(data)
+          navigation.navigate("Account", {user: data})
+        }
+        );
+    } else {
+      navigation.navigate("Login")
+    }
+  })
+}
+  
+  //directions
   const origin = {latitude: userLat, longitude: userLong};
-  let destination = {latitude: destinationLat, longitude: destinationLong};
+  const destination = {latitude: destinationLat, longitude: destinationLong};
 
+  const onGetDirectionsPress = () => {
+    setDestinationLat(tempLat);
+    setDestinationLong(tempLong);
+  }
+
+  //direction
+  useEffect(() => {
+    (async () => {
+      let { destination } = await renderInner();
+      if (destinationLat === null) {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({accuracy: Location.Accuracy.High});
+      setUserLat(location.coords.latitude);
+      setUserLong(location.coords.longitude);
+      setPerms(true);
+      setLocation(location);
+    })();
+  }, []);
+
+  //user location
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -56,20 +101,6 @@ export default MapScreen = ({ navigation }) => {
     })();
   }, []);
 
-  let user = firebase.auth().currentUser; //will be equal to null if no one is logged in, not working properly atm
-
-  const onLoginPress = () => { 
-    if (user != null) {    //check if user logged in
-      console.log(user);
-      console.log("1");
-      navigation.navigate("Account")       
-  } 
-  else{
-    console.log(user);
-    console.log("2");
-    navigation.navigate("Login")
-  } 
-}
   //fetch the api
   useEffect(() => {
     apiFetch();
@@ -170,11 +201,17 @@ export default MapScreen = ({ navigation }) => {
     setRatings(state.markers[markerID].rating);
     setReviews(state.markers[markerID].reviews);
 
-    //DIRECTIONS SET TO COORDS WHEN MARKER PRESSED
+    //DIRECTIONS SET TO COORDS OF MARKER WHEN MARKER PRESSED
     //sets destination
-    setDestinationLat(state.markers[markerID].coordinate.latitude);
-    setDestinationLong(state.markers[markerID].coordinate.longitude);
-    console.log(destination)
+    //setDestinationLat(state.markers[markerID].coordinate.latitude);
+    //setDestinationLong(state.markers[markerID].coordinate.longitude);
+    //console.log(destination)     
+
+    setTempLat(state.markers[markerID].coordinate.latitude);
+    setTempLong(state.markers[markerID].coordinate.longitude);
+    //setDestinationLat(tempLat);
+    //setDestinationLong(tempLong);
+
     bs.current.snapTo(0);
   };
 
@@ -210,7 +247,8 @@ export default MapScreen = ({ navigation }) => {
       )}
       <View style={styles.hairline} />
       {marker && marker.length && (
-        <TouchableOpacity>
+        <TouchableOpacity
+        onPress={() => onGetDirectionsPress()}>
           <Text style={styles.textSubheading}>Get Directions</Text>
         </TouchableOpacity>
       )}
@@ -258,9 +296,11 @@ export default MapScreen = ({ navigation }) => {
           destination={destination}
           apikey={MAP_API_KEY}
           strokeWidth={5}
-          strokeColor="hotpink"
-          mode="WALKING"
-        />
+          strokeColor="#00ced1"
+          optimizeWaypoints={true}
+          mode = "WALKING"  
+          
+          />
           {state.markers.map((marker, index) => {
             return (
               <Marker
@@ -380,6 +420,7 @@ export default MapScreen = ({ navigation }) => {
           initialSnap={1}
           borderRadius={10}
           enabledGestureInteraction={true}
+          enabledContentTapInteraction={false} //this line needed to be added to make markers in bottomsheet respond to onpress
         />
       </View>
     );

@@ -4,24 +4,27 @@ import styles from "./model/ReviewTypeStyles.js";
 import { firebase } from "../firebase/config";
 import { TextInput } from 'react-native-paper';
 
-export default function ReviewTypeScreen({ navigation }) {
+export default function ReviewTypeScreen({ route, navigation }) {
 
     const [review, setReview] = useState('')
     const reviewsRef = firebase.firestore().collection('reviews');
 
     const onSubmitReviewPress = () => { //add review to firebase review collection, not assigned to specific account or toilet yet
-                  reviewsRef.add({
-                  title: review,
-              });
-              setReview('');
+      reviewsRef.add({
+      title: review
+      });
+      setReview('');
     }
 
     return (
         <>
-          <TextInput onChangeText={() => {}}
-            style={styles.input}
+          <TextInput onChangeText={() => {}}        
+            style={{ height:100, backgroundColor:'white'}}
             placeholder='Write your review here:'
             placeholderTextColor="#aaaaaa"
+            multiline={true}          
+            numberOfLines={10}
+            textAlign=''
              onChangeText={(text) => setReview(text)}
             underlineColorAndroid="transparent"
           />
@@ -30,6 +33,7 @@ export default function ReviewTypeScreen({ navigation }) {
             style={styles.buttonTwo}
             onPress={() => onSubmitReviewPress()}> 
             <Text style={styles.buttonTitle}>Submit review</Text>
+      
            </TouchableOpacity>
           <TouchableOpacity
             style={styles.buttonTwo}
