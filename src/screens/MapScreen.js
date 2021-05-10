@@ -12,7 +12,7 @@ import * as Animatable from "react-native-animatable";
 import { FontAwesome, MaterialIcons, Entypo } from "@expo/vector-icons";
 import { MAP_API_KEY } from "@env";
 import toiletApi from "../../api/googlePlaces";
-import { initialMapState } from "./model/MapData";
+import { initialMapState, toilet } from "./model/MapData";
 import { styles } from "./model/MapStyles";
 import StarRating from "./components/StarRating";
 import { CARD_WIDTH } from "./model/Constants";
@@ -26,20 +26,87 @@ import MapViewDirections from "react-native-maps-directions";
 export default MapScreen = ({ navigation }) => {
   const [state, setState] = useState(initialMapState);
   const [areaLoad, setAreaLoad] = useState(false);
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
+  const [toilet, setToilet] = useState(toilet)
   const [grantedPerms, setPerms] = useState(null);
-  const [userLat, setUserLat] = useState(null);
-  const [userLong, setUserLong] = useState(null);
-  const [destinationLat, setDestinationLat] = useState(null);
-  const [destinationLong, setDestinationLong] = useState(null);
-  const [tempLat, setTempLat] = useState(null);
-  const [tempLong, setTempLong] = useState(null);
 
-  //login screen transition...check if user is already logged in or not.
+  const _map = React.useRef(null);
+  
+
+  /**
+   * Loads the user location
+   */
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+      
+      //save the location into the map state value for use
+      setState({...state, 
+        userLocation: {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,  
+        }
+      });
+
+      setPerms(true);
+    })();
+  }, []);
+
+  let user = firebase.auth().currentUser; //will be equal to null if no one is logged in, not working properly atm
+
+  /**
+   * fetches the list of toilets when the area load boolean changes
+   * or the users current location changes 
+   */
+  useEffect(() => {
+    apiFetch();
+  }, [areaLoad, state.userLocation]);
+
+  const apiFetch = async () => {
+    var lat = areaLoad ? state.region.latitude : state.userLocation.latitude;
+    var lng = areaLoad ? state.region.longitude : state.userLocation.longitude;
+    await toiletApi
+      .get(
+        `&location=
+            ${lat}, ${lng}
+          &radius=
+            ${state.radius}
+          &keyword=toilet
+          &key=${MAP_API_KEY}`
+      )
+      .then((response) => {
+        response.data.results.map((toiletData) => {
+          const newToilet = {
+            coordinate: {
+              latitude: toiletData.geometry.location.lat,
+              longitude: toiletData.geometry.location.lng,
+            },
+            title: toiletData.name,
+            address: toiletData.vicinity,
+            rating: toiletData.rating,
+            reviews: toiletData.user_ratings_total,
+          };
+
+          state.markers.push(newToilet);
+
+        });
+      })
+      .catch((err) => console.log("Error:", err));
+
+    setAreaLoad((current) => false);
+
+  };
+
   const onLoginPress = () => {
-    //if there is a user logged in, retrieve them and skip having to go through login screen again
 
+    //if there is a user logged in, retrieve them and skip having to go through login screen again
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         //if user is signed in
@@ -58,97 +125,26 @@ export default MapScreen = ({ navigation }) => {
     });
   };
 
-  //directions
-  const origin = { latitude: userLat, longitude: userLong };
-  const destination = { latitude: parseFloat(destinationLat), longitude: parseFloat(destinationLong) };
-  //prevents destination prop type error by parsing to float rather than having the value be a string. Still having issue because the default destination values aren't a valid address. 
-
+ /**
+  * saves the current selected toilets coordinates
+  * into the current map state to for use in 
+  * react native maps directions
+  */
   const onGetDirectionsPress = () => {
-    setDestinationLat(tempLat);
-    setDestinationLong(tempLong);
+    setState({...state, 
+      selectedToiletDest: toilet.coordinate
+    });
     bs.current.snapTo(1);
   };
 
-  //direction
-  useEffect(() => {
-    (async () => {
-      let { destination } = await renderInner();
-      if (destinationLat === null) {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
-      });
-      setUserLat(location.coords.latitude);
-      setUserLong(location.coords.longitude);
-      setPerms(true);
-      setLocation(location);
-    })();
-  }, []);
-
-  //user location
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
-      });
-      setUserLat(location.coords.latitude);
-      setUserLong(location.coords.longitude);
-      setPerms(true);
-      setLocation(location);
-    })();
-  }, []);
-
-  let user = firebase.auth().currentUser; //will be equal to null if no one is logged in, not working properly atm
-
-  //fetch the api
-  useEffect(() => {
-    apiFetch();
-  }, [areaLoad, location]);
-
-  const apiFetch = async () => {
-    var lat = areaLoad ? state.region.latitude : userLat;
-    var lng = areaLoad ? state.region.longitude : userLong;
-    await toiletApi
-      .get(
-        `&location=
-            ${lat}, ${lng}
-          &radius=
-            ${state.radius}
-          &keyword=toilet
-          &key=${MAP_API_KEY}`
-      )
-      .then((response) => {
-        // console.log(response.data)
-        response.data.results.map((toiletData) => {
-          const newToilet = {
-            coordinate: {
-              latitude: toiletData.geometry.location.lat,
-              longitude: toiletData.geometry.location.lng,
-            },
-            title: toiletData.name,
-            address: toiletData.vicinity,
-            image: require("../../assets/ToiletPhotos/toilet1.jpg"),
-            rating: toiletData.rating,
-            reviews: toiletData.user_ratings_total,
-          };
-          //need to get coords from inside newtoilet...which is put inside a marker. Go to onmarkerpress...
-         // console.log(newToilet);
-          state.markers.push(newToilet);
-        });
-      })
-      .catch((err) => console.log("Error:", err));
-    setAreaLoad((current) => false);
-  };
-
+  /**
+   * resets the current marker list and updates
+   * the areaload boolean to tell the app to update 
+   * the list with a new set of toilets 
+   * 
+   * list will be updated based on the current region the 
+   * user is at on the map
+   */
   const onAreaSearchPress = () => {
     setState({ ...state, markers: [] });
     setAreaLoad((current) => true);
@@ -156,8 +152,11 @@ export default MapScreen = ({ navigation }) => {
 
   let mapAnimation = new Animated.Value(0);
 
-  // deals with the animation for the markers
-  // render each time the dom changes
+
+  /**
+   * deals with the animation for the markers 
+   * renders each time the dom changes
+   */
   useEffect(() => {
     mapAnimation.addListener(({ value }) => {
       // value represents the index of the current item
@@ -191,38 +190,26 @@ export default MapScreen = ({ navigation }) => {
   });
 
   const [marker, setMarker] = useState();
-  const [title, setTitle] = useState();
-  const [address, setAddress] = useState();
-  const [ratings, setRatings] = useState();
-  const [reviews, setReviews] = useState();
 
+  /**
+   * gets the current selected marker and saves its information 
+   * in a usestate for later use
+
+   */
   const onMarkerPress = (mapEventData) => {
     // get the event data on press
     const markerID = mapEventData._targetInst.return.key;
-   // console.log(false); // get the markerID of the event data
-    //console.log(markerID);
-   // console.log(state.markers[markerID]);
-    // console.log(state.markers[markerID].title);
+    setToilet(state.markers[markerID]);
     setMarker(markerID);
-    setTitle(state.markers[markerID].title);
-    setAddress(state.markers[markerID].address);
-    setRatings(state.markers[markerID].rating);
-    setReviews(state.markers[markerID].reviews);
-
-    //DIRECTIONS SET TO COORDS OF MARKER WHEN MARKER PRESSED
-    //sets destination
-    //setDestinationLat(state.markers[markerID].coordinate.latitude);
-    //setDestinationLong(state.markers[markerID].coordinate.longitude);
-    //console.log(destination)
-
-    setTempLat(state.markers[markerID].coordinate.latitude);
-    setTempLong(state.markers[markerID].coordinate.longitude);
-    //setDestinationLat(tempLat);
-    //setDestinationLong(tempLong);
-
     bs.current.snapTo(0);
   };
 
+  /**
+   * handles which map style will be shown 
+   * by updating the state variable 'mapType'
+   * 
+   * maptype is passed through react native maps
+   */
   const onMapStyleButtonPress = () => {
     if (state.mapType == "standard") {
       setState({ ...state, mapType: "satellite" });
@@ -231,7 +218,9 @@ export default MapScreen = ({ navigation }) => {
     }
   };
 
-  //creates bottomsheet content
+  /**
+   * creates bottom sheet content
+   */
   const bs = React.createRef();
   renderHeader = () => (
     <View style={styles.panelHeader}>
@@ -247,11 +236,11 @@ export default MapScreen = ({ navigation }) => {
             styles.toiletTitle //check for null in useState otherwise crash on startup as undefined
           }
         >
-          {title}
+          {toilet.title}
         </Text>
       )}
       {marker && marker.length && (
-        <Text style={styles.toiletSubtitle}>{address}</Text>
+        <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
       )}
       <View style={styles.hairline} />
       {marker && marker.length && (
@@ -261,19 +250,16 @@ export default MapScreen = ({ navigation }) => {
       )}
       {marker && marker.length && (
         <Text style={styles.textSubheading}>
-          Rating: <StarRating ratings={ratings} />
+          Rating: <StarRating ratings={toilet.rating} />
         </Text>
       )}
       {marker && marker.length && (
-        <Text style={styles.textSubheading}>Reviews: {reviews}</Text>
+        <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
       )}
     </View>
   );
 
-  const _map = React.useRef(null);
-  //console.log(grantedPerms);
-
-  if (location) {
+  if (state.userLocation.latitude) {
     return (
       <View style={styles.container}>
         <MapView
@@ -285,9 +271,8 @@ export default MapScreen = ({ navigation }) => {
           showsCompass={false}
           showsPointsOfInterest={false}
           initialRegion={{
-            //will set the map on start at the users current location
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
+            latitude: state.userLocation.latitude,
+            longitude: state.userLocation.longitude,
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}
@@ -301,8 +286,8 @@ export default MapScreen = ({ navigation }) => {
           }
         >
           <MapViewDirections
-            origin={origin}
-            destination={destination}
+            origin={state.userLocation}
+            destination={state.selectedToiletDest}
             apikey={MAP_API_KEY}
             strokeWidth={5}
             strokeColor="#00ced1"
