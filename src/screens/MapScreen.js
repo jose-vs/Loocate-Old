@@ -133,9 +133,11 @@ export default MapScreen = ({ navigation }) => {
     bs.current.snapTo(1);
   };
 
-  const onChangeModePress = () => {
+  /*const onChangeModePress = () => {
     setMode({});
   };
+  */
+
   /**
    * resets the current marker list and updates
    * the areaload boolean to tell the app to update
