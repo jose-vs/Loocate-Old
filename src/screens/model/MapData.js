@@ -19,6 +19,7 @@ const initialMapState = {
   selectedToiletIndex: null,
   radius: 2000,
   mapType: "standard",
+  mode: "WALKING",
 };
 
 const filter = [
@@ -42,10 +43,10 @@ const toilet = {
     latitude: null,
     longitude: null,
   },
-  title: '',
-  address: '',
+  title: "",
+  address: "",
   rating: null,
   reviews: null,
-}
+};
 
 export { initialMapState, filter, toilet };

@@ -26,11 +26,11 @@ import MapViewDirections from "react-native-maps-directions";
 export default MapScreen = ({ navigation }) => {
   const [state, setState] = useState(initialMapState);
   const [areaLoad, setAreaLoad] = useState(false);
-  const [toilet, setToilet] = useState(toilet)
+  const [toilet, setToilet] = useState(toilet);
   const [grantedPerms, setPerms] = useState(null);
+  const [mode, setMode] = useState("walking");
 
   const _map = React.useRef(null);
-  
 
   /**
    * Loads the user location
@@ -46,13 +46,14 @@ export default MapScreen = ({ navigation }) => {
       let location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
-      
+
       //save the location into the map state value for use
-      setState({...state, 
+      setState({
+        ...state,
         userLocation: {
           latitude: location.coords.latitude,
-          longitude: location.coords.longitude,  
-        }
+          longitude: location.coords.longitude,
+        },
       });
 
       setPerms(true);
@@ -63,7 +64,7 @@ export default MapScreen = ({ navigation }) => {
 
   /**
    * fetches the list of toilets when the area load boolean changes
-   * or the users current location changes 
+   * or the users current location changes
    */
   useEffect(() => {
     apiFetch();
@@ -95,17 +96,14 @@ export default MapScreen = ({ navigation }) => {
           };
 
           state.markers.push(newToilet);
-
         });
       })
       .catch((err) => console.log("Error:", err));
 
     setAreaLoad((current) => false);
-
   };
 
   const onLoginPress = () => {
-
     //if there is a user logged in, retrieve them and skip having to go through login screen again
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
@@ -125,24 +123,25 @@ export default MapScreen = ({ navigation }) => {
     });
   };
 
- /**
-  * saves the current selected toilets coordinates
-  * into the current map state to for use in 
-  * react native maps directions
-  */
+  /**
+   * saves the current selected toilets coordinates
+   * into the current map state to for use in
+   * react native maps directions
+   */
   const onGetDirectionsPress = () => {
-    setState({...state, 
-      selectedToiletDest: toilet.coordinate
-    });
+    setState({ ...state, selectedToiletDest: toilet.coordinate });
     bs.current.snapTo(1);
   };
 
+  const onChangeModePress = () => {
+    setMode({});
+  };
   /**
    * resets the current marker list and updates
-   * the areaload boolean to tell the app to update 
-   * the list with a new set of toilets 
-   * 
-   * list will be updated based on the current region the 
+   * the areaload boolean to tell the app to update
+   * the list with a new set of toilets
+   *
+   * list will be updated based on the current region the
    * user is at on the map
    */
   const onAreaSearchPress = () => {
@@ -152,9 +151,8 @@ export default MapScreen = ({ navigation }) => {
 
   let mapAnimation = new Animated.Value(0);
 
-
   /**
-   * deals with the animation for the markers 
+   * deals with the animation for the markers
    * renders each time the dom changes
    */
   useEffect(() => {
@@ -205,9 +203,9 @@ export default MapScreen = ({ navigation }) => {
   };
 
   /**
-   * handles which map style will be shown 
+   * handles which map style will be shown
    * by updating the state variable 'mapType'
-   * 
+   *
    * maptype is passed through react native maps
    */
   const onMapStyleButtonPress = () => {
@@ -215,6 +213,14 @@ export default MapScreen = ({ navigation }) => {
       setState({ ...state, mapType: "satellite" });
     } else if (state.mapType == "satellite") {
       setState({ ...state, mapType: "standard" });
+    }
+  };
+
+  const onModeStyleButtonPress = () => {
+    if (state.mode == "WALKING") {
+      setState({ ...state, mode: "DRIVING" });
+    } else if (state.mode == "DRIVING") {
+      setState({ ...state, mode: "WALKING" });
     }
   };
 
@@ -292,7 +298,7 @@ export default MapScreen = ({ navigation }) => {
             strokeWidth={5}
             strokeColor="#00ced1"
             optimizeWaypoints={true}
-            mode="WALKING"
+            mode={state.mode}
           />
           {state.markers.map((marker, index) => {
             return (
@@ -359,6 +365,23 @@ export default MapScreen = ({ navigation }) => {
                 size={26}
                 color="black"
                 style={{ top: 6, left: 6, opacity: 0.6 }}
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
+        {/* MODE BUTTON */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              onModeStyleButtonPress();
+            }}
+          >
+            <View style={styles.circleButton}>
+              <MaterialIcons
+                name="layers"
+                size={26}
+                color="black"
+                style={{ top: 6, right: 6, opacity: 0.6 }}
               />
             </View>
           </TouchableOpacity>
