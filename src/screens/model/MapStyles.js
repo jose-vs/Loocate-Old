@@ -46,8 +46,8 @@ export const styles = StyleSheet.create({
     color: "#385c59",
   },
   circleButton: {
-    marginRight: 10,
-    marginLeft: 10,
+    marginRight: 5,
+    marginLeft: 5,
     width: 38,
     height: 38,
     borderRadius: 20,

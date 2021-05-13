@@ -9,7 +9,12 @@ import {
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import * as Animatable from "react-native-animatable";
-import { FontAwesome, MaterialIcons, Entypo } from "@expo/vector-icons";
+import {
+  FontAwesome,
+  MaterialIcons,
+  Entypo,
+  FontAwesome5,
+} from "@expo/vector-icons";
 import { MAP_API_KEY } from "@env";
 import toiletApi from "../../api/googlePlaces";
 import { initialMapState, toilet } from "./model/MapData";
@@ -28,7 +33,6 @@ export default MapScreen = ({ navigation }) => {
   const [areaLoad, setAreaLoad] = useState(false);
   const [toilet, setToilet] = useState(toilet);
   const [grantedPerms, setPerms] = useState(null);
-  const [mode, setMode] = useState("walking");
 
   const _map = React.useRef(null);
 
@@ -218,14 +222,6 @@ export default MapScreen = ({ navigation }) => {
     }
   };
 
-  const onModeStyleButtonPress = () => {
-    if (state.mode == "WALKING") {
-      setState({ ...state, mode: "DRIVING" });
-    } else if (state.mode == "DRIVING") {
-      setState({ ...state, mode: "WALKING" });
-    }
-  };
-
   /**
    * creates bottom sheet content
    */
@@ -370,24 +366,50 @@ export default MapScreen = ({ navigation }) => {
               />
             </View>
           </TouchableOpacity>
-        </View>
-        {/* MODE BUTTON */}
-        <View style={styles.modeButtonContainer}>
           <TouchableOpacity
             onPress={() => {
-              onModeStyleButtonPress();
+              setState({ ...state, mode: "WALKING" });
+            }}
+          >
+            <View style={styles.modeCircleButton}>
+              <FontAwesome5
+                name="walking"
+                size={24}
+                color="black"
+                style={{ top: 6, left: 11, opacity: 0.6 }}
+              />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setState({ ...state, mode: "DRIVING" });
             }}
           >
             <View style={styles.modeCircleButton}>
               <MaterialIcons
-                name="layers"
-                size={26}
+                name="drive-eta"
+                size={24}
                 color="black"
-                style={{ top: 6, right: 6, opacity: 0.6 }}
+                style={{ top: 6, left: 6.5, opacity: 0.6 }}
+              />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setState({ ...state, mode: "BICYCLING" });
+            }}
+          >
+            <View style={styles.modeCircleButton}>
+              <MaterialIcons
+                name="directions-bike"
+                size={24}
+                color="black"
+                style={{ top: 6, left: 6.5, opacity: 0.6 }}
               />
             </View>
           </TouchableOpacity>
         </View>
+
         {/* FOOTER */}
         <View style={styles.footer}>
           {/* MAP BUTTON */}
