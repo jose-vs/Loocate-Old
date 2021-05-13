@@ -372,13 +372,13 @@ export default MapScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
         {/* MODE BUTTON */}
-        <View style={styles.buttonContainer}>
+        <View style={styles.modeButtonContainer}>
           <TouchableOpacity
             onPress={() => {
               onModeStyleButtonPress();
             }}
           >
-            <View style={styles.circleButton}>
+            <View style={styles.modeCircleButton}>
               <MaterialIcons
                 name="layers"
                 size={26}
