@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
+import { SearchBar } from "react-native-elements";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import * as Animatable from "react-native-animatable";
 import { FontAwesome, MaterialIcons, Entypo } from "@expo/vector-icons";
@@ -60,8 +61,11 @@ export default MapScreen = ({ navigation }) => {
 
   //directions
   const origin = { latitude: userLat, longitude: userLong };
-  const destination = { latitude: parseFloat(destinationLat), longitude: parseFloat(destinationLong) };
-  //prevents destination prop type error by parsing to float rather than having the value be a string. Still having issue because the default destination values aren't a valid address. 
+  const destination = {
+    latitude: parseFloat(destinationLat),
+    longitude: parseFloat(destinationLong),
+  };
+  //prevents destination prop type error by parsing to float rather than having the value be a string. Still having issue because the default destination values aren't a valid address.
 
   const onGetDirectionsPress = () => {
     setDestinationLat(tempLat);
@@ -141,7 +145,7 @@ export default MapScreen = ({ navigation }) => {
             reviews: toiletData.user_ratings_total,
           };
           //need to get coords from inside newtoilet...which is put inside a marker. Go to onmarkerpress...
-         // console.log(newToilet);
+          // console.log(newToilet);
           state.markers.push(newToilet);
         });
       })
@@ -199,9 +203,9 @@ export default MapScreen = ({ navigation }) => {
   const onMarkerPress = (mapEventData) => {
     // get the event data on press
     const markerID = mapEventData._targetInst.return.key;
-   // console.log(false); // get the markerID of the event data
+    // console.log(false); // get the markerID of the event data
     //console.log(markerID);
-   // console.log(state.markers[markerID]);
+    // console.log(state.markers[markerID]);
     // console.log(state.markers[markerID].title);
     setMarker(markerID);
     setTitle(state.markers[markerID].title);
@@ -330,27 +334,16 @@ export default MapScreen = ({ navigation }) => {
             );
           })}
         </MapView>
-        <View style={styles.searchBox}>
-          <TextInput
-            placeholder="Search here"
-            placeholderTextColor="#777"
-            autoCapitalize="none"
-            style={styles.searchBoxText}
-          />
-          {/* USER SCREEN */}
-          <TouchableOpacity
-            onPress={() => {
-              //navigates to loginscreen or accountscreen when pressed
-              onLoginPress();
-            }}
-          ></TouchableOpacity>
+        <TouchableOpacity style={styles.searchBox} activeOpacity={1}>
           <FontAwesome
             name="search"
             size={24}
             color="black"
-            style={{ right: 8, opacity: 0.6 }}
+            style={{ left: 8, right: 8, opacity: 0.6 }}
           />
-        </View>
+          <Text style={{ left: 16, right: 8, opacity: 0.6 }}>Search here</Text>
+        </TouchableOpacity>
+
         <Animatable.View style={styles.searchHere} animation="fadeInLeft">
           <TouchableOpacity
             onPress={() => {

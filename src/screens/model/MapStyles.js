@@ -10,7 +10,6 @@ export const styles = StyleSheet.create({
     position: "absolute",
     marginTop: 50,
     flexDirection: "row",
-    justifyContent: "space-between",
     backgroundColor: "#fff",
     width: "90%",
     alignSelf: "center",
@@ -23,8 +22,8 @@ export const styles = StyleSheet.create({
     elevation: 10,
   },
   searchBoxText: {
-    paddingLeft: 8,
-    paddingRight: 8,
+    paddingLeft: 16,
+    paddingRight: 16,
   },
   searchHere: {
     position: "absolute",
