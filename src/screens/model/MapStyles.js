@@ -45,8 +45,8 @@ export const styles = StyleSheet.create({
     color: "#385c59",
   },
   circleButton: {
-    marginRight: 10,
-    marginLeft: 10,
+    marginRight: 5,
+    marginLeft: 5,
     width: 38,
     height: 38,
     borderRadius: 20,
@@ -69,6 +69,34 @@ export const styles = StyleSheet.create({
     padding: 20,
   },
   bottomContainer: {
+    position: "absolute",
+    flex: 1,
+  },
+  modeCircleButton: {
+    marginRight: 10,
+    marginLeft: 10,
+    width: 38,
+    height: 38,
+    borderRadius: 20,
+    flexDirection: "row",
+    backgroundColor: "#FFF",
+    shadowColor: "#ccc",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 10,
+  },
+  modeButtonContainer: {
+    position: "absolute",
+    flexDirection: "row",
+    top: 220,
+    paddingHorizontal: 10,
+    alignSelf: "flex-end",
+  },
+  modeButton: {
+    padding: 60,
+  },
+  ModeBottomContainer: {
     position: "absolute",
     flex: 1,
   },
@@ -123,11 +151,12 @@ export const styles = StyleSheet.create({
   footerButton: {
     paddingHorizontal: 50,
   },
-  loadScreen: { 
+  loadScreen: {
     flex: 1,
-    backgroundColor: '#75CFB8'
+    backgroundColor: "#75CFB8",
   },
-  buttonTwo: { //using for directions screen
+  buttonTwo: {
+    //using for directions screen
     backgroundColor: "#788eec",
     marginLeft: 30,
     marginRight: 30,
@@ -135,13 +164,13 @@ export const styles = StyleSheet.create({
     height: 48,
     borderRadius: 5,
     alignItems: "center",
-    justifyContent: "center", 
+    justifyContent: "center",
   },
-  icon: { 
+  icon: {
     top: 200,
-    position: 'relative',
-    alignSelf: 'center',
+    position: "relative",
+    alignSelf: "center",
     height: 292,
-    width: 261
-  }
+    width: 261,
+  },
 });
