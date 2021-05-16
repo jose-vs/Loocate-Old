@@ -6,6 +6,15 @@ export { default as RegistrationScreen } from './src/screens/RegistrationScreen'
 export { default as ReviewTypeScreen } from './src/screens/ReviewTypeScreen'
 export { default as DisplayReviewsScreen} from './src/screens/DisplayReviewsScreen'
 import App from './App';
+import _ from 'lodash';
+
+//fix for timer warning in login screens (without editing to edit a file in node modules, which would need to be done every time you clone)
+const _console = _.clone(console);
+console.warn = message => {
+  if (message.indexOf('Setting a timer') <= -1) {
+    _console.warn(message);
+  }
+};
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);
 // It also ensures that whether you load the app in the Expo client or in a native build,

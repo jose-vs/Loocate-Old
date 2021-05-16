@@ -3,16 +3,23 @@ const initialMapState = {
 
   region: {
     // Auckland City
-    latitude: -36.853121304049786,
-    longitude: 174.76650674225814,
+    latitude: null,
+    longitude: null,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   },
-
+  userLocation: {
+    latitude: null,
+    longitude: null,
+  },
+  selectedToiletDest: {
+    latitude: null,
+    longitude: null,
+  },
+  selectedToiletIndex: null,
   radius: 2000,
-
-  showTopComponents: true,
   mapType: "standard",
+  mode: "WALKING",
 };
 
 const filter = [
@@ -30,4 +37,16 @@ const filter = [
   },
 ];
 
-export { initialMapState, filter };
+const toilet = {
+  id: null,
+  coordinate: {
+    latitude: null,
+    longitude: null,
+  },
+  title: "",
+  address: "",
+  rating: null,
+  reviews: null,
+};
+
+export { initialMapState, filter, toilet };
