@@ -30,7 +30,6 @@ import MapViewDirections from "react-native-maps-directions";
 
 export default MapScreen = ({ navigation }) => {
   const [state, setState] = useState(initialMapState);
-  const [areaLoad, setAreaLoad] = useState(false);
   const [toilet, setToilet] = useState(toilet);
   const [grantedPerms, setPerms] = useState(null);
 
@@ -60,23 +59,14 @@ export default MapScreen = ({ navigation }) => {
         },
       });
 
+      apiFetch(location.coords.latitude, location.coords.longitude);
       setPerms(true);
     })();
   }, []);
 
   let user = firebase.auth().currentUser; //will be equal to null if no one is logged in, not working properly atm
 
-  /**
-   * fetches the list of toilets when the area load boolean changes
-   * or the users current location changes
-   */
-  useEffect(() => {
-    apiFetch();
-  }, [areaLoad, state.userLocation]);
-
-  const apiFetch = async () => {
-    var lat = areaLoad ? state.region.latitude : state.userLocation.latitude;
-    var lng = areaLoad ? state.region.longitude : state.userLocation.longitude;
+  const apiFetch = async (lat, lng) => {
     await toiletApi
       .get(
         `&location=
@@ -89,6 +79,7 @@ export default MapScreen = ({ navigation }) => {
       .then((response) => {
         response.data.results.map((toiletData) => {
           const newToilet = {
+            id: toiletData.place_id,
             coordinate: {
               latitude: toiletData.geometry.location.lat,
               longitude: toiletData.geometry.location.lng,
@@ -99,12 +90,13 @@ export default MapScreen = ({ navigation }) => {
             reviews: toiletData.user_ratings_total,
           };
 
+          console.log(newToilet);
           state.markers.push(newToilet);
+          
         });
       })
       .catch((err) => console.log("Error:", err));
 
-    setAreaLoad((current) => false);
   };
 
   const onLoginPress = () => {
@@ -137,22 +129,13 @@ export default MapScreen = ({ navigation }) => {
     bs.current.snapTo(1);
   };
 
-  /*const onChangeModePress = () => {
-    setMode({});
-  };
-  */
-
   /**
-   * resets the current marker list and updates
-   * the areaload boolean to tell the app to update
-   * the list with a new set of toilets
-   *
    * list will be updated based on the current region the
    * user is at on the map
    */
   const onAreaSearchPress = () => {
-    setState({ ...state, markers: [] });
-    setAreaLoad((current) => true);
+    console.log(state.region);
+    apiFetch(state.region.latitude, state.region.longitude);
   };
 
   let mapAnimation = new Animated.Value(0);
@@ -198,7 +181,6 @@ export default MapScreen = ({ navigation }) => {
   /**
    * gets the current selected marker and saves its information 
    * in a usestate for later use
-
    */
   const onMarkerPress = (mapEventData) => {
     // get the event data on press
