@@ -6,21 +6,20 @@ import { firebase } from "../firebase/config";
 
 export default function AccountScreen({ route, navigation }) {
 
-  const {dat} = route.params;
+  const {data} = route.params;
 
   const onLogOutPress = () => {    
     firebase.auth().signOut()
     navigation.navigate("Login");
   }
-
-  
+ 
   const viewMyReviewsPress = () => {
 
     navigation.navigate("DisplayReviews");
   }
 
   const createReviewsPress = () => {
-    navigation.navigate("ReviewType");
+    navigation.navigate("ReviewViewAndCreate");
   }
 
   return (

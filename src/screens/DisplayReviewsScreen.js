@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TextInput, Text, TouchableOpacity, View, ScrollView } from "react-native";
-import styles from "./model/ReviewTypeStyles.js";
+import styles from "./model/ReviewViewAndCreateStyles.js";
 import { firebase } from "../firebase/config";
 
 export default function DisplayReviewsScreen({ route, navigation }) {
