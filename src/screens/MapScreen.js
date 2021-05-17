@@ -26,6 +26,7 @@ import BottomSheet from "reanimated-bottom-sheet";
 import * as Location from "expo-location";
 import { firebase } from "../firebase/config";
 import MapViewDirections from "react-native-maps-directions";
+//import { getDistance } from "geolib";
 
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
@@ -60,6 +61,7 @@ export default MapScreen = ({ navigation }) => {
       });
 
       apiFetch(location.coords.latitude, location.coords.longitude);
+
       setPerms(true);
     })();
   }, []);
@@ -88,18 +90,27 @@ export default MapScreen = ({ navigation }) => {
             address: toiletData.vicinity,
             rating: toiletData.rating,
             reviews: toiletData.user_ratings_total,
+
             distance: null,
+            // getDistance(
+            //   {latitude: state.userLocation.latitude, longitude: state.userLocation.longitude},
+            //   {latitude: toiletData.geometry.location.lat, longitude: toiletData.geometry.location.lng}
+            // ),
             duration: null,
           };
 
-          //console.log(newToilet);
+          setToilet(newToilet);
+          state.selectedToiletDest = newToilet.coordinate;
+
           state.markers.push(newToilet);
+
+          console.log(newToilet);
         });
       })
       .catch((err) => console.log("Error:", err));
-  };
 
-  useEffect(() => {}, [state.userLocation]);
+    state.selectedToiletDest = null;
+  };
 
   const onLoginPress = () => {
     //if there is a user logged in, retrieve them and skip having to go through login screen again
@@ -136,7 +147,7 @@ export default MapScreen = ({ navigation }) => {
    * user is at on the map
    */
   const onAreaSearchPress = () => {
-    console.log(state.region);
+    state.markers = [];
     apiFetch(state.region.latitude, state.region.longitude);
   };
 
@@ -282,16 +293,9 @@ export default MapScreen = ({ navigation }) => {
             optimizeWaypoints={true}
             mode={state.mode}
             onReady={(result) => {
-              // setToilet({
-              //   ...toilet,
-              //   distance: result.distance,
-              //   duration: result.duration,
-              // });
               toilet.distance = result.distance;
               toilet.duration = result.duration;
               console.log(toilet);
-              console.log(`Distance: ${result.distance} km`);
-              console.log(`Duration: ${result.duration} min.`);
               _map.current.fitToCoordinates(result.coordinates, {
                 edgePadding: {
                   right: width / 20,
