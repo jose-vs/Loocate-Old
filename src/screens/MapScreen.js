@@ -264,7 +264,45 @@ export default MapScreen = ({ navigation }) => {
     </View>
   );
 
-  if (state.userLocation.latitude) {
+   if(state.onSearch) {
+    return (
+      <View>
+        <View style={styles.searchBox}>
+        <FontAwesome
+            name="search"
+            size={24}
+            color="black"
+            style={{ left: 8, right: 8, opacity: 0.6 }}
+          />
+  
+          <TextInput
+            placeholder="Search here"
+            placeholderTextColor="#777"
+            autoCapitalize="none"
+            style={{ left: 16, right: 8, opacity: 0.6 }}
+          />
+        </View>
+
+
+        {/* <TouchableOpacity 
+        style={styles.onSearchBoxPress} 
+        activeOpacity={1}
+        onPress={()=>{
+          setState({...state, onSearch: false})
+          console.log(state.onSearch)}}
+        >
+        
+          <Entypo
+            name="chevron-left"
+            size={24}
+            color="black"
+            style={{ left: 6, right: 8, opacity: 0.6 }}
+          />
+          <Text style={{ left: 16, right: 8, opacity: 0.6 }}>Search here</Text>
+        </TouchableOpacity> */}
+      </View>
+    )
+  }else if (state.userLocation.latitude) {
     return (
       <View style={styles.container}>
         <MapView
@@ -320,7 +358,13 @@ export default MapScreen = ({ navigation }) => {
             );
           })}
         </MapView>
-        <TouchableOpacity style={styles.searchBox} activeOpacity={1}>
+        <TouchableOpacity 
+        style={styles.searchBox} 
+        activeOpacity={1}
+        onPress={()=>{
+          setState({...state, onSearch: true})
+          console.log(state.onSearch)}}
+        >
           <FontAwesome
             name="search"
             size={24}
@@ -453,7 +497,7 @@ export default MapScreen = ({ navigation }) => {
         />
       </View>
     );
-  } else {
+  }  else {
     return (
       <View style={styles.loadScreen}>
         <Image

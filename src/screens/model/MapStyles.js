@@ -21,6 +21,19 @@ export const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 10,
   },
+  onSearchBoxPress: {
+    position: "absolute",
+    marginTop: 50,
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    width: "90%",
+    alignSelf: "center",
+    borderRadius: 23,
+    borderWidth: 2,
+    borderColor: "#555",
+    padding: 10,
+
+  },
   searchBoxText: {
     paddingLeft: 16,
     paddingRight: 16,

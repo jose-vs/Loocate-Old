@@ -16,10 +16,10 @@ const initialMapState = {
     latitude: null,
     longitude: null,
   },
-  selectedToiletIndex: null,
   radius: 2000,
   mapType: "standard",
   mode: "WALKING",
+  onSearch: false
 };
 
 const filter = [
