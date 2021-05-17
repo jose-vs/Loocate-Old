@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   Image,
+  Dimensions,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import * as Animatable from "react-native-animatable";
@@ -26,9 +27,8 @@ import * as Location from "expo-location";
 import { firebase } from "../firebase/config";
 import MapViewDirections from "react-native-maps-directions";
 
-//import Map_TopMenu from "./components/Map_TopMenu";
-
 export default MapScreen = ({ navigation }) => {
+  const { width, height } = Dimensions.get("window");
   const [state, setState] = useState(initialMapState);
   const [toilet, setToilet] = useState(toilet);
   const [grantedPerms, setPerms] = useState(null);
@@ -88,16 +88,18 @@ export default MapScreen = ({ navigation }) => {
             address: toiletData.vicinity,
             rating: toiletData.rating,
             reviews: toiletData.user_ratings_total,
+            distance: null,
+            duration: null,
           };
 
-          console.log(newToilet);
+          //console.log(newToilet);
           state.markers.push(newToilet);
-          
         });
       })
       .catch((err) => console.log("Error:", err));
-
   };
+
+  useEffect(() => {}, [state.userLocation]);
 
   const onLoginPress = () => {
     //if there is a user logged in, retrieve them and skip having to go through login screen again
@@ -179,7 +181,7 @@ export default MapScreen = ({ navigation }) => {
   const [marker, setMarker] = useState();
 
   /**
-   * gets the current selected marker and saves its information 
+   * gets the current selected marker and saves its information
    * in a usestate for later use
    */
   const onMarkerPress = (mapEventData) => {
@@ -279,6 +281,26 @@ export default MapScreen = ({ navigation }) => {
             strokeColor="#00ced1"
             optimizeWaypoints={true}
             mode={state.mode}
+            onReady={(result) => {
+              // setToilet({
+              //   ...toilet,
+              //   distance: result.distance,
+              //   duration: result.duration,
+              // });
+              toilet.distance = result.distance;
+              toilet.duration = result.duration;
+              console.log(toilet);
+              console.log(`Distance: ${result.distance} km`);
+              console.log(`Duration: ${result.duration} min.`);
+              _map.current.fitToCoordinates(result.coordinates, {
+                edgePadding: {
+                  right: width / 20,
+                  bottom: height / 20,
+                  left: width / 20,
+                  top: height / 20,
+                },
+              });
+            }}
           />
           {state.markers.map((marker, index) => {
             return (

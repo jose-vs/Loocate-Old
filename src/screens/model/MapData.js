@@ -47,6 +47,8 @@ const toilet = {
   address: "",
   rating: null,
   reviews: null,
+  distance: null,
+  duration: null
 };
 
 export { initialMapState, filter, toilet };
