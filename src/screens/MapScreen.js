@@ -26,7 +26,6 @@ import BottomSheet from "reanimated-bottom-sheet";
 import * as Location from "expo-location";
 import { firebase } from "../firebase/config";
 import MapViewDirections from "react-native-maps-directions";
-//import { getDistance } from "geolib";
 
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
@@ -59,9 +58,7 @@ export default MapScreen = ({ navigation }) => {
           longitude: location.coords.longitude,
         },
       });
-
       apiFetch(location.coords.latitude, location.coords.longitude);
-
       setPerms(true);
     })();
   }, []);
@@ -92,22 +89,19 @@ export default MapScreen = ({ navigation }) => {
             reviews: toiletData.user_ratings_total,
 
             distance: null,
-            // getDistance(
-            //   {latitude: state.userLocation.latitude, longitude: state.userLocation.longitude},
-            //   {latitude: toiletData.geometry.location.lat, longitude: toiletData.geometry.location.lng}
-            // ),
             duration: null,
           };
 
           setToilet(newToilet);
           state.selectedToiletDest = newToilet.coordinate;
-
           state.markers.push(newToilet);
 
-          console.log(newToilet);
+          //console.log(newToilet);
         });
       })
       .catch((err) => console.log("Error:", err));
+
+    console.log(state.selectedToiletDest);
 
     state.selectedToiletDest = null;
   };
@@ -304,6 +298,11 @@ export default MapScreen = ({ navigation }) => {
                   top: height / 20,
                 },
               });
+            }}
+            onError={(errorMessage) => {
+              console.log(errorMessage);
+              console.log(state.selectedToiletDest);
+              console.log(toilet);
             }}
           />
           {state.markers.map((marker, index) => {
