@@ -10,7 +10,7 @@ import AccountScreen from "./src/screens/AccountScreen";
 import RegistrationScreen from "./src/screens/RegistrationScreen";
 import ListScreen from "./src/screens/ListScreen";
 import MapScreen from "./src/screens/MapScreen";
-import ReviewTypeScreen from './src/screens/ReviewTypeScreen';
+import ReviewViewAndCreateScreen from './src/screens/ReviewViewAndCreateScreen';
 import DisplayReviewsScreen from './src/screens/DisplayReviewsScreen';
 import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs() 
@@ -35,7 +35,7 @@ export default function App() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Registration" component={RegistrationScreen} />
         <Stack.Screen name="Account" component={AccountScreen} />
-        <Stack.Screen name="ReviewType" component={ReviewTypeScreen} />
+        <Stack.Screen name="ReviewViewAndCreate" component={ReviewViewAndCreateScreen} />
         <Stack.Screen name="DisplayReviews" component={DisplayReviewsScreen} />
       </Stack.Navigator>
     </NavigationContainer>

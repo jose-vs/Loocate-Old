@@ -63,8 +63,6 @@ export default MapScreen = ({ navigation }) => {
     })();
   }, []);
 
-  let user = firebase.auth().currentUser; //will be equal to null if no one is logged in, not working properly atm
-
   const apiFetch = async (lat, lng) => {
     await toiletApi
       .get(
@@ -118,7 +116,7 @@ export default MapScreen = ({ navigation }) => {
           .then((document) => {
             const data = document.data(); //this is the specific data (not userAuth, but the data I made in the users collection) of the user
             //console.log(data);
-            navigation.navigate("Account", { user: data });
+            navigation.navigate("Account", { user: data }); //revisit this later, accessing data on account screen is of issue
           });
       } else {
         navigation.navigate("Login");
@@ -134,6 +132,11 @@ export default MapScreen = ({ navigation }) => {
   const onGetDirectionsPress = () => {
     setState({ ...state, selectedToiletDest: toilet.coordinate });
     bs.current.snapTo(1);
+  };
+
+   //Navigates to review screen and takes current toilet being accessed there to have its reviews manipulated.
+  const onReviewPress = () => {
+    navigation.navigate("ReviewViewAndCreate", toilet); 
   };
 
   /**
@@ -247,7 +250,9 @@ export default MapScreen = ({ navigation }) => {
         </Text>
       )}
       {marker && marker.length && (
+        <TouchableOpacity onPress={() => onReviewPress()}>
         <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
+        </TouchableOpacity>
       )}
     </View>
   );
