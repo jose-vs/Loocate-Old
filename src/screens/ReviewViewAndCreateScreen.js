@@ -1,20 +1,22 @@
 import React, { useState } from "react";
-import { Image, Text, TouchableOpacity, View, ScrollView } from "react-native";
+import { Image, Text, Alert, TouchableOpacity, View, ScrollView } from "react-native";
 import styles from "./model/ReviewViewAndCreateStyles";
 import { firebase } from "../firebase/config";
 import { TextInput } from 'react-native-paper';
 
-export default function ReviewViewAndCreateSceen({ route, navigation }) {
+export default function ReviewViewAndCreateScreen({ route, navigation }) {
 
-   const [toilet, setToilet] = useState(route.params); //represents a single toilet brought across by 
-    const [review, setReview] = useState('')
+    let review = ('');
+    let userInput = ('');
     const reviewsRef = firebase.firestore().collection('reviews');
 
-
     //Submit review on selected toilet if logged in. If not logged in, alert and do nothing.
-    const onSubmitReviewPress = () => { 
+    const onSubmitReviewPress = () => {      
       firebase.auth().onAuthStateChanged((user) => {
       if (user) {
+
+        console.log(userInput)
+
         const usersRef = firebase.firestore().collection("users"); 
         usersRef
         .doc(user.uid)
@@ -24,12 +26,19 @@ export default function ReviewViewAndCreateSceen({ route, navigation }) {
         
         reviewsRef.add({
           title: review,
-          toiletID: toilet.id,
+          toiletID: route.params.id,
           userID: data.id 
           });
       })
-    } else {
-        alert('You must be logged in to place a review.');        
+      Alert.alert(
+        'Submission success',
+        'Your review has been placed.'); 
+      } 
+      else {
+        Alert.alert(
+          'Authentication required',
+          'You must be logged in to place a review.');  
+        navigation.navigate('Login');      
       }
     });
     }
@@ -38,14 +47,7 @@ export default function ReviewViewAndCreateSceen({ route, navigation }) {
      * reviews associated with toilet this time. Need to implement validation for if there are no reviews.
     */
     const onViewReviewPress = () => { 
-      firebase.firestore().collection('reviews').get().then((querySnapshot) => {
-        querySnapshot.forEach(snapshot => {
-            if (snapshot.data().toiletID == toilet.id){
-              var data = snapshot.data();          
-              alert(data.title); 
-            }  
-        }
-    )});
+      navigation.navigate('DisplayReviews', route.params);
     }
 
     return (
@@ -57,7 +59,7 @@ export default function ReviewViewAndCreateSceen({ route, navigation }) {
             multiline={true}          
             numberOfLines={10}
             textAlign=''
-             onChangeText={(text) => setReview(text)}
+             onChangeText={(userInput) => review = (userInput)}
             underlineColorAndroid="transparent"
           />
 

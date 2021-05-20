@@ -96,6 +96,16 @@ export default StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 12,
   },
+  appButtonContainerTwo: {
+    width: 120,
+    elevation: 8,
+    backgroundColor: "#009688",
+    borderRadius: 15,
+    alignSelf: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    bottom: '-5%'
+  },
   appButtonText: {
     fontSize: 10,
     color: "#fff",
