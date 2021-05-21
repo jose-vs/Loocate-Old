@@ -64,7 +64,9 @@ export default MapScreen = ({ navigation }) => {
     })();
   }, []);
 
-  const toiletApiFetch = async (lat, lng) => {
+  toiletApiFetch = async (lat, lng) => {
+    const fetchedToilets = [];
+
     await toiletApi
       .get(
         `&location=
@@ -89,35 +91,58 @@ export default MapScreen = ({ navigation }) => {
             distance: null,
             duration: null,
           };
-          
-          distanceApiFetch(newToilet)
-
-          //setToilet(newToilet);
-          //state.selectedToiletDest = newToilet.coordinate;
-          state.markers.push(newToilet);
-
-          //console.log(newToilet);
+          fetchedToilets.push(newToilet);
         });
       })
       .catch((err) => console.log("Error:", err));
 
-    // state.selectedToiletDest = null;
+    Promise.all(
+      fetchedToilets.map((current) => {
+        return distanceApiFetch(current)
+          .then((result) => {
+            return result;
+          })
+          .catch((errorMessage) => {
+            return Promise.reject(errorMessage);
+          });
+      })
+    )
+      .then((result) => {
+        result.map((current) => {
+          state.markers.push(current);
+        });
+        console.log(state.markers);
+      })
+      .catch((errorMessage) => {
+        return Promise.reject(errorMessage);
+      });
   };
 
   const distanceApiFetch = (toilet) => {
-
-   distanceMatrixApi
-    .get(
-      `origins=heading=90:37.773279,-122.468780
-      &destinations=37.773245,-122.469502
+    return distanceMatrixApi
+      .get(
+        `&origins=
+      ${state.userLocation.latitude},${state.userLocation.longitude}
+      &destinations=
+      ${toilet.coordinate.latitude},${toilet.coordinate.longitude}
       &key=${MAP_API_KEY}`
-    ).then((response) => {
-      console.log(response.data)
-    })
-    .catch((err) => {
-       return Promise.reject(`Error on GMAPS route request: ${err}`)
-  });
-  }
+      )
+      .then((response) => {
+        return Promise.resolve({
+          id: toilet.id,
+          coordinate: toilet.coordinate,
+          title: toilet.title,
+          address: toilet.address,
+          rating: toilet.rating,
+          reviews: toilet.reviews,
+          distance: response.data.rows[0].elements[0].distance.value,
+          duration: response.data.rows[0].elements[0].duration.value,
+        });
+      })
+      .catch((err) => {
+        return Promise.reject(`Error on GMAPS route request: ${err}`);
+      });
+  };
 
   const onLoginPress = () => {
     //if there is a user logged in, retrieve them and skip having to go through login screen again
@@ -149,9 +174,9 @@ export default MapScreen = ({ navigation }) => {
     bs.current.snapTo(1);
   };
 
-   //Navigates to review screen and takes current toilet being accessed there to have its reviews manipulated.
+  //Navigates to review screen and takes current toilet being accessed there to have its reviews manipulated.
   const onReviewPress = () => {
-    navigation.navigate("ReviewViewAndCreate", toilet); 
+    navigation.navigate("ReviewViewAndCreate", toilet);
   };
 
   /**
@@ -266,7 +291,7 @@ export default MapScreen = ({ navigation }) => {
       )}
       {marker && marker.length && (
         <TouchableOpacity onPress={() => onReviewPress()}>
-        <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
+          <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -329,7 +354,7 @@ export default MapScreen = ({ navigation }) => {
             }}
             onError={(errorMessage) => {
               console.log(errorMessage);
-              
+
               onAreaSearchPress();
             }}
           />
