@@ -1,26 +1,38 @@
 import { TextInput, Text, TouchableOpacity, View, ScrollView } from "react-native";
 import { firebase } from "../firebase/config";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesome, Entypo, Ionicons } from "@expo/vector-icons";
 import ReviewCard from "./components/ReviewCard";
 import styles from "./model/ListStyles";
+import { initialViewReviewsState} from "./model/ViewReviewsData";
 
 export default function DisplayReviewsScreen({ route, navigation }) {
 
   //need to have two sections on this component...one for your own reviews, that you'd view on your account..and one for all reviews 
   //for a single toilet...
 
-  const [toiletReviews, setToiletReviews] = useState(route.params);
+  //I want to fetch each review that are of the current toilet being looked at, and add them to their own array. I then want to 
+  //use the map in the reviewcard section to iterate through these and display them on the cards, similar to listscreen.
 
-  firebase.firestore().collection('reviews').get().then((querySnapshot) => {
-    querySnapshot.forEach(snapshot => {
-        if (snapshot.data().toiletID == route.params.id){
-          var data = snapshot.data();          
-          alert(data.title); 
-        }  
-    }
+//const arrayOfReviews = [null];
+const [state, setState] = useState(initialViewReviewsState);
+//const [arrayOfReviews, setarrayOfReviews] = useState(toilet);
+
+useEffect(() => {
+firebase.firestore().collection('reviews').get().then((querySnapshot) => {
+  querySnapshot.forEach(snapshot => {
+      if (snapshot.data().toiletID == route.params.id){
+        var review = snapshot.data(); 
+        console.log(review) 
+        state.reviews.push(review);
+        console.log(state.reviews.title)      
+        //alert(data.title); 
+      }  
+  }
 )});
-   
+}, []);
+
+
   return (
     <View style={styles.container}>
       <View style={styles.searchBox}>
@@ -63,14 +75,13 @@ export default function DisplayReviewsScreen({ route, navigation }) {
         showsVerticalScrollIndicator={true}
         style={styles.listContainer}
       >
-        {toilets.map((item, index) => {
+        {state.reviews.map((item, index) => {
           return (
           <ReviewCard 
             key={index}
-            ratings={item.rating}
-            reviews={item.reviews}
+            review={item.title} //need to make this item.title, but is undefined.
           />
-          )
+          )          
         })}
       </ScrollView>
 
@@ -120,28 +131,4 @@ export default function DisplayReviewsScreen({ route, navigation }) {
       </View>
     </View>
   );
-
-  /*
-    return (
-      <View style={styles.textAreaContainer}      
-        style={{ flex: 1, width: "100%" }}
-        keyboardShouldPersistTaps="always">
-      <TextInput
-       //multiline={true}
-       //textAlignVertical= "top"
-      value="Displayed reviews to be added here. TBA"
-       editable={false}
-       textAlign={'center'}
-       numberOfLines={10}
-       style={{ height:300, backgroundColor:'white'}}
-      />
-        <TouchableOpacity
-          style={styles.buttonTwo}
-          onPress={() => navigation.navigate("Account")}>
-          <Text style={styles.buttonTitle}>Back</Text>
-        </TouchableOpacity>
-    </View>
-      );
-      */
-
 }

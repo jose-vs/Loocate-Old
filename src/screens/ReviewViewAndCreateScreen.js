@@ -77,7 +77,7 @@ export default function ReviewViewAndCreateScreen({ route, navigation }) {
            </TouchableOpacity>
           <TouchableOpacity
             style={styles.buttonTwo}
-            onPress={() => navigation.navigate("Map")}>
+            onPress={() => goBack()}>
             <Text style={styles.buttonTitle}>Back</Text>
            </TouchableOpacity>
         </>

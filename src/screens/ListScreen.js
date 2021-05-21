@@ -78,7 +78,8 @@ export default ListScreen = ({ route, navigation }) => {
             address={item.address}
             ratings={item.rating}
             reviews={item.reviews}
-            onPress={() => {navigation.navigate("ReviewViewAndCreate", item)}}
+            item={item}
+            navigation={navigation}
           />
           )
         })}

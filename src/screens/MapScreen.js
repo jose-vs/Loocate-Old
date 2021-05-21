@@ -61,7 +61,7 @@ export default MapScreen = ({ navigation }) => {
       apiFetch(location.coords.latitude, location.coords.longitude);
       setPerms(true);
     })();
-  }, []);
+  }, []); 
 
   const apiFetch = async (lat, lng) => {
     await toiletApi

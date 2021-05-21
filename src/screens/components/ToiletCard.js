@@ -8,6 +8,7 @@ import styles from '../model/ListStyles'
 import StarRating from './StarRating'
 
 export default ToiletCard = (props) => {
+
     return ( 
         <View style = {styles.textContent}>
             <View style = {{padding: 15}}>
@@ -19,6 +20,7 @@ export default ToiletCard = (props) => {
                 <Text style={styles.appButtonText}>Directions</Text> 
             </TouchableOpacity>
             <TouchableOpacity
+            onPress={() => {props.navigation.navigate("ReviewViewAndCreate", props.item)}}
                 style={styles.appButtonContainerTwo}>
                 <Text style={styles.appButtonText}>Reviews</Text> 
             </TouchableOpacity>
