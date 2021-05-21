@@ -18,6 +18,7 @@ import {
 } from "@expo/vector-icons";
 import { MAP_API_KEY } from "@env";
 import toiletApi from "../../api/googlePlaces";
+import distanceMatrixApi from "../../api/distanceMatrixApi";
 import { initialMapState, toilet } from "./model/MapData";
 import { styles } from "./model/MapStyles";
 import StarRating from "./components/StarRating";
@@ -58,12 +59,12 @@ export default MapScreen = ({ navigation }) => {
           longitude: location.coords.longitude,
         },
       });
-      apiFetch(location.coords.latitude, location.coords.longitude);
+      toiletApiFetch(location.coords.latitude, location.coords.longitude);
       setPerms(true);
     })();
   }, []);
 
-  const apiFetch = async (lat, lng) => {
+  const toiletApiFetch = async (lat, lng) => {
     await toiletApi
       .get(
         `&location=
@@ -85,13 +86,14 @@ export default MapScreen = ({ navigation }) => {
             address: toiletData.vicinity,
             rating: toiletData.rating,
             reviews: toiletData.user_ratings_total,
-
             distance: null,
             duration: null,
           };
+          
+          distanceApiFetch(newToilet)
 
-          setToilet(newToilet);
-          state.selectedToiletDest = newToilet.coordinate;
+          //setToilet(newToilet);
+          //state.selectedToiletDest = newToilet.coordinate;
           state.markers.push(newToilet);
 
           //console.log(newToilet);
@@ -99,10 +101,23 @@ export default MapScreen = ({ navigation }) => {
       })
       .catch((err) => console.log("Error:", err));
 
-    console.log(state.selectedToiletDest);
-
-    state.selectedToiletDest = null;
+    // state.selectedToiletDest = null;
   };
+
+  const distanceApiFetch = (toilet) => {
+
+   distanceMatrixApi
+    .get(
+      `origins=heading=90:37.773279,-122.468780
+      &destinations=37.773245,-122.469502
+      &key=${MAP_API_KEY}`
+    ).then((response) => {
+      console.log(response.data)
+    })
+    .catch((err) => {
+       return Promise.reject(`Error on GMAPS route request: ${err}`)
+  });
+  }
 
   const onLoginPress = () => {
     //if there is a user logged in, retrieve them and skip having to go through login screen again
@@ -145,7 +160,7 @@ export default MapScreen = ({ navigation }) => {
    */
   const onAreaSearchPress = () => {
     state.markers = [];
-    apiFetch(state.region.latitude, state.region.longitude);
+    toiletApiFetch(state.region.latitude, state.region.longitude);
   };
 
   let mapAnimation = new Animated.Value(0);
@@ -279,6 +294,14 @@ export default MapScreen = ({ navigation }) => {
           provider={PROVIDER_GOOGLE} //Needed to ensure google maps is used as the map
           showsUserLocation={grantedPerms}
           showsMyLocationButton={false}
+          // onUserLocationChange={(userCoords) => {
+          //    setState({...state, userLocation: {
+          //      latitude: userCoords.nativeEvent.coordinate.latitude,
+          //       longitude: userCoords.nativeEvent.coordinate.latitude
+          //     }
+          //   });
+          //   console.log(state.userLocation)
+          // }}
           onRegionChangeComplete={(region) =>
             setState({ ...state, region: region })
           }
@@ -306,8 +329,8 @@ export default MapScreen = ({ navigation }) => {
             }}
             onError={(errorMessage) => {
               console.log(errorMessage);
-              console.log(state.selectedToiletDest);
-              console.log(toilet);
+              
+              onAreaSearchPress();
             }}
           />
           {state.markers.map((marker, index) => {
