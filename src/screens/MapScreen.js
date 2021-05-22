@@ -110,7 +110,6 @@ export default MapScreen = ({ navigation }) => {
     )
       .then((result) => {
         setState({ ...state, markers: result });
-        console.log("Markers Loaded");
       })
       .catch((errorMessage) => {
         return Promise.reject(errorMessage);
@@ -134,8 +133,8 @@ export default MapScreen = ({ navigation }) => {
           address: toilet.address,
           rating: toilet.rating,
           reviews: toilet.reviews,
-          distance: response.data.rows[0].elements[0].distance.value,
-          duration: response.data.rows[0].elements[0].duration.value,
+          distance: response.data.rows[0].elements[0].distance.value / 1000,
+          duration: response.data.rows[0].elements[0].duration.value / 60,
         });
       })
       .catch((err) => {
@@ -154,7 +153,6 @@ export default MapScreen = ({ navigation }) => {
           .get()
           .then((document) => {
             const data = document.data(); //this is the specific data (not userAuth, but the data I made in the users collection) of the user
-            //console.log(data);
             navigation.navigate("Account", { user: data }); //revisit this later, accessing data on account screen is of issue
           });
       } else {
@@ -229,6 +227,7 @@ export default MapScreen = ({ navigation }) => {
       return null;
     } else {
       return state.markers.map((marker, index) => {
+
         return (
           <Marker
             onLoad={() => this.forceUpdate()}
