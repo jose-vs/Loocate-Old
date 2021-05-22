@@ -76,8 +76,8 @@ export default MapScreen = ({ navigation }) => {
           &keyword=toilet
           &key=${MAP_API_KEY}`
       )
-      .then((response) => {
-        response.data.results.map((toiletData) => {
+      .then(async (response) => {
+        await response.data.results.map((toiletData) => {
           const newToilet = {
             id: toiletData.place_id,
             coordinate: {
@@ -91,14 +91,15 @@ export default MapScreen = ({ navigation }) => {
             distance: null,
             duration: null,
           };
+
           fetchedToilets.push(newToilet);
         });
       })
       .catch((err) => console.log("Error:", err));
 
     Promise.all(
-      fetchedToilets.map((current) => {
-        return distanceApiFetch(current)
+      fetchedToilets.map(async (current) => {
+        return await distanceApiFetch(current)
           .then((result) => {
             return result;
           })
@@ -108,18 +109,16 @@ export default MapScreen = ({ navigation }) => {
       })
     )
       .then((result) => {
-        result.map((current) => {
-          state.markers.push(current);
-        });
-        console.log(state.markers);
+        setState({ ...state, markers: result });
+        console.log("Markers Loaded");
       })
       .catch((errorMessage) => {
         return Promise.reject(errorMessage);
       });
   };
 
-  const distanceApiFetch = (toilet) => {
-    return distanceMatrixApi
+  const distanceApiFetch = async (toilet) => {
+    return await distanceMatrixApi
       .get(
         `&origins=
       ${state.userLocation.latitude},${state.userLocation.longitude}
@@ -127,8 +126,8 @@ export default MapScreen = ({ navigation }) => {
       ${toilet.coordinate.latitude},${toilet.coordinate.longitude}
       &key=${MAP_API_KEY}`
       )
-      .then((response) => {
-        return Promise.resolve({
+      .then(async (response) => {
+        return await Promise.resolve({
           id: toilet.id,
           coordinate: toilet.coordinate,
           title: toilet.title,
@@ -184,7 +183,6 @@ export default MapScreen = ({ navigation }) => {
    * user is at on the map
    */
   const onAreaSearchPress = () => {
-    state.markers = [];
     toiletApiFetch(state.region.latitude, state.region.longitude);
   };
 
@@ -225,6 +223,33 @@ export default MapScreen = ({ navigation }) => {
       }, 10);
     });
   });
+
+  const RenderMarkers = () => {
+    if (state.markers === undefined || state.markers == 0) {
+      return null;
+    } else {
+      return state.markers.map((marker, index) => {
+        return (
+          <Marker
+            onLoad={() => this.forceUpdate()}
+            key={index}
+            tracksViewChanges={false}
+            coordinate={marker.coordinate}
+            onPress={(e) => {
+              onMarkerPress(e);
+            }}
+          >
+            <View style={styles.markerWrap}>
+              <Image
+                source={require("../../assets/pin.png")}
+                style={styles.marker}
+              />
+            </View>
+          </Marker>
+        );
+      });
+    }
+  };
 
   const [marker, setMarker] = useState();
 
@@ -319,19 +344,11 @@ export default MapScreen = ({ navigation }) => {
           provider={PROVIDER_GOOGLE} //Needed to ensure google maps is used as the map
           showsUserLocation={grantedPerms}
           showsMyLocationButton={false}
-          // onUserLocationChange={(userCoords) => {
-          //    setState({...state, userLocation: {
-          //      latitude: userCoords.nativeEvent.coordinate.latitude,
-          //       longitude: userCoords.nativeEvent.coordinate.latitude
-          //     }
-          //   });
-          //   console.log(state.userLocation)
-          // }}
           onRegionChangeComplete={(region) =>
             setState({ ...state, region: region })
           }
         >
-          <MapViewDirections
+          {state.selectedToiletDest.latitude && <MapViewDirections
             origin={state.userLocation}
             destination={state.selectedToiletDest}
             apikey={MAP_API_KEY}
@@ -354,30 +371,10 @@ export default MapScreen = ({ navigation }) => {
             }}
             onError={(errorMessage) => {
               console.log(errorMessage);
-
               onAreaSearchPress();
             }}
-          />
-          {state.markers.map((marker, index) => {
-            return (
-              <Marker
-                onLoad={() => this.forceUpdate()}
-                key={index}
-                tracksViewChanges={false}
-                coordinate={marker.coordinate}
-                onPress={(e) => {
-                  onMarkerPress(e);
-                }}
-              >
-                <View style={styles.markerWrap}>
-                  <Image
-                    source={require("../../assets/pin.png")}
-                    style={styles.marker}
-                  />
-                </View>
-              </Marker>
-            );
-          })}
+          />}
+          <RenderMarkers />
         </MapView>
         <View style={styles.searchBox}>
           <TextInput
