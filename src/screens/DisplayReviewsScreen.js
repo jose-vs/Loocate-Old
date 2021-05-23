@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { FontAwesome, Entypo, Ionicons } from "@expo/vector-icons";
 import ReviewCard from "./components/ReviewCard";
 import styles from "./model/ListStyles";
+import { StackActions } from '@react-navigation/native';
 
 export default function DisplayReviewsScreen({ route, navigation }) {
 
@@ -13,15 +14,9 @@ export default function DisplayReviewsScreen({ route, navigation }) {
 
 const [reviewsArray, setReviewsArray] = useState(route.params);
 
-
-//If there are no reviews for this toilet at the moment
-const returnToPrevPage = () => { 
-  console.log('only print once plz')
-  Alert.alert (
-    'No reviews found.',
-    'Be the first to create a review for this toilet!');
-    navigation.navigate("ReviewViewAndCreate");
-}
+useEffect(() => {
+  
+}, []);
 
   return (
     <View style={styles.container}>
@@ -65,15 +60,17 @@ const returnToPrevPage = () => {
         showsVerticalScrollIndicator={true}
         style={styles.listContainer}
       >
-        {reviewsArray.length ? reviewsArray.map((item, index) => {
+        {reviewsArray.map((item, index) => {
           return (
           <ReviewCard 
+            title={item.title}   
             key={index}
-            title={item.title} //need to make this item.title, but is undefined.
-            rating={item.rating}
+            address={item.address}
+            loocateRating = {item.loocateRating}
+            rating={item.rating}                
           />
           )          
-        }) : returnToPrevPage()}
+        })}
       </ScrollView>
 
       {/* FOOTER */}
@@ -81,7 +78,6 @@ const returnToPrevPage = () => {
         {/* MAP BUTTON */}
         <TouchableOpacity
           onPress={() => {
-            resetStateReviewArray();
             navigation.navigate("Map");
           }}
         >
@@ -96,7 +92,7 @@ const returnToPrevPage = () => {
         <TouchableOpacity
           onPress={() => {
             //navigates to listscreen when pressed
-            //navigation.navigate("List");
+            navigation.navigate("List");
           }}
         >
           <Entypo
@@ -110,7 +106,6 @@ const returnToPrevPage = () => {
         <TouchableOpacity
           onPress={() => {
             //navigates to loginscreen when pressed
-            resetStateReviewArray();
             navigation.navigate("Login");
           }}
         >

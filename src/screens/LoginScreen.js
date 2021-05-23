@@ -3,11 +3,13 @@ import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import styles from './model/LoginStyles';
 import { firebase } from '../firebase/config';
+import { StackActions } from '@react-navigation/native';
 
 export default function LoginScreen({navigation}) {
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const popAction = StackActions.pop(1); //go back one screen in stack (number represents how many screens to go back by)
 
     const onFooterLinkPress = () => {
         navigation.navigate('Registration')
@@ -79,7 +81,7 @@ export default function LoginScreen({navigation}) {
                 </View>
                 <TouchableOpacity
                 style={styles.buttonTwo}
-                onPress={() => navigation.navigate("Map")}>
+                onPress={() => navigation.dispatch(popAction)}>
                 <Text style={styles.buttonTitle}>Back</Text>
                 </TouchableOpacity>
             </KeyboardAwareScrollView>

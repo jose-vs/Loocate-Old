@@ -30,6 +30,7 @@ import MapViewDirections from "react-native-maps-directions";
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
   const [state, setState] = useState(initialMapState);
+  const [loocateData, setLoocateData] = useState([]);
   const [toilet, setToilet] = useState(toilet);
   const [grantedPerms, setPerms] = useState(null);
 
@@ -58,10 +59,22 @@ export default MapScreen = ({ navigation }) => {
           longitude: location.coords.longitude,
         },
       });
-      apiFetch(location.coords.latitude, location.coords.longitude);
+      firestoreReviewsFetch();
+      apiFetch(location.coords.latitude, location.coords.longitude); 
       setPerms(true);
     })();
   }, []); 
+
+  const firestoreReviewsFetch = () => {
+    //needs async/await 
+    const reviewsRef = firebase.firestore().collection('reviews');
+    reviewsRef.get().then((querySnapshot) => {
+      querySnapshot.forEach(snapshot => {
+            var reviewData = snapshot.data();         
+            setLoocateData([...loocateData, reviewData]);
+      })
+  });
+  } 
 
   const apiFetch = async (lat, lng) => {
     await toiletApi
@@ -85,11 +98,23 @@ export default MapScreen = ({ navigation }) => {
             address: toiletData.vicinity,
             rating: toiletData.rating,
             reviews: toiletData.user_ratings_total,
+            
+            loocateRating:  0, 
+            loocateReviews: 0, 
 
             distance: null,
             duration: null,
           };
 
+          //add Loocate review/rating data to toilets...
+          for (var i = 0; i < loocateData.length; ++i) {
+            if (newToilet.id == loocateData.toiletID)
+            {
+              console.log(loocateData.rating);
+              newToilet.loocateRating = loocateData.rating
+              newToilet.loocateReviews = loocateData.title
+            }
+          }
           setToilet(newToilet);
           state.selectedToiletDest = newToilet.coordinate;
           state.markers.push(newToilet);
@@ -246,12 +271,22 @@ export default MapScreen = ({ navigation }) => {
       )}
       {marker && marker.length && (
         <Text style={styles.textSubheading}>
-          Rating: <StarRating ratings={toilet.rating} />
+          Loocate Rating: <StarRating ratings={toilet.loocateRating} />
         </Text>
       )}
       {marker && marker.length && (
         <TouchableOpacity onPress={() => onReviewPress()}>
-        <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
+        <Text style={styles.textSubheading}>Loocate Reviews: {toilet.loocateReviews}</Text>
+        </TouchableOpacity>
+      )}
+      {marker && marker.length && (
+        <Text style={styles.textSubheading}>
+          Google Rating: <StarRating ratings={toilet.rating} />
+        </Text>
+      )}
+      {marker && marker.length && (
+        <TouchableOpacity>
+        <Text style={styles.textSubheading}>Google Reviews: {toilet.reviews}</Text>
         </TouchableOpacity>
       )}
     </View>
