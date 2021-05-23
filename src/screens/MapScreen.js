@@ -27,6 +27,9 @@ import BottomSheet from "reanimated-bottom-sheet";
 import * as Location from "expo-location";
 import { firebase } from "../firebase/config";
 import MapViewDirections from "react-native-maps-directions";
+import googleAutocomplete from "../../api/googleAutocomplete";
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+
 
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
@@ -250,6 +253,13 @@ export default MapScreen = ({ navigation }) => {
     }
   };
 
+const [destination, setDestiation] = useState();
+ const onSearchChange = (destination) => {
+  setDestiation(destination);
+  const searchURl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?key=${MAP_API_KEY}&input=${destination}`;
+
+ }
+
   const [marker, setMarker] = useState();
 
   /**
@@ -375,27 +385,6 @@ export default MapScreen = ({ navigation }) => {
           />}
           <RenderMarkers />
         </MapView>
-        <View style={styles.searchBox}>
-          <TextInput
-            placeholder="Search here"
-            placeholderTextColor="#777"
-            autoCapitalize="none"
-            style={styles.searchBoxText}
-          />
-          {/* USER SCREEN */}
-          <TouchableOpacity
-            onPress={() => {
-              //navigates to loginscreen or accountscreen when pressed
-              onLoginPress();
-            }}
-          ></TouchableOpacity>
-          <FontAwesome
-            name="search"
-            size={24}
-            color="black"
-            style={{ right: 8, opacity: 0.6 }}
-          />
-        </View>
         <Animatable.View style={styles.searchHere} animation="fadeInLeft">
           <TouchableOpacity
             onPress={() => {
@@ -405,6 +394,35 @@ export default MapScreen = ({ navigation }) => {
             <Text style={styles.searchHereText}>Search this area</Text>
           </TouchableOpacity>
         </Animatable.View>
+        <GooglePlacesAutocomplete
+          placeholder='Search'
+          onPress={(data, details = null) => {
+          // 'details' is provided when fetchDetails = true
+          console.log(data, details);
+          }}
+        query={{
+          key: MAP_API_KEY,
+          language: 'en',
+      }}
+      styles = {{
+        textInputContainer: {
+          position: "absolute",
+          marginTop: 50,
+          flexDirection: "row",
+          justifyContent: "space-between",
+          backgroundColor: "#fff",
+          width: "90%",
+          alignSelf: "center",
+          borderRadius: 25,
+          padding: 10,
+          shadowColor: "#ccc",
+          shadowOffset: { width: 0, height: 3 },
+          shadowOpacity: 0.5,
+          shadowRadius: 5,
+          elevation: 10,
+        }
+      }}
+    />
 
         <View style={styles.buttonContainer}>
           {/* Map Style Button */}
