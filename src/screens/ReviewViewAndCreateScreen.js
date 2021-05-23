@@ -8,15 +8,13 @@ export default function ReviewViewAndCreateScreen({ route, navigation }) {
 
     let review = ('');
     let userInput = ('');
+    let existingReviewArray = [];
     const reviewsRef = firebase.firestore().collection('reviews');
 
     //Submit review on selected toilet if logged in. If not logged in, alert and do nothing.
     const onSubmitReviewPress = () => {      
       firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-
-        console.log(userInput)
-
         const usersRef = firebase.firestore().collection("users"); 
         usersRef
         .doc(user.uid)
@@ -27,7 +25,8 @@ export default function ReviewViewAndCreateScreen({ route, navigation }) {
         reviewsRef.add({
           title: review,
           toiletID: route.params.id,
-          userID: data.id 
+          userID: data.id,
+          rating: 0 //add in star rating variable when I get around to it...
           });
       })
       Alert.alert(
@@ -43,11 +42,22 @@ export default function ReviewViewAndCreateScreen({ route, navigation }) {
     });
     }
 
-    /* view all reviews associated with toilet. Is how it was implemented last sprint for now, but only displays
-     * reviews associated with toilet this time. Need to implement validation for if there are no reviews.
+    /* Retrieves review for current toilet selected and puts them in an array. Array is sent to DisplayReviewsScreen while navigating
+     * so that they can be rendered in the useState.
     */
     const onViewReviewPress = () => { 
-      navigation.navigate('DisplayReviews', route.params);
+      navigation.navigate('DisplayReviews', existingReviewArray);
+    }
+
+    const testdata = () => {
+      reviewsRef.get().then((querySnapshot) => {
+        querySnapshot.forEach(snapshot => {
+            if (snapshot.data().toiletID == route.params.id){
+              var existingReview = snapshot.data(); 
+              existingReviewArray = [...existingReviewArray, existingReview]
+            } 
+        }
+      )});
     }
 
     return (
@@ -77,7 +87,7 @@ export default function ReviewViewAndCreateScreen({ route, navigation }) {
            </TouchableOpacity>
           <TouchableOpacity
             style={styles.buttonTwo}
-            onPress={() => goBack()}>
+            onPress={() => testdata()}>
             <Text style={styles.buttonTitle}>Back</Text>
            </TouchableOpacity>
         </>

@@ -11,7 +11,8 @@ export default ReviewCard = (props) => {
     return ( 
         <View style = {styles.textContent}>
             <View style = {{padding: 15}}>
-            <Text><StarRating ratings={props.title}/>{props.title}</Text>
+            <Text numberOfLine={1} style = {styles.listTitle}>{props.title}</Text>
+            <Text><StarRating rating={props.rating}/>{props.rating}</Text>
             <TouchableOpacity
                 style={styles.appButtonContainer}>
                 <Text style={styles.appButtonText}>Edit Review</Text> 

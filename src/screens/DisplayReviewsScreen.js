@@ -1,37 +1,27 @@
-import { TextInput, Text, TouchableOpacity, View, ScrollView } from "react-native";
-import { firebase } from "../firebase/config";
+import { TextInput, Text, Alert, TouchableOpacity, View, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { FontAwesome, Entypo, Ionicons } from "@expo/vector-icons";
 import ReviewCard from "./components/ReviewCard";
 import styles from "./model/ListStyles";
-import { initialViewReviewsState} from "./model/ViewReviewsData";
 
 export default function DisplayReviewsScreen({ route, navigation }) {
 
-  //need to have two sections on this component...one for your own reviews, that you'd view on your account..and one for all reviews 
-  //for a single toilet...
+//this page should only be for reviews viewed on a specific toilet. Viewing reviews on account needs to be done differently...
 
   //I want to fetch each review that are of the current toilet being looked at, and add them to their own array. I then want to 
   //use the map in the reviewcard section to iterate through these and display them on the cards, similar to listscreen.
 
-//const arrayOfReviews = [null];
-const [state, setState] = useState(initialViewReviewsState);
-//const [arrayOfReviews, setarrayOfReviews] = useState(toilet);
+const [reviewsArray, setReviewsArray] = useState(route.params);
 
-useEffect(() => {
-firebase.firestore().collection('reviews').get().then((querySnapshot) => {
-  querySnapshot.forEach(snapshot => {
-      if (snapshot.data().toiletID == route.params.id){
-        var review = snapshot.data(); 
-        console.log(review) 
-        state.reviews.push(review);
-        console.log(state.reviews.title)      
-        //alert(data.title); 
-      }  
-  }
-)});
-}, []);
 
+//If there are no reviews for this toilet at the moment
+const returnToPrevPage = () => { 
+  console.log('only print once plz')
+  Alert.alert (
+    'No reviews found.',
+    'Be the first to create a review for this toilet!');
+    navigation.navigate("ReviewViewAndCreate");
+}
 
   return (
     <View style={styles.container}>
@@ -75,14 +65,15 @@ firebase.firestore().collection('reviews').get().then((querySnapshot) => {
         showsVerticalScrollIndicator={true}
         style={styles.listContainer}
       >
-        {state.reviews.map((item, index) => {
+        {reviewsArray.length ? reviewsArray.map((item, index) => {
           return (
           <ReviewCard 
             key={index}
-            review={item.title} //need to make this item.title, but is undefined.
+            title={item.title} //need to make this item.title, but is undefined.
+            rating={item.rating}
           />
           )          
-        })}
+        }) : returnToPrevPage()}
       </ScrollView>
 
       {/* FOOTER */}
@@ -90,6 +81,7 @@ firebase.firestore().collection('reviews').get().then((querySnapshot) => {
         {/* MAP BUTTON */}
         <TouchableOpacity
           onPress={() => {
+            resetStateReviewArray();
             navigation.navigate("Map");
           }}
         >
@@ -118,6 +110,7 @@ firebase.firestore().collection('reviews').get().then((querySnapshot) => {
         <TouchableOpacity
           onPress={() => {
             //navigates to loginscreen when pressed
+            resetStateReviewArray();
             navigation.navigate("Login");
           }}
         >
