@@ -27,14 +27,15 @@ const filter = [
     type: "nearest",
   },
   {
-    type: "top-rated",
+    type: "top rated",
   },
   {
-    type: "visited",
+    type: "most reviewed",
   },
   {
-    type: "not-visited",
+    type: "open now",
   },
+
 ];
 
 const toilet = {

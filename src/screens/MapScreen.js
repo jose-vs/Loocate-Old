@@ -59,7 +59,7 @@ export default MapScreen = ({ navigation }) => {
           longitude: location.coords.longitude,
         },
       });
-      toiletApiFetch(location.coords.latitude, location.coords.longitude);
+      toiletApiFetch(location.coords.latitude, location.coords.longitude)
       setPerms(true);
     })();
   }, []);
@@ -109,7 +109,7 @@ export default MapScreen = ({ navigation }) => {
       })
     )
       .then((result) => {
-        setState({ ...state, markers: result });
+        setState({ ...state, markers: result.sort((a, b) => (a.distance > b.distance) ? 1 : -1)});
       })
       .catch((errorMessage) => {
         return Promise.reject(errorMessage);
@@ -227,10 +227,8 @@ export default MapScreen = ({ navigation }) => {
       return null;
     } else {
       return state.markers.map((marker, index) => {
-
         return (
           <Marker
-            onLoad={() => this.forceUpdate()}
             key={index}
             tracksViewChanges={false}
             coordinate={marker.coordinate}
@@ -347,7 +345,8 @@ export default MapScreen = ({ navigation }) => {
             setState({ ...state, region: region })
           }
         >
-          {state.selectedToiletDest.latitude && <MapViewDirections
+          {state.selectedToiletDest.latitude && 
+          <MapViewDirections
             origin={state.userLocation}
             destination={state.selectedToiletDest}
             apikey={MAP_API_KEY}
@@ -373,6 +372,7 @@ export default MapScreen = ({ navigation }) => {
               onAreaSearchPress();
             }}
           />}
+
           <RenderMarkers />
         </MapView>
         <View style={styles.searchBox}>
