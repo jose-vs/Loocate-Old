@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fffa",
+    backgroundColor: "#fff",
   },
   searchBox: {
     position: "absolute",
@@ -30,7 +30,9 @@ export default StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 10,
     paddingLeft: 15,
-    backgroundColor: "#FFF",
+    backgroundColor: "#fff",
+    borderTopWidth: 2,
+    borderTopColor: "#eee"
   },
   chipsScrollView: {
     position: "absolute",

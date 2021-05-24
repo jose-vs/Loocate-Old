@@ -14,18 +14,18 @@ import { filter } from "./model/MapData";
 
 export default ListScreen = ({ route, navigation }) => {
   const [toilets, setToilets] = useState(route.params);
-
   const filterPress = (filter) => {
+    const sorted = [...toilets]
+
     switch(filter) {
       case 'nearest':
-        setToilets(toilets.sort((a, b) => (a.distance > b.distance) ? 1 : -1))
+        setToilets(sorted.sort((a, b) => (a.distance > b.distance) ? 1 : -1))
         break;
       case 'top rated':
-        setToilets(toilets.sort((a, b) => (a.rating < b.rating) ? 1 : -1))
-        console.log(toilets)
+        setToilets(sorted.sort((a, b) => (a.rating < b.rating) ? 1 : -1))
         break;
       case 'most reviewed':
-        setToilets(toilets.sort((a, b) => (a.reviews < b.reviews) ? 1 : -1))
+        setToilets(sorted.sort((a, b) => (a.reviews < b.reviews) ? 1 : -1))
         break;
       case 'open now':
         break;
@@ -95,7 +95,7 @@ export default ListScreen = ({ route, navigation }) => {
       >
         {toilets.map((item, index) => {
           return (
-          <ToiletCard 
+          <ToiletCard
             key={index}
             title ={item.title}
             address={item.address}

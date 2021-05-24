@@ -19,7 +19,6 @@ export default ToiletCard = (props) => {
                 <Text style={styles.appButtonText}>TBC</Text> 
             </TouchableOpacity>
            </View>
-            <View style={styles.hairline}/>
         </View>
     )
 }

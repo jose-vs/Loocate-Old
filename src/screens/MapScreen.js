@@ -60,6 +60,7 @@ export default MapScreen = ({ navigation }) => {
         },
       });
       toiletApiFetch(location.coords.latitude, location.coords.longitude)
+
       setPerms(true);
     })();
   }, []);
@@ -109,7 +110,7 @@ export default MapScreen = ({ navigation }) => {
       })
     )
       .then((result) => {
-        setState({ ...state, markers: result.sort((a, b) => (a.distance > b.distance) ? 1 : -1)});
+        setState({ ...state, markers: result.sort((a, b) => (a.distance > b.distance) ? 1 : -1)})  
       })
       .catch((errorMessage) => {
         return Promise.reject(errorMessage);
@@ -369,7 +370,6 @@ export default MapScreen = ({ navigation }) => {
             }}
             onError={(errorMessage) => {
               console.log(errorMessage);
-              onAreaSearchPress();
             }}
           />}
 
