@@ -27,8 +27,8 @@ import BottomSheet from "reanimated-bottom-sheet";
 import * as Location from "expo-location";
 import { firebase } from "../firebase/config";
 import MapViewDirections from "react-native-maps-directions";
-import googleAutocomplete from "../../api/googleAutocomplete";
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import Geocoder from 'react-native-geocoding';
 
 
 export default MapScreen = ({ navigation }) => {
@@ -38,7 +38,7 @@ export default MapScreen = ({ navigation }) => {
   const [grantedPerms, setPerms] = useState(null);
 
   const _map = React.useRef(null);
-
+  Geocoder.init(MAP_API_KEY)
   /**
    * Loads the user location
    */
@@ -252,14 +252,6 @@ export default MapScreen = ({ navigation }) => {
       });
     }
   };
-
-const [destination, setDestiation] = useState();
- const onSearchChange = (destination) => {
-  setDestiation(destination);
-  const searchURl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?key=${MAP_API_KEY}&input=${destination}`;
-
- }
-
   const [marker, setMarker] = useState();
 
   /**
@@ -331,6 +323,9 @@ const [destination, setDestiation] = useState();
     </View>
   );
 
+  const [search, setSearch] = useState();
+  console.log(search);
+
   if (state.userLocation.latitude) {
     return (
       <View style={styles.container}>
@@ -398,7 +393,8 @@ const [destination, setDestiation] = useState();
           placeholder='Search'
           onPress={(data, details = null) => {
           // 'details' is provided when fetchDetails = true
-          console.log(data, details);
+          //console.log(data, details);
+          setSearch(data.description);
           }}
         query={{
           key: MAP_API_KEY,
