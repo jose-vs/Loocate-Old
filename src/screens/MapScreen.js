@@ -27,9 +27,8 @@ import BottomSheet from "reanimated-bottom-sheet";
 import * as Location from "expo-location";
 import { firebase } from "../firebase/config";
 import MapViewDirections from "react-native-maps-directions";
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import Geocoder from 'react-native-geocoding';
-
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import Geocoder from "react-native-geocoding";
 
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
@@ -38,7 +37,7 @@ export default MapScreen = ({ navigation }) => {
   const [grantedPerms, setPerms] = useState(null);
 
   const _map = React.useRef(null);
-  Geocoder.init(MAP_API_KEY)
+  Geocoder.init(MAP_API_KEY);
   /**
    * Loads the user location
    */
@@ -230,7 +229,6 @@ export default MapScreen = ({ navigation }) => {
       return null;
     } else {
       return state.markers.map((marker, index) => {
-
         return (
           <Marker
             onLoad={() => this.forceUpdate()}
@@ -352,32 +350,67 @@ export default MapScreen = ({ navigation }) => {
             setState({ ...state, region: region })
           }
         >
-          {state.selectedToiletDest.latitude && <MapViewDirections
-            origin={state.userLocation}
-            destination={state.selectedToiletDest}
-            apikey={MAP_API_KEY}
-            strokeWidth={5}
-            strokeColor="#00ced1"
-            optimizeWaypoints={true}
-            mode={state.mode}
-            onReady={(result) => {
-              toilet.distance = result.distance;
-              toilet.duration = result.duration;
-              console.log(toilet);
-              _map.current.fitToCoordinates(result.coordinates, {
-                edgePadding: {
-                  right: width / 20,
-                  bottom: height / 20,
-                  left: width / 20,
-                  top: height / 20,
-                },
-              });
+          <GooglePlacesAutocomplete
+            placeholder="Search"
+            onPress={(data, details = null) => {
+              // 'details' is provided when fetchDetails = true
+              //console.log(data, details);
+              setSearch(data.description);
             }}
-            onError={(errorMessage) => {
-              console.log(errorMessage);
-              onAreaSearchPress();
+            query={{
+              key: MAP_API_KEY,
+              language: "en",
             }}
-          />}
+            styles={{
+              textInputContainer: {
+                position: "absolute",
+                backgroundColor: "red",
+                marginVertical: 45,
+                marginLeft: 10,
+                marginRight: 10,
+              },
+              textInput: {
+                position: "absolute",
+                marginVertical: 50,
+                marginLeft: 45,
+                marginRight: 10,
+                height: 38,
+                color: "#5d5d5d",
+                fontSize: 16,
+              },
+              predefinedPlacesDescription: {
+                color: "#1faadb",
+              },
+            }}
+          />
+          {state.selectedToiletDest.latitude && (
+            <MapViewDirections
+              origin={state.userLocation}
+              destination={state.selectedToiletDest}
+              apikey={MAP_API_KEY}
+              strokeWidth={5}
+              strokeColor="#00ced1"
+              optimizeWaypoints={true}
+              mode={state.mode}
+              onReady={(result) => {
+                toilet.distance = result.distance;
+                toilet.duration = result.duration;
+                console.log(toilet);
+                _map.current.fitToCoordinates(result.coordinates, {
+                  edgePadding: {
+                    right: width / 20,
+                    bottom: height / 20,
+                    left: width / 20,
+                    top: height / 20,
+                  },
+                });
+              }}
+              onError={(errorMessage) => {
+                console.log(errorMessage);
+                onAreaSearchPress();
+              }}
+            />
+          )}
           <RenderMarkers />
         </MapView>
         <Animatable.View style={styles.searchHere} animation="fadeInLeft">
@@ -389,37 +422,6 @@ export default MapScreen = ({ navigation }) => {
             <Text style={styles.searchHereText}>Search this area</Text>
           </TouchableOpacity>
         </Animatable.View>
-        <GooglePlacesAutocomplete
-          placeholder='Search'
-          onPress={(data, details = null) => {
-          // 'details' is provided when fetchDetails = true
-          //console.log(data, details);
-          setSearch(data.description);
-          }}
-        query={{
-          key: MAP_API_KEY,
-          language: 'en',
-      }}
-      styles = {{
-        textInputContainer: {
-          position: "absolute",
-          marginTop: 50,
-          flexDirection: "row",
-          justifyContent: "space-between",
-          backgroundColor: "#fff",
-          width: "90%",
-          alignSelf: "center",
-          borderRadius: 25,
-          padding: 10,
-          shadowColor: "#ccc",
-          shadowOffset: { width: 0, height: 3 },
-          shadowOpacity: 0.5,
-          shadowRadius: 5,
-          elevation: 10,
-        }
-      }}
-    />
-
         <View style={styles.buttonContainer}>
           {/* Map Style Button */}
           <TouchableOpacity
@@ -479,7 +481,6 @@ export default MapScreen = ({ navigation }) => {
             </View>
           </TouchableOpacity>
         </View>
-
         {/* FOOTER */}
         <View style={styles.footer}>
           {/* MAP BUTTON */}

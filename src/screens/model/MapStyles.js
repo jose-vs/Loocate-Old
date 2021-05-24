@@ -6,25 +6,21 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  searchBox: {
+  textInputContainer: {
     position: "absolute",
-    marginTop: 50,
+    paddingVertical: 30,
     flexDirection: "row",
-    justifyContent: "space-between",
-    backgroundColor: "#fff",
-    width: "90%",
-    alignSelf: "center",
-    borderRadius: 25,
-    padding: 10,
-    shadowColor: "#ccc",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
-    elevation: 10,
+    //backgroundColor: "red",
   },
-  searchBoxText: {
-    paddingLeft: 8,
-    paddingRight: 8,
+  textInput: {
+    //position: "absolute",
+    //backgroundColor: "red",
+    height: 44,
+    borderRadius: 5,
+    paddingVertical: 30,
+    paddingHorizontal: 10,
+    fontSize: 15,
+    flex: 1,
   },
   searchHere: {
     position: "absolute",
