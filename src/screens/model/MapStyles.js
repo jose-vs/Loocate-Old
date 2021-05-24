@@ -13,14 +13,13 @@ export const styles = StyleSheet.create({
     //backgroundColor: "red",
   },
   textInput: {
-    //position: "absolute",
+    position: "absolute",
     //backgroundColor: "red",
     height: 44,
     borderRadius: 5,
     paddingVertical: 30,
     paddingHorizontal: 10,
     fontSize: 15,
-    flex: 1,
   },
   searchHere: {
     position: "absolute",

@@ -327,6 +327,44 @@ export default MapScreen = ({ navigation }) => {
   if (state.userLocation.latitude) {
     return (
       <View style={styles.container}>
+        <GooglePlacesAutocomplete
+          placeholder="Search"
+          onPress={(data, details = null) => {
+            // 'details' is provided when fetchDetails = true
+            //console.log(data, details);
+            setSearch(data.description);
+          }}
+          query={{
+            key: MAP_API_KEY,
+            language: "en",
+          }}
+          styles={{
+            container: {
+              backgroundColor: "red",
+              flex: 0.2,
+            },
+            textInputContainer: {
+              position: "absolute",
+              backgroundColor: "red",
+              marginVertical: 45,
+              marginLeft: 10,
+              marginRight: 10,
+            },
+            textInput: {
+              position: "absolute",
+              marginVertical: 20,
+              marginLeft: 45,
+              marginRight: 10,
+              height: 38,
+              color: "#5d5d5d",
+              fontSize: 16,
+            },
+            predefinedPlacesDescription: {
+              color: "#1faadb",
+            },
+          }}
+        />
+
         <MapView
           ref={_map}
           showuserLocation={true} // may not be needed, deprecated by 'showsuserlocation={true}'
@@ -350,39 +388,6 @@ export default MapScreen = ({ navigation }) => {
             setState({ ...state, region: region })
           }
         >
-          <GooglePlacesAutocomplete
-            placeholder="Search"
-            onPress={(data, details = null) => {
-              // 'details' is provided when fetchDetails = true
-              //console.log(data, details);
-              setSearch(data.description);
-            }}
-            query={{
-              key: MAP_API_KEY,
-              language: "en",
-            }}
-            styles={{
-              textInputContainer: {
-                position: "absolute",
-                backgroundColor: "red",
-                marginVertical: 45,
-                marginLeft: 10,
-                marginRight: 10,
-              },
-              textInput: {
-                position: "absolute",
-                marginVertical: 50,
-                marginLeft: 45,
-                marginRight: 10,
-                height: 38,
-                color: "#5d5d5d",
-                fontSize: 16,
-              },
-              predefinedPlacesDescription: {
-                color: "#1faadb",
-              },
-            }}
-          />
           {state.selectedToiletDest.latitude && (
             <MapViewDirections
               origin={state.userLocation}
