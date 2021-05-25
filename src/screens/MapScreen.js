@@ -321,18 +321,27 @@ export default MapScreen = ({ navigation }) => {
     </View>
   );
 
-  const [search, setSearch] = useState();
-  console.log(search);
 
   if (state.userLocation.latitude) {
     return (
       <View style={styles.container}>
         <GooglePlacesAutocomplete
           placeholder="Search"
+          listViewDisplayed="auto"
+          fetchDetails={true}
+          minLength={2}
+          debounce={200}
           onPress={(data, details = null) => {
-            // 'details' is provided when fetchDetails = true
-            //console.log(data, details);
-            setSearch(data.description);
+            _map.current.animateToRegion(
+              {
+                latitude: details.geometry.location.lat,
+                longitude: details.geometry.location.lng,
+                latitudeDelta: 0.04,
+                longitudeDelta: 0.05,
+              },
+              350
+            );
+            toiletApiFetch(details.geometry.location.lat, details.geometry.location.lng);
           }}
           query={{
             key: MAP_API_KEY,
@@ -344,27 +353,40 @@ export default MapScreen = ({ navigation }) => {
               flex: 0.2,
             },
             textInputContainer: {
-              position: "absolute",
-              backgroundColor: "red",
-              marginVertical: 45,
-              marginLeft: 10,
-              marginRight: 10,
+              borderTopWidth: 0,
+              borderBottomWidth: 0,
+              height: 50,
+              overflow: 'visible',
+              backgroundColor: Colors.white,
+              borderColor: Colors.white,
+              borderRadius: 100,
             },
             textInput: {
-              position: "absolute",
-              marginVertical: 20,
-              marginLeft: 45,
-              marginRight: 10,
-              height: 38,
-              color: "#5d5d5d",
-              fontSize: 16,
+              backgroundColor: 'transparent',
+              fontSize: 15,
+              lineHeight: 22.5,
+              paddingBottom: 0,
+              flex: 1
+            },
+            listView: {
+              position: 'absolute',
+              top: 60,
+              left: 10,
+              right: 10,
+              backgroundColor: 'white',
+              borderRadius: 5,
+              flex: 1,
+              elevation: 3,
+              zIndex: 10
+            },
+            description: {
+              color: "#1faadb"
             },
             predefinedPlacesDescription: {
-              color: "#1faadb",
-            },
+              color: "#1faadb"
+            }
           }}
         />
-
         <MapView
           ref={_map}
           showuserLocation={true} // may not be needed, deprecated by 'showsuserlocation={true}'
