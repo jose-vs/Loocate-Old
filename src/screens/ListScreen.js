@@ -117,8 +117,14 @@ export default ListScreen = ({ route, navigation }) => {
         {/* USER SCREEN */}
         <TouchableOpacity
           onPress={() => {
-            //navigates to loginscreen when pressed
-            navigation.navigate("Login");
+              //if there is a user logged in, retrieve them and skip having to go through login screen again
+              firebase.auth().onAuthStateChanged((user) => {
+              if (user) {
+                navigation.navigate("Account");
+              } else {
+                navigation.navigate("Login");
+              }
+            });
           }}
         >
           <FontAwesome

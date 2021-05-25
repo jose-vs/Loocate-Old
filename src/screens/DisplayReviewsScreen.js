@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { FontAwesome, Entypo, Ionicons } from "@expo/vector-icons";
 import ReviewCard from "./components/ReviewCard";
 import styles from "./model/ListStyles";
-import { StackActions } from '@react-navigation/native';
+import { firebase } from "../firebase/config";
 
 export default function DisplayReviewsScreen({ route, navigation }) {
 
@@ -47,9 +47,7 @@ const [reviewsArray, setReviewsArray] = useState(route.params);
           paddingRight: Platform.OS === "android" ? 20 : 0,
         }}
       >
-
       </ScrollView>
-
       <ScrollView
         vertical
         scrollEventThrottle={1}
@@ -58,11 +56,14 @@ const [reviewsArray, setReviewsArray] = useState(route.params);
       >
         {reviewsArray.map((item, index) => {
           return (
-          <ReviewCard 
-            title={item.title}   
+          <ReviewCard                   
+            title={item.title}  
+            userID={item.userID}
             key={index}
-            loocateRating = {item.loocateRating}
-            rating={item.rating}                
+            loocateRating={item.loocateRating}
+            rating={item.rating}  
+            item={item}  
+            navigation={navigation}             
           />
           )          
         })}
@@ -100,8 +101,14 @@ const [reviewsArray, setReviewsArray] = useState(route.params);
         {/* USER SCREEN */}
         <TouchableOpacity
           onPress={() => {
-            //navigates to loginscreen when pressed
-            navigation.navigate("Login");
+              //if there is a user logged in, retrieve them and skip having to go through login screen again
+              firebase.auth().onAuthStateChanged((user) => {
+              if (user) {
+                navigation.navigate("Account");
+              } else {
+                navigation.navigate("Login");
+              }
+            });
           }}
         >
           <FontAwesome

@@ -1,12 +1,49 @@
-import React, { useState } from "react";
-import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
+import React, { useState, useEffect } from "react";
+import { Image, Text, ActivityIndicator, TouchableOpacity, View } from "react-native";
 import styles from "./model/AccountStyles.js";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { firebase } from "../firebase/config";
 
-export default function AccountScreen({ route, navigation }) {
+export default function AccountScreen({navigation }) {
 
-  const {data} = route.params;
+  const [existingReviewsArray, setExistingReviewsArray] = useState([]);
+  const [userId, setUserId] = useState();
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Create a useEffect [with no dependencies] that runs once to get the userId
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged((user) => {
+      const usersRef = firebase.firestore().collection("users");
+
+      usersRef
+        .doc(user.uid)
+        .get()
+        .then((document) => {
+          const data = document.data();
+
+          // Use the set state hook here to trigger the second useEffect below
+          setUserId(data.id);
+        });
+    });
+  }, []);
+
+  //get reviews made by userID to useState, listens to changes in userID state
+  useEffect(() => {  
+    let addToReviewsArray = [];
+    const reviewsRef = firebase.firestore().collection("reviews");
+
+    reviewsRef.get().then((querySnapshot) => {
+      querySnapshot.forEach(snapshot => {
+          if (snapshot.data().userID == userId){
+            var existingReview = snapshot.data(); 
+            addToReviewsArray = ([...addToReviewsArray , existingReview]);          
+          } 
+      }
+    )    
+      setExistingReviewsArray(addToReviewsArray);
+      setIsLoading(false);
+    });
+  }, [userId]); 
 
   const onLogOutPress = () => {    
     firebase.auth().signOut()
@@ -14,17 +51,18 @@ export default function AccountScreen({ route, navigation }) {
   }
  
   const viewMyReviewsPress = () => {
+    if (isLoading) {
 
-    navigation.navigate("DisplayReviews");
-  }
+    }
+    else {
+      navigation.navigate("DisplayReviews", existingReviewsArray);
+    }
 
-  const createReviewsPress = () => {
-    navigation.navigate("ReviewViewAndCreate");
   }
 
   return (
     <View style={styles.container}>
-      <KeyboardAwareScrollView
+      {isLoading ? <ActivityIndicator /> : <KeyboardAwareScrollView
         style={{ flex: 1, width: "100%" }}
         keyboardShouldPersistTaps="always">
         <Image
@@ -35,10 +73,7 @@ export default function AccountScreen({ route, navigation }) {
       Your Account
       </Text>
         <TouchableOpacity style={styles.buttonTwo} onPress={() => viewMyReviewsPress()}>
-          <Text style={styles.buttonTitle}>View my reviews</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonTwo} onPress={() => createReviewsPress()}>
-          <Text style={styles.buttonTitle}>Create review (temporarily here)</Text>
+          <Text style={styles.buttonTitle}>My reviews</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.buttonTwo}
@@ -48,7 +83,7 @@ export default function AccountScreen({ route, navigation }) {
         <TouchableOpacity style={styles.button} onPress={() => onLogOutPress()}>
           <Text style={styles.buttonTitle}>Log out</Text>
         </TouchableOpacity>
-      </KeyboardAwareScrollView>
+      </KeyboardAwareScrollView>}
     </View>
   );
 }

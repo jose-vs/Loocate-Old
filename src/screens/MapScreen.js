@@ -133,16 +133,7 @@ export default MapScreen = ({ navigation }) => {
     //if there is a user logged in, retrieve them and skip having to go through login screen again
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        //if user is signed in
-        const usersRef = firebase.firestore().collection("users"); //get user collection from firestore
-        usersRef //call the database of user data (NOT the users in auth())
-          .doc(user.uid)
-          .get()
-          .then((document) => {
-            const data = document.data(); //this is the specific data (not userAuth, but the data I made in the users collection) of the user
-            //console.log(data);
-            navigation.navigate("Account", { user: data }); //revisit this later, accessing data on account screen is of issue
-          });
+        navigation.navigate("Account");
       } else {
         navigation.navigate("Login");
       }

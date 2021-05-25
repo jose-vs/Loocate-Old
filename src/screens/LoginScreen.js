@@ -9,7 +9,7 @@ export default function LoginScreen({navigation}) {
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const popAction = StackActions.pop(1); //go back one screen in stack (number represents how many screens to go back by)
+    //const popAction = StackActions.pop(1); //go back one screen in stack (number represents how many screens to go back by)
 
     const onFooterLinkPress = () => {
         navigation.navigate('Registration')
@@ -81,7 +81,7 @@ export default function LoginScreen({navigation}) {
                 </View>
                 <TouchableOpacity
                 style={styles.buttonTwo}
-                onPress={() => navigation.dispatch(popAction)}>
+                onPress={() => navigation.navigate("Map")}>
                 <Text style={styles.buttonTitle}>Back</Text>
                 </TouchableOpacity>
             </KeyboardAwareScrollView>

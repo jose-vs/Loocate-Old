@@ -1,15 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Image, Text, Alert, TouchableOpacity, View, ScrollView } from "react-native";
 import styles from "./model/ReviewViewAndCreateStyles";
 import { firebase } from "../firebase/config";
 import { TextInput } from 'react-native-paper';
-import { useEffect } from "react/cjs/react.development";
 import { StackActions } from '@react-navigation/native';
 
 export default function ReviewViewAndCreateScreen({ route, navigation }) {
   
-  var review = ('');
-  var addToReviewsArray = [];
+  var review = (''); 
   const [existingReviewsArray, setExistingReviewsArray] = useState([]);
   const usersRef = firebase.firestore().collection("users"); 
   const reviewsRef = firebase.firestore().collection('reviews');
@@ -17,6 +15,7 @@ export default function ReviewViewAndCreateScreen({ route, navigation }) {
 
     //fetches reviews from database and puts them in local array
     useEffect(() => {
+      var addToReviewsArray = [];
       reviewsRef.get().then((querySnapshot) => {
         querySnapshot.forEach(snapshot => {
             if (snapshot.data().toiletID == route.params.id){
