@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  SafeAreaView,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import * as Animatable from "react-native-animatable";
@@ -325,6 +326,8 @@ export default MapScreen = ({ navigation }) => {
   if (state.userLocation.latitude) {
     return (
       <View style={styles.container}>
+        <View style = {styles.searchContainer}> 
+       <SafeAreaView style = {{ flex: 1}}>
         <GooglePlacesAutocomplete
           placeholder="Search"
           listViewDisplayed="auto"
@@ -348,45 +351,34 @@ export default MapScreen = ({ navigation }) => {
             language: "en",
           }}
           styles={{
-            container: {
-              backgroundColor: "red",
-              flex: 0.2,
-            },
             textInputContainer: {
-              borderTopWidth: 0,
-              borderBottomWidth: 0,
+              width: '90%',
+              position: 'absolute',
+              borderRadius: 15,
+              padding: 10,
+              alignSelf: "center",
               height: 50,
-              overflow: 'visible',
-              backgroundColor: Colors.white,
-              borderColor: Colors.white,
-              borderRadius: 100,
             },
             textInput: {
-              backgroundColor: 'transparent',
-              fontSize: 15,
-              lineHeight: 22.5,
-              paddingBottom: 0,
-              flex: 1
+              height: 50,
+              color: 'black',
+              fontSize: 16,
             },
             listView: {
+              width: '80%',
               position: 'absolute',
-              top: 60,
-              left: 10,
-              right: 10,
+              marginTop: 60,
+              padding: 10,
+              alignSelf: "center",
               backgroundColor: 'white',
-              borderRadius: 5,
-              flex: 1,
-              elevation: 3,
-              zIndex: 10
+              elevation: 1,
             },
-            description: {
-              color: "#1faadb"
+            separator: {
+              opacity: 0
             },
-            predefinedPlacesDescription: {
-              color: "#1faadb"
-            }
           }}
-        />
+        /></SafeAreaView>
+        </View>
         <MapView
           ref={_map}
           showuserLocation={true} // may not be needed, deprecated by 'showsuserlocation={true}'

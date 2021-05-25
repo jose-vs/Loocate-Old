@@ -1,17 +1,27 @@
 import { StyleSheet } from "react-native";
+import { color } from "react-native-reanimated";
 
 import { width, CARD_HEIGHT, CARD_WIDTH } from "./Constants";
 
 export const styles = StyleSheet.create({
   container: {
+    backgroundColor: "#007965",
     flex: 1,
+    zIndex: -1,
   },
   textInputContainer: {
     position: "absolute",
     paddingVertical: 30,
     flexDirection: "row",
-    //backgroundColor: "red",
+    backgroundColor: "transparent",
   },
+  searchContainer: {
+    position: 'relative',
+    height: 20,
+    paddingTop: 45,
+    flexGrow: 0,
+    flexShrink: 0
+  }, 
   textInput: {
     position: "absolute",
     //backgroundColor: "red",
