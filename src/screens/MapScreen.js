@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  SafeAreaView,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import * as Animatable from "react-native-animatable";
@@ -27,6 +28,8 @@ import BottomSheet from "reanimated-bottom-sheet";
 import * as Location from "expo-location";
 import { firebase } from "../firebase/config";
 import MapViewDirections from "react-native-maps-directions";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import Geocoder from "react-native-geocoding";
 
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
@@ -35,7 +38,7 @@ export default MapScreen = ({ navigation }) => {
   const [grantedPerms, setPerms] = useState(null);
 
   const _map = React.useRef(null);
-
+  Geocoder.init(MAP_API_KEY);
   /**
    * Loads the user location
    */
@@ -248,7 +251,6 @@ export default MapScreen = ({ navigation }) => {
       });
     }
   };
-
   const [marker, setMarker] = useState();
 
   /**
@@ -276,6 +278,24 @@ export default MapScreen = ({ navigation }) => {
       setState({ ...state, mapType: "standard" });
     }
   };
+
+  const onLocationButtonPress = () => {
+    if (state.userLocation != null)
+    {
+      _map.current.animateToRegion(
+        {
+          latitude: state.userLocation.latitude,
+          longitude: state.userLocation.longitude,
+          latitudeDelta: 0.04,
+          longitudeDelta: 0.05,
+        },
+        350
+      );
+    }
+    else{
+      console.log("No user location given (PERMISIONS MAY NOT BE GIVEN");
+    }
+  }
 
   /**
    * creates bottom sheet content
@@ -320,9 +340,67 @@ export default MapScreen = ({ navigation }) => {
     </View>
   );
 
+
   if (state.userLocation.latitude) {
     return (
       <View style={styles.container}>
+        <View style = {styles.searchContainer}> 
+       <SafeAreaView style = {{ flex: 1}}>
+        <GooglePlacesAutocomplete
+          placeholder="Search"
+          listViewDisplayed="auto"
+          fetchDetails={true}
+          minLength={2}
+          debounce={200}
+          onPress={(data, details = null) => {
+            _map.current.animateToRegion(
+              {
+                latitude: details.geometry.location.lat,
+                longitude: details.geometry.location.lng,
+                latitudeDelta: 0.04,
+                longitudeDelta: 0.05,
+              },
+              350
+            );
+            toiletApiFetch(details.geometry.location.lat, details.geometry.location.lng);
+          }}
+          query={{
+            key: MAP_API_KEY,
+            language: "en",
+          }}
+          styles={{
+            textInputContainer: {
+              width: '95%',
+              position: 'absolute',
+              //borderRadius: 40,
+              padding: 10,
+              alignSelf: "center",
+              height: 40,
+            },
+            textInput: {
+              height: 40,
+              color: 'black',
+              fontSize: 16,
+              paddingLeft: 15,
+              borderRadius: 25,
+            },
+            listView: {
+              zIndex: 2,
+              width: '90%',
+              position: 'absolute',
+              marginTop: 60,
+              padding: 10,
+              alignSelf: "center",
+              backgroundColor: 'white',
+              borderRadius: 25,
+              elevation: 1,
+            },
+            separator: {
+              opacity: 0
+            },
+          }}
+        /></SafeAreaView>
+        </View>
         <MapView
           ref={_map}
           showuserLocation={true} // may not be needed, deprecated by 'showsuserlocation={true}'
@@ -346,56 +424,36 @@ export default MapScreen = ({ navigation }) => {
             setState({ ...state, region: region })
           }
         >
-          {state.selectedToiletDest.latitude && 
-          <MapViewDirections
-            origin={state.userLocation}
-            destination={state.selectedToiletDest}
-            apikey={MAP_API_KEY}
-            strokeWidth={5}
-            strokeColor="#00ced1"
-            optimizeWaypoints={true}
-            mode={state.mode}
-            onReady={(result) => {
-              toilet.distance = result.distance;
-              toilet.duration = result.duration;
-              console.log(toilet);
-              _map.current.fitToCoordinates(result.coordinates, {
-                edgePadding: {
-                  right: width / 20,
-                  bottom: height / 20,
-                  left: width / 20,
-                  top: height / 20,
-                },
-              });
-            }}
-            onError={(errorMessage) => {
-              console.log(errorMessage);
-            }}
-          />}
-
+          {state.selectedToiletDest.latitude && (
+            <MapViewDirections
+              origin={state.userLocation}
+              destination={state.selectedToiletDest}
+              apikey={MAP_API_KEY}
+              strokeWidth={5}
+              strokeColor="#00ced1"
+              optimizeWaypoints={true}
+              mode={state.mode}
+              onReady={(result) => {
+                toilet.distance = result.distance;
+                toilet.duration = result.duration;
+                console.log(toilet);
+                _map.current.fitToCoordinates(result.coordinates, {
+                  edgePadding: {
+                    right: width / 20,
+                    bottom: height / 20,
+                    left: width / 20,
+                    top: height / 20,
+                  },
+                });
+              }}
+              onError={(errorMessage) => {
+                console.log(errorMessage);
+                onAreaSearchPress();
+              }}
+            />
+          )}
           <RenderMarkers />
         </MapView>
-        <View style={styles.searchBox}>
-          <TextInput
-            placeholder="Search here"
-            placeholderTextColor="#777"
-            autoCapitalize="none"
-            style={styles.searchBoxText}
-          />
-          {/* USER SCREEN */}
-          <TouchableOpacity
-            onPress={() => {
-              //navigates to loginscreen or accountscreen when pressed
-              onLoginPress();
-            }}
-          ></TouchableOpacity>
-          <FontAwesome
-            name="search"
-            size={24}
-            color="black"
-            style={{ right: 8, opacity: 0.6 }}
-          />
-        </View>
         <Animatable.View style={styles.searchHere} animation="fadeInLeft">
           <TouchableOpacity
             onPress={() => {
@@ -405,8 +463,21 @@ export default MapScreen = ({ navigation }) => {
             <Text style={styles.searchHereText}>Search this area</Text>
           </TouchableOpacity>
         </Animatable.View>
-
         <View style={styles.buttonContainer}>
+        <TouchableOpacity
+            onPress={() => {
+              onLocationButtonPress();
+            }}
+          >
+            <View style={styles.locationButton}>
+              <MaterialIcons
+                name="my-location"
+                size={26}
+                color="black"
+                style={{ top: 6, left: 6, opacity: 0.6 }}
+              />
+            </View>
+          </TouchableOpacity>
           {/* Map Style Button */}
           <TouchableOpacity
             onPress={() => {
@@ -465,7 +536,6 @@ export default MapScreen = ({ navigation }) => {
             </View>
           </TouchableOpacity>
         </View>
-
         {/* FOOTER */}
         <View style={styles.footer}>
           {/* MAP BUTTON */}

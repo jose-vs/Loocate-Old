@@ -1,30 +1,35 @@
 import { StyleSheet } from "react-native";
+import { color } from "react-native-reanimated";
 
 import { width, CARD_HEIGHT, CARD_WIDTH } from "./Constants";
 
 export const styles = StyleSheet.create({
   container: {
+    backgroundColor: "#007965",
     flex: 1,
+    zIndex: -1,
   },
-  searchBox: {
+  textInputContainer: {
     position: "absolute",
-    marginTop: 50,
+    paddingVertical: 30,
     flexDirection: "row",
-    justifyContent: "space-between",
-    backgroundColor: "#fff",
-    width: "90%",
-    alignSelf: "center",
-    borderRadius: 25,
-    padding: 10,
-    shadowColor: "#ccc",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
-    elevation: 10,
+    backgroundColor: "transparent",
   },
-  searchBoxText: {
-    paddingLeft: 8,
-    paddingRight: 8,
+  searchContainer: {
+    position: 'relative',
+    height: 20,
+    paddingTop: 30,
+    flexGrow: 0,
+    flexShrink: 0
+  }, 
+  textInput: {
+    position: "absolute",
+    //backgroundColor: "red",
+    height: 44,
+    borderRadius: 5,
+    paddingVertical: 30,
+    paddingHorizontal: 10,
+    fontSize: 15,
   },
   searchHere: {
     position: "absolute",
@@ -45,6 +50,20 @@ export const styles = StyleSheet.create({
   searchHereText: {
     color: "#385c59",
   },
+  locationButton: {
+    marginRight: 50,
+    marginLeft: 5,
+    width: 38,
+    height: 38,
+    borderRadius: 20,
+    flexDirection: "row",
+    backgroundColor: "#FFF",
+    shadowColor: "#ccc",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 10,
+  },
   circleButton: {
     marginRight: 5,
     marginLeft: 5,
@@ -62,8 +81,9 @@ export const styles = StyleSheet.create({
   buttonContainer: {
     position: "absolute",
     flexDirection: "row",
-    top: 110,
+    top: 90,
     paddingHorizontal: 10,
+    paddingRight: 20,
     alignSelf: "flex-end",
   },
   button: {
