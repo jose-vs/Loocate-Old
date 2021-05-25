@@ -279,6 +279,24 @@ export default MapScreen = ({ navigation }) => {
     }
   };
 
+  const onLocationButtonPress = () => {
+    if (state.userLocation != null)
+    {
+      _map.current.animateToRegion(
+        {
+          latitude: state.userLocation.latitude,
+          longitude: state.userLocation.longitude,
+          latitudeDelta: 0.04,
+          longitudeDelta: 0.05,
+        },
+        350
+      );
+    }
+    else{
+      console.log("No user location given (PERMISIONS MAY NOT BE GIVEN");
+    }
+  }
+
   /**
    * creates bottom sheet content
    */
@@ -352,25 +370,29 @@ export default MapScreen = ({ navigation }) => {
           }}
           styles={{
             textInputContainer: {
-              width: '90%',
+              width: '95%',
               position: 'absolute',
-              borderRadius: 15,
+              //borderRadius: 40,
               padding: 10,
               alignSelf: "center",
-              height: 50,
+              height: 40,
             },
             textInput: {
-              height: 50,
+              height: 40,
               color: 'black',
               fontSize: 16,
+              paddingLeft: 15,
+              borderRadius: 25,
             },
             listView: {
-              width: '80%',
+              zIndex: 2,
+              width: '90%',
               position: 'absolute',
               marginTop: 60,
               padding: 10,
               alignSelf: "center",
               backgroundColor: 'white',
+              borderRadius: 25,
               elevation: 1,
             },
             separator: {
@@ -442,6 +464,20 @@ export default MapScreen = ({ navigation }) => {
           </TouchableOpacity>
         </Animatable.View>
         <View style={styles.buttonContainer}>
+        <TouchableOpacity
+            onPress={() => {
+              onLocationButtonPress();
+            }}
+          >
+            <View style={styles.locationButton}>
+              <MaterialIcons
+                name="my-location"
+                size={26}
+                color="black"
+                style={{ top: 6, left: 6, opacity: 0.6 }}
+              />
+            </View>
+          </TouchableOpacity>
           {/* Map Style Button */}
           <TouchableOpacity
             onPress={() => {
