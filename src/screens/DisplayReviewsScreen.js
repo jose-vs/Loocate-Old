@@ -14,10 +14,6 @@ export default function DisplayReviewsScreen({ route, navigation }) {
 
 const [reviewsArray, setReviewsArray] = useState(route.params);
 
-useEffect(() => {
-  
-}, []);
-
   return (
     <View style={styles.container}>
       <View style={styles.searchBox}>
@@ -65,7 +61,6 @@ useEffect(() => {
           <ReviewCard 
             title={item.title}   
             key={index}
-            address={item.address}
             loocateRating = {item.loocateRating}
             rating={item.rating}                
           />
