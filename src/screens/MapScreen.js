@@ -83,7 +83,6 @@ export default MapScreen = ({ navigation }) => {
       .then(async (response) => {
 
         await response.data.results.map((toiletData) => {
-
           const newToilet = {
             id: toiletData.place_id,
             coordinate: {
@@ -96,8 +95,8 @@ export default MapScreen = ({ navigation }) => {
             reviews: toiletData.user_ratings_total,
             distance: null,
             duration: null,
-            //string representattion atm 
-            open: (toiletData.opening_hours === undefined) ? "bruh" : String(toiletData.opening_hours.open_now)
+            open: (toiletData.opening_hours === undefined) ? "gay" : 
+            (toiletData.opening_hours.open_now == true) ? "open" : "closed"
           }
           fetchedToilets.push(newToilet);
         });
