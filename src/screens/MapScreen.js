@@ -81,8 +81,9 @@ export default MapScreen = ({ navigation }) => {
           &key=${MAP_API_KEY}`
       )
       .then(async (response) => {
-        console.log(response.data.results);
+
         await response.data.results.map((toiletData) => {
+
           const newToilet = {
             id: toiletData.place_id,
             coordinate: {
@@ -95,8 +96,9 @@ export default MapScreen = ({ navigation }) => {
             reviews: toiletData.user_ratings_total,
             distance: null,
             duration: null,
-            open: toiletData.opening_hours.open_now,
-          };;
+            //string representattion atm 
+            open: (toiletData.opening_hours === undefined) ? "bruh" : String(toiletData.opening_hours.open_now)
+          }
           fetchedToilets.push(newToilet);
         });
       })
@@ -339,7 +341,7 @@ export default MapScreen = ({ navigation }) => {
         </TouchableOpacity>
       )}
         {marker && marker.length && (
-        <Text style={styles.toiletSubtitle}>Open/Closed? {toilet.status}</Text>
+        <Text style={styles.toiletSubtitle}>Open/Closed? {toilet.open}</Text>
       )}
     </View>
   );
