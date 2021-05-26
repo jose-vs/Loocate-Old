@@ -49,7 +49,8 @@ const toilet = {
   rating: null,
   reviews: null,
   distance: null,
-  duration: null
+  duration: null,
+  open: false,
 };
 
 export { initialMapState, filter, toilet };

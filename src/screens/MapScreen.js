@@ -81,6 +81,7 @@ export default MapScreen = ({ navigation }) => {
           &key=${MAP_API_KEY}`
       )
       .then(async (response) => {
+        console.log(response.data.results);
         await response.data.results.map((toiletData) => {
           const newToilet = {
             id: toiletData.place_id,
@@ -94,13 +95,12 @@ export default MapScreen = ({ navigation }) => {
             reviews: toiletData.user_ratings_total,
             distance: null,
             duration: null,
-          };
-
+            open: toiletData.opening_hours.open_now,
+          };;
           fetchedToilets.push(newToilet);
         });
       })
       .catch((err) => console.log("Error:", err));
-
     Promise.all(
       fetchedToilets.map(async (current) => {
         return await distanceApiFetch(current)
@@ -139,6 +139,7 @@ export default MapScreen = ({ navigation }) => {
           reviews: toilet.reviews,
           distance: response.data.rows[0].elements[0].distance.value / 1000,
           duration: response.data.rows[0].elements[0].duration.value / 60,
+          open: toilet.open,
         });
       })
       .catch((err) => {
@@ -337,9 +338,11 @@ export default MapScreen = ({ navigation }) => {
           <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
         </TouchableOpacity>
       )}
+        {marker && marker.length && (
+        <Text style={styles.toiletSubtitle}>Open/Closed? {toilet.status}</Text>
+      )}
     </View>
   );
-
 
   if (state.userLocation.latitude) {
     return (
