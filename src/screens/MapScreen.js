@@ -16,11 +16,17 @@ import {
   MaterialIcons,
   Entypo,
   FontAwesome5,
+  MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { MAP_API_KEY } from "@env";
 import toiletApi from "../../api/googlePlaces";
 import distanceMatrixApi from "../../api/distanceMatrixApi";
-import { initialMapState, toilet } from "./model/MapData";
+import {
+  initialMapState,
+  toilet,
+  mapDarkStyle,
+  mapStandardStyle,
+} from "./model/MapData";
 import { styles } from "./model/MapStyles";
 import StarRating from "./components/StarRating";
 import { CARD_WIDTH } from "./model/Constants";
@@ -278,10 +284,17 @@ export default MapScreen = ({ navigation }) => {
       setState({ ...state, mapType: "standard" });
     }
   };
+  // Make change into light and dark mode
+  const onStyleButtonPress = () => {
+    if (state.mapType == "standard") {
+      setState({ ...state, mapType: "satellite" });
+    } else if (state.mapType == "satellite") {
+      setState({ ...state, mapType: "standard" });
+    }
+  };
 
   const onLocationButtonPress = () => {
-    if (state.userLocation != null)
-    {
+    if (state.userLocation != null) {
       _map.current.animateToRegion(
         {
           latitude: state.userLocation.latitude,
@@ -291,11 +304,10 @@ export default MapScreen = ({ navigation }) => {
         },
         350
       );
-    }
-    else{
+    } else {
       console.log("No user location given (PERMISIONS MAY NOT BE GIVEN");
     }
-  }
+  };
 
   /**
    * creates bottom sheet content
@@ -340,66 +352,69 @@ export default MapScreen = ({ navigation }) => {
     </View>
   );
 
-
   if (state.userLocation.latitude) {
     return (
       <View style={styles.container}>
-        <View style = {styles.searchContainer}> 
-       <SafeAreaView style = {{ flex: 1}}>
-        <GooglePlacesAutocomplete
-          placeholder="Search"
-          listViewDisplayed="auto"
-          fetchDetails={true}
-          minLength={2}
-          debounce={200}
-          onPress={(data, details = null) => {
-            _map.current.animateToRegion(
-              {
-                latitude: details.geometry.location.lat,
-                longitude: details.geometry.location.lng,
-                latitudeDelta: 0.04,
-                longitudeDelta: 0.05,
-              },
-              350
-            );
-            toiletApiFetch(details.geometry.location.lat, details.geometry.location.lng);
-          }}
-          query={{
-            key: MAP_API_KEY,
-            language: "en",
-          }}
-          styles={{
-            textInputContainer: {
-              width: '95%',
-              position: 'absolute',
-              //borderRadius: 40,
-              padding: 10,
-              alignSelf: "center",
-              height: 40,
-            },
-            textInput: {
-              height: 40,
-              color: 'black',
-              fontSize: 16,
-              paddingLeft: 15,
-              borderRadius: 25,
-            },
-            listView: {
-              zIndex: 2,
-              width: '90%',
-              position: 'absolute',
-              marginTop: 60,
-              padding: 10,
-              alignSelf: "center",
-              backgroundColor: 'white',
-              borderRadius: 25,
-              elevation: 1,
-            },
-            separator: {
-              opacity: 0
-            },
-          }}
-        /></SafeAreaView>
+        <View style={styles.searchContainer}>
+          <SafeAreaView style={{ flex: 1 }}>
+            <GooglePlacesAutocomplete
+              placeholder="Search"
+              listViewDisplayed="auto"
+              fetchDetails={true}
+              minLength={2}
+              debounce={200}
+              onPress={(data, details = null) => {
+                _map.current.animateToRegion(
+                  {
+                    latitude: details.geometry.location.lat,
+                    longitude: details.geometry.location.lng,
+                    latitudeDelta: 0.04,
+                    longitudeDelta: 0.05,
+                  },
+                  350
+                );
+                toiletApiFetch(
+                  details.geometry.location.lat,
+                  details.geometry.location.lng
+                );
+              }}
+              query={{
+                key: MAP_API_KEY,
+                language: "en",
+              }}
+              styles={{
+                textInputContainer: {
+                  width: "95%",
+                  position: "absolute",
+                  //borderRadius: 40,
+                  padding: 10,
+                  alignSelf: "center",
+                  height: 40,
+                },
+                textInput: {
+                  height: 40,
+                  color: "black",
+                  fontSize: 16,
+                  paddingLeft: 15,
+                  borderRadius: 25,
+                },
+                listView: {
+                  zIndex: 2,
+                  width: "90%",
+                  position: "absolute",
+                  marginTop: 60,
+                  padding: 10,
+                  alignSelf: "center",
+                  backgroundColor: "white",
+                  borderRadius: 25,
+                  elevation: 1,
+                },
+                separator: {
+                  opacity: 0,
+                },
+              }}
+            />
+          </SafeAreaView>
         </View>
         <MapView
           ref={_map}
@@ -417,6 +432,7 @@ export default MapScreen = ({ navigation }) => {
           }}
           mapType={state.mapType}
           style={styles.container}
+          customMapStyle={mapDarkStyle}
           provider={PROVIDER_GOOGLE} //Needed to ensure google maps is used as the map
           showsUserLocation={grantedPerms}
           showsMyLocationButton={false}
@@ -464,7 +480,7 @@ export default MapScreen = ({ navigation }) => {
           </TouchableOpacity>
         </Animatable.View>
         <View style={styles.buttonContainer}>
-        <TouchableOpacity
+          <TouchableOpacity
             onPress={() => {
               onLocationButtonPress();
             }}
@@ -473,6 +489,20 @@ export default MapScreen = ({ navigation }) => {
               <MaterialIcons
                 name="my-location"
                 size={26}
+                color="black"
+                style={{ top: 6, left: 6, opacity: 0.6 }}
+              />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              onStyleButtonPress();
+            }}
+          >
+            <View style={styles.circleButton}>
+              <MaterialCommunityIcons
+                name="theme-light-dark"
+                size={24}
                 color="black"
                 style={{ top: 6, left: 6, opacity: 0.6 }}
               />
