@@ -2,7 +2,7 @@ import { TextInput, Text, Alert, TouchableOpacity, View, ScrollView } from "reac
 import React, { useEffect, useState } from "react";
 import { FontAwesome, Entypo, Ionicons } from "@expo/vector-icons";
 import ReviewCard from "./components/ReviewCard";
-import styles from "./model/ListStyles";
+import styles from "./model/ListStylesTwo";
 import { firebase } from "../firebase/config";
 
 export default function DisplayReviewsScreen({ route, navigation }) {
@@ -29,6 +29,12 @@ const [reviewsArray, setReviewsArray] = useState(route.params);
           color="black"
           style={{ right: 8, opacity: 0.6 }}
         />
+      </View>
+      <View style={styles.placeNewReviewButton}>
+        <TouchableOpacity
+          style={styles.appButtonContainer}>
+          <Text style={styles.appButtonText}>Create New Review</Text> 
+        </TouchableOpacity>
       </View>
       <ScrollView
         horizontal
@@ -60,7 +66,6 @@ const [reviewsArray, setReviewsArray] = useState(route.params);
             title={item.title}  
             userID={item.userID}
             key={index}
-            loocateRating={item.loocateRating}
             rating={item.rating}  
             item={item}  
             navigation={navigation}             
@@ -88,7 +93,7 @@ const [reviewsArray, setReviewsArray] = useState(route.params);
         <TouchableOpacity
           onPress={() => {
             //navigates to listscreen when pressed
-            navigation.navigate("List");
+            //navigation.navigate("List");
           }}
         >
           <Entypo

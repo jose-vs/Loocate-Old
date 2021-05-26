@@ -262,22 +262,12 @@ export default MapScreen = ({ navigation }) => {
       )}
       {marker && marker.length && (
         <Text style={styles.textSubheading}>
-          Loocate Rating: <StarRating ratings={toilet.loocateRating} />
+          Overall Rating: <StarRating ratings={toilet.rating} />
         </Text>
       )}
       {marker && marker.length && (
         <TouchableOpacity onPress={() => onReviewPress()}>
-        <Text style={styles.textSubheading}>Loocate Reviews: {toilet.loocateReviews}</Text>
-        </TouchableOpacity>
-      )}
-      {marker && marker.length && (
-        <Text style={styles.textSubheading}>
-          Google Rating: <StarRating ratings={toilet.rating} />
-        </Text>
-      )}
-      {marker && marker.length && (
-        <TouchableOpacity>
-        <Text style={styles.textSubheading}>Google Reviews: {toilet.reviews}</Text>
+        <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
         </TouchableOpacity>
       )}
     </View>

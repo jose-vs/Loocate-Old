@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Image, Text, ActivityIndicator, TouchableOpacity, View } from "react-native";
+import { Image, Text, ActivityIndicator, TouchableOpacity, View, Alert } from "react-native";
 import styles from "./model/AccountStyles.js";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { firebase } from "../firebase/config";
@@ -14,7 +14,6 @@ export default function AccountScreen({navigation }) {
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => {
       const usersRef = firebase.firestore().collection("users");
-
       usersRef
         .doc(user.uid)
         .get()
@@ -55,9 +54,15 @@ export default function AccountScreen({navigation }) {
 
     }
     else {
-      navigation.navigate("DisplayReviews", existingReviewsArray);
-    }
-
+      if (existingReviewsArray.length) {
+        navigation.navigate('DisplayReviews', existingReviewsArray);         
+      }   
+      else if (!existingReviewsArray.length) {
+        Alert.alert (
+          'No reviews found.',
+          'Submit reviews on toilets and they will be viewable here.');
+      }      
+    } 
   }
 
   return (
