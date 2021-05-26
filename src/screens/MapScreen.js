@@ -34,6 +34,7 @@ import Geocoder from "react-native-geocoding";
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
   const [state, setState] = useState(initialMapState);
+  const [loocateData, setLoocateData] = useState([]);
   const [toilet, setToilet] = useState(toilet);
   const [grantedPerms, setPerms] = useState(null);
 
@@ -62,11 +63,27 @@ export default MapScreen = ({ navigation }) => {
           longitude: location.coords.longitude,
         },
       });
+<<<<<<< HEAD
       toiletApiFetch(location.coords.latitude, location.coords.longitude)
 
+=======
+      firestoreReviewsFetch();
+      apiFetch(location.coords.latitude, location.coords.longitude); 
+>>>>>>> view-reviews-and-tidy-up-add-reviews
       setPerms(true);
     })();
-  }, []);
+  }, []); 
+
+  const firestoreReviewsFetch = () => {
+    //needs async/await 
+    const reviewsRef = firebase.firestore().collection('reviews');
+    reviewsRef.get().then((querySnapshot) => {
+      querySnapshot.forEach(snapshot => {
+            var reviewData = snapshot.data();         
+            setLoocateData([...loocateData, reviewData]);
+      })
+  });
+  } 
 
   toiletApiFetch = async (lat, lng) => {
     const fetchedToilets = [];
@@ -92,11 +109,35 @@ export default MapScreen = ({ navigation }) => {
             address: toiletData.vicinity,
             rating: toiletData.rating,
             reviews: toiletData.user_ratings_total,
+<<<<<<< HEAD
+=======
+            
+            loocateRating:  0, 
+            loocateReviews: 0, 
+
+>>>>>>> view-reviews-and-tidy-up-add-reviews
             distance: null,
             duration: null,
           };
 
+<<<<<<< HEAD
           fetchedToilets.push(newToilet);
+=======
+          //add Loocate review/rating data to toilets...
+          for (var i = 0; i < loocateData.length; ++i) {
+            if (newToilet.id == loocateData.toiletID)
+            {
+              console.log(loocateData.rating);
+              newToilet.loocateRating = loocateData.rating
+              newToilet.loocateReviews = loocateData.title
+            }
+          }
+          setToilet(newToilet);
+          state.selectedToiletDest = newToilet.coordinate;
+          state.markers.push(newToilet);
+
+          //console.log(newToilet);
+>>>>>>> view-reviews-and-tidy-up-add-reviews
         });
       })
       .catch((err) => console.log("Error:", err));
@@ -150,6 +191,7 @@ export default MapScreen = ({ navigation }) => {
     //if there is a user logged in, retrieve them and skip having to go through login screen again
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
+<<<<<<< HEAD
         //if user is signed in
         const usersRef = firebase.firestore().collection("users"); //get user collection from firestore
         usersRef //call the database of user data (NOT the users in auth())
@@ -159,6 +201,9 @@ export default MapScreen = ({ navigation }) => {
             const data = document.data(); //this is the specific data (not userAuth, but the data I made in the users collection) of the user
             navigation.navigate("Account", { user: data }); //revisit this later, accessing data on account screen is of issue
           });
+=======
+        navigation.navigate("Account");
+>>>>>>> view-reviews-and-tidy-up-add-reviews
       } else {
         navigation.navigate("Login");
       }
@@ -329,7 +374,7 @@ export default MapScreen = ({ navigation }) => {
       )}
       {marker && marker.length && (
         <Text style={styles.textSubheading}>
-          Rating: <StarRating ratings={toilet.rating} />
+          Overall Rating: <StarRating ratings={toilet.rating} />
         </Text>
       )}
       {marker && marker.length && (

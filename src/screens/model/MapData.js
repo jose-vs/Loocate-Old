@@ -47,6 +47,8 @@ const toilet = {
   title: "",
   address: "",
   rating: null,
+  loocateRating: null,
+  loocateReviews: null,
   reviews: null,
   distance: null,
   duration: null
