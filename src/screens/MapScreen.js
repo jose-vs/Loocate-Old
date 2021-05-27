@@ -95,8 +95,8 @@ export default MapScreen = ({ navigation }) => {
             reviews: toiletData.user_ratings_total,
             distance: null,
             duration: null,
-            open: (toiletData.opening_hours === undefined) ? "gay" : 
-            (toiletData.opening_hours.open_now == true) ? "open" : "closed"
+            open: (toiletData.opening_hours === undefined) ? "Not Avaliable" : 
+            (toiletData.opening_hours.open_now == true) ? "Open" : "Closed"
           }
           fetchedToilets.push(newToilet);
         });
@@ -321,7 +321,9 @@ export default MapScreen = ({ navigation }) => {
         </Text>
       )}
       {marker && marker.length && (
-        <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
+        <View>
+            <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
+        </View>
       )}
       <View style={styles.hairline} />
       {marker && marker.length && (
@@ -340,7 +342,7 @@ export default MapScreen = ({ navigation }) => {
         </TouchableOpacity>
       )}
         {marker && marker.length && (
-        <Text style={styles.toiletSubtitle}>Open/Closed? {toilet.open}</Text>
+        <Text style={styles.textSubheading}>Status: {toilet.open}</Text>
       )}
     </View>
   );
