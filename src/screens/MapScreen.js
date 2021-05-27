@@ -338,7 +338,7 @@ export default MapScreen = ({ navigation }) => {
             rating: toilet.rating,
             })
             
-          setReviewsArray([...reviewsArray , {title: review, address: toilet.address, toiletID: toilet.id, 
+          setReviewsArray([...reviewsArray , {title: review, name: data.fullName, address: toilet.address, toiletID: toilet.id, 
             userID: data.id, rating: toilet.rating}]); 
         })
 
@@ -346,6 +346,7 @@ export default MapScreen = ({ navigation }) => {
           'Submission success',
           'Your review has been placed.'); 
           this.textInput.clear()
+          return;
         } 
         else {
           Alert.alert(

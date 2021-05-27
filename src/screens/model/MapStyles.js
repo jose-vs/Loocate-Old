@@ -168,13 +168,13 @@ export const styles = StyleSheet.create({
   listContainer: { 
     position: "relative",
     top: 20,
-    marginBottom: -100
+    marginBottom: -150
   },
   reviewTextInputContainer: {
     position: "relative",
     top: 100,
     left: 10,
-    marginBottom: 30,
+    marginBottom: 20,
     backgroundColor: 'white',
     textAlignVertical: 'top'
 
