@@ -161,6 +161,16 @@ export const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
+  chipsScrollView: {
+    position: "absolute",
+    top: 20,
+    paddingHorizontal: 10,
+  },
+  listContainer: { 
+    position: "relative",
+    top: 20,
+    marginBottom:120
+  },
   footer: {
     position: "relative",
     flexDirection: "row",

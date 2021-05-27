@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Animated,
   Text,
@@ -18,6 +18,7 @@ import {
   FontAwesome5,
 } from "@expo/vector-icons";
 import { MAP_API_KEY } from "@env";
+import { ScrollView } from "react-native-gesture-handler";
 import toiletApi from "../../api/googlePlaces";
 import distanceMatrixApi from "../../api/distanceMatrixApi";
 import { initialMapState, toilet } from "./model/MapData";
@@ -34,9 +35,10 @@ import Geocoder from "react-native-geocoding";
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
   const [state, setState] = useState(initialMapState);
-  const [loocateData, setLoocateData] = useState([]);
+  const [reviewsArray, setReviewsArray] = useState([]);
   const [toilet, setToilet] = useState(toilet);
   const [grantedPerms, setPerms] = useState(null);
+  const mounted = useRef(false);
 
   const _map = React.useRef(null);
   Geocoder.init(MAP_API_KEY);
@@ -63,27 +65,35 @@ export default MapScreen = ({ navigation }) => {
           longitude: location.coords.longitude,
         },
       });
-<<<<<<< HEAD
+
       toiletApiFetch(location.coords.latitude, location.coords.longitude)
 
-=======
-      firestoreReviewsFetch();
-      apiFetch(location.coords.latitude, location.coords.longitude); 
->>>>>>> view-reviews-and-tidy-up-add-reviews
+
       setPerms(true);
     })();
   }, []); 
 
-  const firestoreReviewsFetch = () => {
-    //needs async/await 
-    const reviewsRef = firebase.firestore().collection('reviews');
-    reviewsRef.get().then((querySnapshot) => {
-      querySnapshot.forEach(snapshot => {
-            var reviewData = snapshot.data();         
-            setLoocateData([...loocateData, reviewData]);
-      })
-  });
-  } 
+  //triggers on setToilet which only happens on marker press, retrieves toilet reviews
+  useEffect(() => {
+    if (mounted.current) {
+      var addToReviewsArray = [];
+      const reviewsRef = firebase.firestore().collection('reviews');
+
+      reviewsRef.get().then((querySnapshot) => {
+        querySnapshot.forEach(snapshot => {
+          if (snapshot.data().toiletID == toilet.id) {
+            addToReviewsArray = ([...addToReviewsArray , snapshot.data()]);
+          }
+        }
+      )    
+          setReviewsArray(addToReviewsArray);
+          console.log(reviewsArray);
+      });
+    }
+    else {
+      mounted.current = true;
+    }
+  }, [toilet]); 
 
   toiletApiFetch = async (lat, lng) => {
     const fetchedToilets = [];
@@ -108,37 +118,13 @@ export default MapScreen = ({ navigation }) => {
             title: toiletData.name,
             address: toiletData.vicinity,
             rating: toiletData.rating,
-            reviews: toiletData.user_ratings_total,
-<<<<<<< HEAD
-=======
-            
-            loocateRating:  0, 
-            loocateReviews: 0, 
-
->>>>>>> view-reviews-and-tidy-up-add-reviews
+            reviews: toiletData.user_ratings_total,     
             distance: null,
             duration: null,
           };
-
-<<<<<<< HEAD
           fetchedToilets.push(newToilet);
-=======
-          //add Loocate review/rating data to toilets...
-          for (var i = 0; i < loocateData.length; ++i) {
-            if (newToilet.id == loocateData.toiletID)
-            {
-              console.log(loocateData.rating);
-              newToilet.loocateRating = loocateData.rating
-              newToilet.loocateReviews = loocateData.title
-            }
-          }
-          setToilet(newToilet);
-          state.selectedToiletDest = newToilet.coordinate;
-          state.markers.push(newToilet);
-
-          //console.log(newToilet);
->>>>>>> view-reviews-and-tidy-up-add-reviews
         });
+
       })
       .catch((err) => console.log("Error:", err));
 
@@ -191,19 +177,7 @@ export default MapScreen = ({ navigation }) => {
     //if there is a user logged in, retrieve them and skip having to go through login screen again
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-<<<<<<< HEAD
-        //if user is signed in
-        const usersRef = firebase.firestore().collection("users"); //get user collection from firestore
-        usersRef //call the database of user data (NOT the users in auth())
-          .doc(user.uid)
-          .get()
-          .then((document) => {
-            const data = document.data(); //this is the specific data (not userAuth, but the data I made in the users collection) of the user
-            navigation.navigate("Account", { user: data }); //revisit this later, accessing data on account screen is of issue
-          });
-=======
         navigation.navigate("Account");
->>>>>>> view-reviews-and-tidy-up-add-reviews
       } else {
         navigation.navigate("Login");
       }
@@ -381,7 +355,54 @@ export default MapScreen = ({ navigation }) => {
         <TouchableOpacity onPress={() => onReviewPress()}>
           <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
         </TouchableOpacity>
-      )}
+      )} 
+      <ScrollView
+        horizontal
+        scrollEventThrottle={1}
+        showsHorizontalScrollIndicator={false}
+        height={20}
+        style={styles.chipsScrollView}
+        contentInset={{
+          // iOS only
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 20,
+        }}
+        contentContainerStyle={{
+          paddingRight: Platform.OS === "android" ? 20 : 0,
+        }}
+      >
+      </ScrollView>
+      <ScrollView
+        vertical
+        scrollEventThrottle={1}
+        showsVerticalScrollIndicator={true}
+        style={styles.listContainer}
+      >       
+        {reviewsArray.map((item, index) => {
+          return (
+          <ReviewCard                   
+            title={item.title}  
+            userID={item.userID}
+            key={index}
+            rating={item.rating}  
+            item={item}  
+            navigation={navigation}             
+          />
+          )          
+        })}
+      </ScrollView>
+      <TextInput onChangeText={() => {}}        
+            style={{ height:100, backgroundColor:'white'}}
+            placeholder='Write your review here:'
+            placeholderTextColor="#aaaaaa"
+            multiline={true}          
+            numberOfLines={10}
+            textAlign='left'
+             onChangeText={(userInput) => review = (userInput)}
+            underlineColorAndroid="transparent"
+          />      
     </View>
   );
 
@@ -623,7 +644,7 @@ export default MapScreen = ({ navigation }) => {
         </View>
         <BottomSheet
           ref={bs}
-          snapPoints={[320, 0]}
+          snapPoints={['32%', '0%', '96.5%']}
           renderContent={renderInner}
           renderHeader={renderHeader}
           borderRadius={10}
