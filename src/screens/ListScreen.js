@@ -20,6 +20,8 @@ export default ListScreen = ({ route, navigation }) => {
     switch(filter) {
       case 'nearest':
         setToilets(sorted.sort((a, b) => (a.distance > b.distance) ? 1 : -1))
+        let nearest = sorted[0];
+        console.log(nearest);
         break;
       case 'top rated':
         setToilets(sorted.sort((a, b) => (a.rating < b.rating) ? 1 : -1))

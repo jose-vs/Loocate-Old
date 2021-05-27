@@ -30,6 +30,7 @@ import { firebase } from "../firebase/config";
 import MapViewDirections from "react-native-maps-directions";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import Geocoder from "react-native-geocoding";
+import {nearest} from './ListScreen';
 
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
@@ -99,6 +100,7 @@ export default MapScreen = ({ navigation }) => {
             (toiletData.opening_hours.open_now == true) ? "Open" : "Closed"
           }
           fetchedToilets.push(newToilet);
+    
         });
       })
       .catch((err) => console.log("Error:", err));
@@ -120,7 +122,8 @@ export default MapScreen = ({ navigation }) => {
         return Promise.reject(errorMessage);
       });
   };
-
+  
+  
   const distanceApiFetch = async (toilet) => {
     return await distanceMatrixApi
       .get(
@@ -147,6 +150,9 @@ export default MapScreen = ({ navigation }) => {
         return Promise.reject(`Error on GMAPS route request: ${err}`);
       });
   };
+
+  state.markers.sort((a, b) => (a.distance > b.distance) ? 1 : -1);
+  let nearest = state.markers[0];
 
   const onLoginPress = () => {
     //if there is a user logged in, retrieve them and skip having to go through login screen again
@@ -281,6 +287,12 @@ export default MapScreen = ({ navigation }) => {
     }
   };
 
+  const onNearestButtonPress = () => {
+    setToilet(state.markers[0]);
+    console.log(toilet);
+    bs.current.snapTo(0);
+  }
+
   const onLocationButtonPress = () => {
     if (state.userLocation != null)
     {
@@ -299,6 +311,7 @@ export default MapScreen = ({ navigation }) => {
     }
   }
 
+
   /**
    * creates bottom sheet content
    */
@@ -311,19 +324,11 @@ export default MapScreen = ({ navigation }) => {
 
   renderInner = () => (
     <View style={styles.bottomPanel}>
-      {marker && marker.length && (
-        <Text
-          style={
-            styles.toiletTitle //check for null in useState otherwise crash on startup as undefined
-          }
-        >
-          {toilet.title}
-        </Text>
+      {marker && marker.length && (//check for null in useState otherwise crash on startup as undefined
+        <Text style={styles.toiletTitle}> {toilet.title}</Text>
       )}
       {marker && marker.length && (
-        <View>
             <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
-        </View>
       )}
       <View style={styles.hairline} />
       {marker && marker.length && (
@@ -464,9 +469,17 @@ export default MapScreen = ({ navigation }) => {
           <TouchableOpacity
             onPress={() => {
               onAreaSearchPress();
+            }}>
+            <Text style={styles.searchHereText}>Search this area</Text>
+          </TouchableOpacity>
+        </Animatable.View>
+        <Animatable.View style={styles.nearestToilet} animation="fadeInLeft">
+          <TouchableOpacity
+            onPress={() => {
+              onNearestButtonPress();
             }}
           >
-            <Text style={styles.searchHereText}>Search this area</Text>
+            <Text style={styles.searchHereText}>Nearest Toilet</Text>
           </TouchableOpacity>
         </Animatable.View>
         <View style={styles.buttonContainer}>
