@@ -35,20 +35,30 @@ export default ReviewCard = (props) => {
     return ( 
         <View style = {styles.textContent}>
             <View style = {{padding: 15}}>  
-            <Text numberOfLine={1} style = {styles.listTitle}>Jane Doe</Text>
+            <Text numberOfLine={1} style = {styles.listTitle}>{props.name}</Text>
             <Text><StarRating rating={props.rating}/>{props.rating}</Text>  
             <Text numberOfLine={1} style = {styles.listAddress}>{props.title}</Text>        
             {isLoggedIn ? <TouchableOpacity
                 onPress={() => {props.navigation.navigate("ReviewViewAndCreate", props.item)}}>
                     <Entypo
-                    style={{position: "relative", bottom: 0, left: 0}}
+                    style={{position: "relative", bottom: 0, marginLeft: 280, marginRight: 0}}
+                    name="trash"
+                    size={30}
+                    color="grey"               
+                    /> 
+            </TouchableOpacity> : null}
+            {isLoggedIn ? <TouchableOpacity
+                onPress={() => {props.navigation.navigate("ReviewViewAndCreate", props.item)}}>
+                    <Entypo
+                    style={{position: "relative", bottom: 0, marginLeft: 240, marginRight: 0, marginVertical: -30, 
+                    marginHorizontal: 10}}
                     name="pencil"
                     size={30}
                     color="grey"               
                     /> 
-            </TouchableOpacity> : null}              
+            </TouchableOpacity> : null}                 
            </View>
             <View style={styles.hairline}/>
         </View>
     )
-}
+}    

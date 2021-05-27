@@ -32,7 +32,7 @@ const [reviewsArray, setReviewsArray] = useState(route.params);
       </View>
       <View style={styles.placeNewReviewButton}>
         <TouchableOpacity
-          style={styles.appButtonContainer}>
+          style={styles.newReviewButtonList}>
           <Text style={styles.appButtonText}>Create New Review</Text> 
         </TouchableOpacity>
       </View>

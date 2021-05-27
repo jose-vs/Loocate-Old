@@ -109,6 +109,16 @@ export default StyleSheet.create({
     right: '-140%'
  
   },
+  newReviewButtonList: {
+    width: 215,
+    elevation: 8,
+    backgroundColor: "#009688",
+    borderRadius: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    marginLeft: 95,
+    marginRight: 70,
+  },
   appButtonContainerTwo: {
     width: 120,
     elevation: 8,

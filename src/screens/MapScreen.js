@@ -8,6 +8,8 @@ import {
   Image,
   Dimensions,
   SafeAreaView,
+  KeyboardAvoidingView,
+  Alert,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import * as Animatable from "react-native-animatable";
@@ -87,7 +89,6 @@ export default MapScreen = ({ navigation }) => {
         }
       )    
           setReviewsArray(addToReviewsArray);
-          console.log(reviewsArray);
       });
     }
     else {
@@ -316,6 +317,45 @@ export default MapScreen = ({ navigation }) => {
     }
   }
 
+      //Submit review on selected toilet if logged in. If not logged in, alert and do nothing.
+      const onSubmitReviewPress = () => {      
+        const usersRef = firebase.firestore().collection("users"); 
+        const reviewsRef = firebase.firestore().collection('reviews');
+        firebase.auth().onAuthStateChanged((user) => {
+        if (user) {       
+          usersRef
+          .doc(user.uid)
+          .get()
+          .then((document) => {
+          const data = document.data();
+
+          reviewsRef.add({
+            title: review,
+            name: data.fullName,
+            address: toilet.address,
+            toiletID: toilet.id,
+            userID: data.id,
+            rating: toilet.rating,
+            })
+            
+          setReviewsArray([...reviewsArray , {title: review, address: toilet.address, toiletID: toilet.id, 
+            userID: data.id, rating: toilet.rating}]); 
+        })
+
+        Alert.alert(
+          'Submission success',
+          'Your review has been placed.'); 
+          this.textInput.clear()
+        } 
+        else {
+          Alert.alert(
+            'Authentication required',
+            'You must be logged in to place a review.');  
+          return;      
+        }
+        });
+    }
+
   /**
    * creates bottom sheet content
    */
@@ -327,7 +367,8 @@ export default MapScreen = ({ navigation }) => {
   );
 
   renderInner = () => (
-    <View style={styles.bottomPanel}>
+    <KeyboardAvoidingView style={styles.bottomPanel}
+      behavior="height">
       {marker && marker.length && (
         <Text
           style={
@@ -360,7 +401,7 @@ export default MapScreen = ({ navigation }) => {
         horizontal
         scrollEventThrottle={1}
         showsHorizontalScrollIndicator={false}
-        height={20}
+        height={80}
         style={styles.chipsScrollView}
         contentInset={{
           // iOS only
@@ -382,7 +423,8 @@ export default MapScreen = ({ navigation }) => {
       >       
         {reviewsArray.map((item, index) => {
           return (
-          <ReviewCard                   
+          <ReviewCard
+            name={item.name}                   
             title={item.title}  
             userID={item.userID}
             key={index}
@@ -394,16 +436,22 @@ export default MapScreen = ({ navigation }) => {
         })}
       </ScrollView>
       <TextInput onChangeText={() => {}}        
-            style={{ height:100, backgroundColor:'white'}}
-            placeholder='Write your review here:'
-            placeholderTextColor="#aaaaaa"
-            multiline={true}          
-            numberOfLines={10}
-            textAlign='left'
-             onChangeText={(userInput) => review = (userInput)}
-            underlineColorAndroid="transparent"
-          />      
-    </View>
+        style={styles.reviewTextInputContainer}
+        placeholder='Write your review here:'
+        placeholderTextColor="#aaaaaa"
+        multiline={true}          
+        numberOfLines={10}
+        textAlign='left'
+        onChangeText={(userInput) => review = (userInput)}
+        ref={input => { this.textInput = input }} 
+        underlineColorAndroid="transparent"
+      />     
+      <TouchableOpacity
+        style={styles.reviewButton}
+        onPress={() => onSubmitReviewPress()}> 
+        <Text style={styles.reviewButtonTitle}>Submit review</Text>    
+      </TouchableOpacity> 
+    </KeyboardAvoidingView>
   );
 
 
