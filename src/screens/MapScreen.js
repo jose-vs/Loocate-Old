@@ -193,16 +193,16 @@ const mapDarkStyle = [
   },
 ];
 
-const mapLightStyle = [
-  {
-    elementTyle: "labels.icons",
-    stylers: [
-      {
-        visability: "off",
-      },
-    ],
-  },
-];
+// const mapLightStyle = [
+//   {
+//     elementTyle: "labels.icons",
+//     stylers: [
+//       {
+//         visability: "off",
+//       },
+//     ],
+//   },
+// ];
 
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
@@ -588,7 +588,7 @@ export default MapScreen = ({ navigation }) => {
         </View>
         <MapView
           ref={_map}
-          customMapStyle={mapDarkStyle}
+          customMapStyle={state.customMapStyle}
           showuserLocation={true} // may not be needed, deprecated by 'showsuserlocation={true}'
           loadingEnabled={true}
           loadingIndicatorColor="#75CFB8"
@@ -667,7 +667,11 @@ export default MapScreen = ({ navigation }) => {
           {/* Dark Mode Button */}
           <TouchableOpacity
             onPress={() => {
-              onStyleButtonPress();
+              if (state.customMapStyle == false) {
+                setState({ ...state, customMapStyle: mapDarkStyle });
+              } else if (state.customMapStyle == mapDarkStyle) {
+                setState({ ...state, customMapStyle: false });
+              }
             }}
           >
             <View style={styles.circleButton}>
