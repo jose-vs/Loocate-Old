@@ -68,9 +68,13 @@ export default MapScreen = ({ navigation }) => {
         },
       });
 <<<<<<< HEAD
+<<<<<<< HEAD
 
       toiletApiFetch(location.coords.latitude, location.coords.longitude)
 
+=======
+      toiletApiFetch(location.coords.latitude, location.coords.longitude)
+>>>>>>> parent of 8275566 (redesign toilet bottomsheet)
 =======
       toiletApiFetch(location.coords.latitude, location.coords.longitude)
 >>>>>>> parent of 8275566 (redesign toilet bottomsheet)
@@ -147,7 +151,11 @@ export default MapScreen = ({ navigation }) => {
       })
     )
       .then((result) => {
+<<<<<<< HEAD
         setState({ ...state, markers: result.sort((a, b) => (a.distance > b.distance) ? 1 : -1)})
+=======
+        setState({ ...state, markers: result.sort((a, b) => (a.distance > b.distance) ? 1 : -1)})  
+>>>>>>> parent of 8275566 (redesign toilet bottomsheet)
       })
       .catch((errorMessage) => {
         return Promise.reject(errorMessage);
@@ -383,6 +391,28 @@ export default MapScreen = ({ navigation }) => {
         >
           {toilet.title}
         </Text>
+<<<<<<< HEAD
+=======
+      )}
+      {marker && marker.length && (
+        <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
+      )}
+      <View style={styles.hairline} />
+      {marker && marker.length && (
+        <TouchableOpacity onPress={() => onGetDirectionsPress()}>
+          <Text style={styles.textSubheading}>Get Directions</Text>
+        </TouchableOpacity>
+      )}
+      {marker && marker.length && (
+        <Text style={styles.textSubheading}>
+          Rating: <StarRating ratings={toilet.rating} />
+        </Text>
+      )}
+      {marker && marker.length && (
+        <TouchableOpacity onPress={() => onReviewPress()}>
+          <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
+        </TouchableOpacity>
+>>>>>>> parent of 8275566 (redesign toilet bottomsheet)
       )}
       {marker && marker.length && (
         <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
@@ -566,6 +596,7 @@ export default MapScreen = ({ navigation }) => {
           }
         >
 <<<<<<< HEAD
+<<<<<<< HEAD
           {state.selectedToiletDest.latitude && (
             <MapViewDirections
               origin={state.userLocation}
@@ -594,6 +625,9 @@ export default MapScreen = ({ navigation }) => {
             />
           )}
           {state.selectedToiletDest.latitude &&
+=======
+          {state.selectedToiletDest.latitude && 
+>>>>>>> parent of 8275566 (redesign toilet bottomsheet)
           <MapViewDirections
             origin={state.userLocation}
             destination={state.selectedToiletDest}
@@ -748,7 +782,11 @@ export default MapScreen = ({ navigation }) => {
         <BottomSheet
           ref={bs}
 <<<<<<< HEAD
+<<<<<<< HEAD
           snapPoints={['32%', '0%', '96.5%']}
+=======
+          snapPoints={[320, 0]}
+>>>>>>> parent of 8275566 (redesign toilet bottomsheet)
 =======
           snapPoints={[320, 0]}
 >>>>>>> parent of 8275566 (redesign toilet bottomsheet)
