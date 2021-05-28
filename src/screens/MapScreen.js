@@ -461,7 +461,7 @@ export default MapScreen = ({ navigation }) => {
                 flexDirection: "row",
                 justifyContent: "flex-start",
                 paddingHorizontal: 28,
-                paddingVertical: 5
+                paddingVertical: 5,
               }}
             >
               <RenderBsMode />
@@ -674,22 +674,22 @@ export default MapScreen = ({ navigation }) => {
             <Text style={styles.searchHereText}>Search this area</Text>
           </TouchableOpacity>
         </Animatable.View>
-        <TouchableOpacity style={styles.locationButtonContainer}
-            onPress={() => {
-              onLocationButtonPress();
-            }}
-          >
-            <View style={styles.locationButton}>
-              <MaterialIcons
-                name="my-location"
-                size={26}
-                color="black"
-                style={{ top: 6, left: 6, opacity: 0.6 }}
-              />
-            </View>
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.locationButtonContainer}
+          onPress={() => {
+            onLocationButtonPress();
+          }}
+        >
+          <View style={styles.locationButton}>
+            <MaterialIcons
+              name="my-location"
+              size={26}
+              color="black"
+              style={{ top: 6, left: 6, opacity: 0.6 }}
+            />
+          </View>
+        </TouchableOpacity>
         <View style={styles.buttonContainer}>
-          
           {/* Map Style Button */}
           <TouchableOpacity
             onPress={() => {
@@ -710,7 +710,12 @@ export default MapScreen = ({ navigation }) => {
               setState({ ...state, mode: "WALKING" });
             }}
           >
-            <View style={styles.modeCircleButton}>
+            <View
+              style={[
+                styles.modeCircleButton,
+                state.mode != "WALKING" ? {} : { backgroundColor: "#009688" },
+              ]}
+            >
               <FontAwesome5
                 name="walking"
                 size={24}
@@ -724,7 +729,12 @@ export default MapScreen = ({ navigation }) => {
               setState({ ...state, mode: "DRIVING" });
             }}
           >
-            <View style={styles.modeCircleButton}>
+            <View
+              style={[
+                styles.modeCircleButton,
+                state.mode != "DRIVING" ? {} : { backgroundColor: "#009688" },
+              ]}
+            >
               <MaterialIcons
                 name="drive-eta"
                 size={24}
@@ -738,7 +748,12 @@ export default MapScreen = ({ navigation }) => {
               setState({ ...state, mode: "BICYCLING" });
             }}
           >
-            <View style={styles.modeCircleButton}>
+            <View
+              style={[
+                styles.modeCircleButton,
+                state.mode != "BICYCLING" ? {} : { backgroundColor: "#009688" },
+              ]}
+            >
               <MaterialIcons
                 name="directions-bike"
                 size={24}
