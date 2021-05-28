@@ -402,6 +402,9 @@ export default MapScreen = ({ navigation }) => {
           <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
         </TouchableOpacity>
       )}
+        {marker && marker.length && (
+        <Text style={styles.textSubheading}>Status: {toilet.open}</Text>
+      )}
       <ScrollView
         horizontal
         scrollEventThrottle={1}
