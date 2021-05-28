@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Animated,
   Text,
@@ -7,9 +7,6 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
-  SafeAreaView,
-  KeyboardAvoidingView,
-  Alert,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import * as Animatable from "react-native-animatable";
@@ -20,7 +17,6 @@ import {
   FontAwesome5,
 } from "@expo/vector-icons";
 import { MAP_API_KEY } from "@env";
-import { ScrollView } from "react-native-gesture-handler";
 import toiletApi from "../../api/googlePlaces";
 import distanceMatrixApi from "../../api/distanceMatrixApi";
 import { initialMapState, toilet } from "./model/MapData";
@@ -31,19 +27,16 @@ import BottomSheet from "reanimated-bottom-sheet";
 import * as Location from "expo-location";
 import { firebase } from "../firebase/config";
 import MapViewDirections from "react-native-maps-directions";
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import Geocoder from "react-native-geocoding";
 
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
   const [state, setState] = useState(initialMapState);
-  const [reviewsArray, setReviewsArray] = useState([]);
   const [toilet, setToilet] = useState(toilet);
+  const [showDirectionsButton, setDirectionsButton] = useState(false);
   const [grantedPerms, setPerms] = useState(null);
-  const mounted = useRef(false);
 
   const _map = React.useRef(null);
-  Geocoder.init(MAP_API_KEY);
+
   /**
    * Loads the user location
    */
@@ -67,42 +60,11 @@ export default MapScreen = ({ navigation }) => {
           longitude: location.coords.longitude,
         },
       });
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-      toiletApiFetch(location.coords.latitude, location.coords.longitude)
-
-=======
-      toiletApiFetch(location.coords.latitude, location.coords.longitude)
->>>>>>> parent of 8275566 (redesign toilet bottomsheet)
-=======
-      toiletApiFetch(location.coords.latitude, location.coords.longitude)
->>>>>>> parent of 8275566 (redesign toilet bottomsheet)
+      toiletApiFetch(location.coords.latitude, location.coords.longitude);
 
       setPerms(true);
     })();
   }, []);
-
-  //triggers on setToilet which only happens on marker press, retrieves toilet reviews
-  useEffect(() => {
-    if (mounted.current) {
-      var addToReviewsArray = [];
-      const reviewsRef = firebase.firestore().collection('reviews');
-
-      reviewsRef.get().then((querySnapshot) => {
-        querySnapshot.forEach(snapshot => {
-          if (snapshot.data().toiletID == toilet.id) {
-            addToReviewsArray = ([...addToReviewsArray , snapshot.data()]);
-          }
-        }
-      )
-          setReviewsArray(addToReviewsArray);
-      });
-    }
-    else {
-      mounted.current = true;
-    }
-  }, [toilet]);
 
   toiletApiFetch = async (lat, lng) => {
     const fetchedToilets = [];
@@ -117,7 +79,6 @@ export default MapScreen = ({ navigation }) => {
           &key=${MAP_API_KEY}`
       )
       .then(async (response) => {
-
         await response.data.results.map((toiletData) => {
           const newToilet = {
             id: toiletData.place_id,
@@ -131,14 +92,13 @@ export default MapScreen = ({ navigation }) => {
             reviews: toiletData.user_ratings_total,
             distance: null,
             duration: null,
-            open: (toiletData.opening_hours === undefined) ? "Not Avaliable" :
-            (toiletData.opening_hours.open_now == true) ? "Open" : "Closed"
-          }
+          };
+
           fetchedToilets.push(newToilet);
         });
-
       })
       .catch((err) => console.log("Error:", err));
+
     Promise.all(
       fetchedToilets.map(async (current) => {
         return await distanceApiFetch(current)
@@ -151,11 +111,10 @@ export default MapScreen = ({ navigation }) => {
       })
     )
       .then((result) => {
-<<<<<<< HEAD
-        setState({ ...state, markers: result.sort((a, b) => (a.distance > b.distance) ? 1 : -1)})
-=======
-        setState({ ...state, markers: result.sort((a, b) => (a.distance > b.distance) ? 1 : -1)})  
->>>>>>> parent of 8275566 (redesign toilet bottomsheet)
+        setState({
+          ...state,
+          markers: result.sort((a, b) => (a.distance > b.distance ? 1 : -1)),
+        });
       })
       .catch((errorMessage) => {
         return Promise.reject(errorMessage);
@@ -179,9 +138,10 @@ export default MapScreen = ({ navigation }) => {
           address: toilet.address,
           rating: toilet.rating,
           reviews: toilet.reviews,
-          distance: response.data.rows[0].elements[0].distance.value / 1000,
+          distance:
+            Math.floor(response.data.rows[0].elements[0].distance.value * 10) /
+            10000,
           duration: response.data.rows[0].elements[0].duration.value / 60,
-          open: toilet.open,
         });
       })
       .catch((err) => {
@@ -193,7 +153,15 @@ export default MapScreen = ({ navigation }) => {
     //if there is a user logged in, retrieve them and skip having to go through login screen again
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        navigation.navigate("Account");
+        //if user is signed in
+        const usersRef = firebase.firestore().collection("users"); //get user collection from firestore
+        usersRef //call the database of user data (NOT the users in auth())
+          .doc(user.uid)
+          .get()
+          .then((document) => {
+            const data = document.data(); //this is the specific data (not userAuth, but the data I made in the users collection) of the user
+            navigation.navigate("Account", { user: data }); //revisit this later, accessing data on account screen is of issue
+          });
       } else {
         navigation.navigate("Login");
       }
@@ -207,7 +175,7 @@ export default MapScreen = ({ navigation }) => {
    */
   const onGetDirectionsPress = () => {
     setState({ ...state, selectedToiletDest: toilet.coordinate });
-    bs.current.snapTo(1);
+    bs.current.snapTo(0);
   };
 
   //Navigates to review screen and takes current toilet being accessed there to have its reviews manipulated.
@@ -286,6 +254,7 @@ export default MapScreen = ({ navigation }) => {
       });
     }
   };
+
   const [marker, setMarker] = useState();
 
   /**
@@ -297,7 +266,7 @@ export default MapScreen = ({ navigation }) => {
     const markerID = mapEventData._targetInst.return.key;
     setToilet(state.markers[markerID]);
     setMarker(markerID);
-    bs.current.snapTo(0);
+    bs.current.snapTo(1);
   };
 
   /**
@@ -314,264 +283,56 @@ export default MapScreen = ({ navigation }) => {
     }
   };
 
-  const onLocationButtonPress = () => {
-    if (state.userLocation != null)
-    {
-      _map.current.animateToRegion(
-        {
-          latitude: state.userLocation.latitude,
-          longitude: state.userLocation.longitude,
-          latitudeDelta: 0.04,
-          longitudeDelta: 0.05,
-        },
-        350
-      );
-    }
-    else{
-      console.log("No user location given (PERMISIONS MAY NOT BE GIVEN");
-    }
-  }
-
-      //Submit review on selected toilet if logged in. If not logged in, alert and do nothing.
-      const onSubmitReviewPress = () => {
-        const usersRef = firebase.firestore().collection("users");
-        const reviewsRef = firebase.firestore().collection('reviews');
-        firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-          usersRef
-          .doc(user.uid)
-          .get()
-          .then((document) => {
-          const data = document.data();
-
-          reviewsRef.add({
-            title: review,
-            name: data.fullName,
-            address: toilet.address,
-            toiletID: toilet.id,
-            userID: data.id,
-            rating: toilet.rating,
-            })
-
-          setReviewsArray([...reviewsArray , {title: review, address: toilet.address, toiletID: toilet.id,
-            userID: data.id, rating: toilet.rating}]);
-        })
-
-        Alert.alert(
-          'Submission success',
-          'Your review has been placed.');
-          this.textInput.clear()
-        }
-        else {
-          Alert.alert(
-            'Authentication required',
-            'You must be logged in to place a review.');
-          return;
-        }
-        });
-    }
-
   /**
    * creates bottom sheet content
    */
   const bs = React.createRef();
   renderHeader = () => (
-    <View style={styles.panelHeader}>
-      <View style={styles.panelHandle} />
+    <View style={styles.header}>
+      {marker && marker.length && (
+        <View style={{ flexDirection: "column" }}>
+          <Text style={styles.toiletTitle}>{toilet.title}</Text>
+          <Text style={styles.toiletSubtitle}>
+            {toilet.address} ({toilet.distance} km)
+          </Text>
+        </View>
+      )}
     </View>
   );
 
   renderInner = () => (
+
+    // add ratings and review number with directions button in the same line
+
     <View style={styles.bottomPanel}>
       {marker && marker.length && (
-        <Text
-          style={
-            styles.toiletTitle //check for null in useState otherwise crash on startup as undefined
-          }
-        >
-          {toilet.title}
-        </Text>
-<<<<<<< HEAD
-=======
+        <View style={styles.bottomPanel}>
+          <TouchableOpacity
+            onPress={() => {
+              onGetDirectionsPress();
+            }}
+          >
+            <View style={styles.directionsButton}>
+              <FontAwesome5
+                name="directions"
+                size={24}
+                color="black"
+                style={{ top: 6, left: 6, opacity: 0.6 }}
+              />
+              <Text styles={{ paddingLeft: 6 }}>directions</Text>
+            </View>
+          </TouchableOpacity>
+          <Text style={styles.textSubheading}>
+            Rating: <StarRating ratings={toilet.rating} />
+          </Text>
+        </View>
       )}
-      {marker && marker.length && (
-        <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
-      )}
-      <View style={styles.hairline} />
-      {marker && marker.length && (
-        <TouchableOpacity onPress={() => onGetDirectionsPress()}>
-          <Text style={styles.textSubheading}>Get Directions</Text>
-        </TouchableOpacity>
-      )}
-      {marker && marker.length && (
-        <Text style={styles.textSubheading}>
-          Rating: <StarRating ratings={toilet.rating} />
-        </Text>
-      )}
-      {marker && marker.length && (
-        <TouchableOpacity onPress={() => onReviewPress()}>
-          <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
-        </TouchableOpacity>
->>>>>>> parent of 8275566 (redesign toilet bottomsheet)
-      )}
-      {marker && marker.length && (
-        <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
-      )}
-      <View style={styles.hairline} />
-      {marker && marker.length && (
-        <TouchableOpacity onPress={() => onGetDirectionsPress()}>
-          <Text style={styles.textSubheading}>Get Directions</Text>
-        </TouchableOpacity>
-      )}
-      {marker && marker.length && (
-        <Text style={styles.textSubheading}>
-          Rating: <StarRating ratings={toilet.rating} />
-        </Text>
-      )}
-      {marker && marker.length && (
-        <TouchableOpacity onPress={() => onReviewPress()}>
-          <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
-        </TouchableOpacity>
-      )}
-      {marker && marker.length && (
-        <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
-      )}
-      <View style={styles.hairline} />
-      {marker && marker.length && (
-        <TouchableOpacity onPress={() => onGetDirectionsPress()}>
-          <Text style={styles.textSubheading}>Get Directions</Text>
-        </TouchableOpacity>
-      )}
-      {marker && marker.length && (
-        <Text style={styles.textSubheading}>
-          Rating: <StarRating ratings={toilet.rating} />
-        </Text>
-      )}
-      {marker && marker.length && (
-        <TouchableOpacity onPress={() => onReviewPress()}>
-          <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
-        </TouchableOpacity>
-      )}
-        {marker && marker.length && (
-        <Text style={styles.textSubheading}>Status: {toilet.open}</Text>
-      )}
-      <ScrollView
-        horizontal
-        scrollEventThrottle={1}
-        showsHorizontalScrollIndicator={false}
-        height={80}
-        style={styles.chipsScrollView}
-        contentInset={{
-          // iOS only
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 20,
-        }}
-        contentContainerStyle={{
-          paddingRight: Platform.OS === "android" ? 20 : 0,
-        }}
-      >
-      </ScrollView>
-      <ScrollView
-        vertical
-        scrollEventThrottle={1}
-        showsVerticalScrollIndicator={true}
-        style={styles.listContainer}
-      >
-        {reviewsArray.map((item, index) => {
-          return (
-          <ReviewCard
-            name={item.name}
-            title={item.title}
-            userID={item.userID}
-            key={index}
-            rating={item.rating}
-            item={item}
-            navigation={navigation}
-          />
-          )
-        })}
-      </ScrollView>
-      <TextInput onChangeText={() => {}}
-        style={styles.reviewTextInputContainer}
-        placeholder='Write your review here:'
-        placeholderTextColor="#aaaaaa"
-        multiline={true}
-        numberOfLines={10}
-        textAlign='left'
-        onChangeText={(userInput) => review = (userInput)}
-        ref={input => { this.textInput = input }}
-        underlineColorAndroid="transparent"
-      />
-      <TouchableOpacity
-        style={styles.reviewButton}
-        onPress={() => onSubmitReviewPress()}>
-        <Text style={styles.reviewButtonTitle}>Submit review</Text>
-      </TouchableOpacity>
-    </KeyboardAvoidingView>
+    </View>
   );
 
   if (state.userLocation.latitude) {
     return (
       <View style={styles.container}>
-        <View style = {styles.searchContainer}>
-       <SafeAreaView style = {{ flex: 1}}>
-        <GooglePlacesAutocomplete
-          placeholder="Search"
-          listViewDisplayed="auto"
-          fetchDetails={true}
-          minLength={2}
-          debounce={200}
-          onPress={(data, details = null) => {
-            _map.current.animateToRegion(
-              {
-                latitude: details.geometry.location.lat,
-                longitude: details.geometry.location.lng,
-                latitudeDelta: 0.04,
-                longitudeDelta: 0.05,
-              },
-              350
-            );
-            toiletApiFetch(details.geometry.location.lat, details.geometry.location.lng);
-          }}
-          query={{
-            key: MAP_API_KEY,
-            language: "en",
-          }}
-          styles={{
-            textInputContainer: {
-              width: '95%',
-              position: 'absolute',
-              //borderRadius: 40,
-              padding: 10,
-              alignSelf: "center",
-              height: 40,
-            },
-            textInput: {
-              height: 40,
-              color: 'black',
-              fontSize: 16,
-              paddingLeft: 15,
-              borderRadius: 25,
-            },
-            listView: {
-              zIndex: 2,
-              width: '90%',
-              position: 'absolute',
-              marginTop: 60,
-              padding: 10,
-              alignSelf: "center",
-              backgroundColor: 'white',
-              borderRadius: 25,
-              elevation: 1,
-            },
-            separator: {
-              opacity: 0
-            },
-          }}
-        /></SafeAreaView>
-        </View>
         <MapView
           ref={_map}
           showuserLocation={true} // may not be needed, deprecated by 'showsuserlocation={true}'
@@ -595,8 +356,6 @@ export default MapScreen = ({ navigation }) => {
             setState({ ...state, region: region })
           }
         >
-<<<<<<< HEAD
-<<<<<<< HEAD
           {state.selectedToiletDest.latitude && (
             <MapViewDirections
               origin={state.userLocation}
@@ -624,39 +383,30 @@ export default MapScreen = ({ navigation }) => {
               }}
             />
           )}
-          {state.selectedToiletDest.latitude &&
-=======
-          {state.selectedToiletDest.latitude && 
->>>>>>> parent of 8275566 (redesign toilet bottomsheet)
-          <MapViewDirections
-            origin={state.userLocation}
-            destination={state.selectedToiletDest}
-            apikey={MAP_API_KEY}
-            strokeWidth={5}
-            strokeColor="#00ced1"
-            optimizeWaypoints={true}
-            mode={state.mode}
-            onReady={(result) => {
-              toilet.distance = result.distance;
-              toilet.duration = result.duration;
-              console.log(toilet);
-              _map.current.fitToCoordinates(result.coordinates, {
-                edgePadding: {
-                  right: width / 20,
-                  bottom: height / 20,
-                  left: width / 20,
-                  top: height / 20,
-                },
-              });
-            }}
-            onError={(errorMessage) => {
-              console.log(errorMessage);
-            }}
-          />}
 
->>>>>>> parent of 8275566 (redesign toilet bottomsheet)
           <RenderMarkers />
         </MapView>
+        <View style={styles.searchBox}>
+          <TextInput
+            placeholder="Search here"
+            placeholderTextColor="#777"
+            autoCapitalize="none"
+            style={styles.searchBoxText}
+          />
+          {/* USER SCREEN */}
+          <TouchableOpacity
+            onPress={() => {
+              //navigates to loginscreen or accountscreen when pressed
+              onLoginPress();
+            }}
+          ></TouchableOpacity>
+          <FontAwesome
+            name="search"
+            size={24}
+            color="black"
+            style={{ right: 8, opacity: 0.6 }}
+          />
+        </View>
         <Animatable.View style={styles.searchHere} animation="fadeInLeft">
           <TouchableOpacity
             onPress={() => {
@@ -666,21 +416,8 @@ export default MapScreen = ({ navigation }) => {
             <Text style={styles.searchHereText}>Search this area</Text>
           </TouchableOpacity>
         </Animatable.View>
+
         <View style={styles.buttonContainer}>
-        <TouchableOpacity
-            onPress={() => {
-              onLocationButtonPress();
-            }}
-          >
-            <View style={styles.locationButton}>
-              <MaterialIcons
-                name="my-location"
-                size={26}
-                color="black"
-                style={{ top: 6, left: 6, opacity: 0.6 }}
-              />
-            </View>
-          </TouchableOpacity>
           {/* Map Style Button */}
           <TouchableOpacity
             onPress={() => {
@@ -739,6 +476,7 @@ export default MapScreen = ({ navigation }) => {
             </View>
           </TouchableOpacity>
         </View>
+
         {/* FOOTER */}
         <View style={styles.footer}>
           {/* MAP BUTTON */}
@@ -781,19 +519,10 @@ export default MapScreen = ({ navigation }) => {
         </View>
         <BottomSheet
           ref={bs}
-<<<<<<< HEAD
-<<<<<<< HEAD
-          snapPoints={['32%', '0%', '96.5%']}
-=======
-          snapPoints={[320, 0]}
->>>>>>> parent of 8275566 (redesign toilet bottomsheet)
-=======
-          snapPoints={[320, 0]}
->>>>>>> parent of 8275566 (redesign toilet bottomsheet)
+          snapPoints={[0, 320, height]}
           renderContent={renderInner}
           renderHeader={renderHeader}
-          borderRadius={10}
-          initialSnap={1}
+          initialSnap={0}
           borderRadius={10}
           enabledGestureInteraction={true}
           enabledContentTapInteraction={false} //this line needed to be added to make markers in bottomsheet respond to onpress
