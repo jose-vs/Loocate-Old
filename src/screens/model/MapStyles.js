@@ -71,7 +71,7 @@ export const styles = StyleSheet.create({
   },
   locationButton: {
     marginRight: 50,
-    marginLeft: 5,
+    marginLeft: 10,
     width: 38,
     height: 38,
     borderRadius: 20,
@@ -96,6 +96,14 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 5,
     elevation: 10,
+  },
+  locationButtonContainer: { 
+    position: "absolute",
+    flexDirection: "row",
+    top: 100,
+    paddingHorizontal: 10,
+    paddingRight: 20,
+    alignSelf: "flex-start",
   },
   buttonContainer: {
     position: "absolute",

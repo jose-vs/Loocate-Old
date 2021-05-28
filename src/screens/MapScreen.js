@@ -674,8 +674,7 @@ export default MapScreen = ({ navigation }) => {
             <Text style={styles.searchHereText}>Search this area</Text>
           </TouchableOpacity>
         </Animatable.View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
+        <TouchableOpacity style={styles.locationButtonContainer}
             onPress={() => {
               onLocationButtonPress();
             }}
@@ -689,6 +688,8 @@ export default MapScreen = ({ navigation }) => {
               />
             </View>
           </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          
           {/* Map Style Button */}
           <TouchableOpacity
             onPress={() => {
