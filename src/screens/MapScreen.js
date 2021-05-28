@@ -147,7 +147,7 @@ export default MapScreen = ({ navigation }) => {
       })
     )
       .then((result) => {
-        setState({ ...state, markers: result.sort((a, b) => (a.distance > b.distance) ? 1 : -1)})  
+        setState({ ...state, markers: result.sort((a, b) => (a.distance > b.distance) ? 1 : -1)})
       })
       .catch((errorMessage) => {
         return Promise.reject(errorMessage);
@@ -403,6 +403,25 @@ export default MapScreen = ({ navigation }) => {
           <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
         </TouchableOpacity>
       )}
+      {marker && marker.length && (
+        <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
+      )}
+      <View style={styles.hairline} />
+      {marker && marker.length && (
+        <TouchableOpacity onPress={() => onGetDirectionsPress()}>
+          <Text style={styles.textSubheading}>Get Directions</Text>
+        </TouchableOpacity>
+      )}
+      {marker && marker.length && (
+        <Text style={styles.textSubheading}>
+          Rating: <StarRating ratings={toilet.rating} />
+        </Text>
+      )}
+      {marker && marker.length && (
+        <TouchableOpacity onPress={() => onReviewPress()}>
+          <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
+        </TouchableOpacity>
+      )}
         {marker && marker.length && (
         <Text style={styles.textSubheading}>Status: {toilet.open}</Text>
       )}
@@ -574,8 +593,7 @@ export default MapScreen = ({ navigation }) => {
               }}
             />
           )}
-=======
-          {state.selectedToiletDest.latitude && 
+          {state.selectedToiletDest.latitude &&
           <MapViewDirections
             origin={state.userLocation}
             destination={state.selectedToiletDest}
