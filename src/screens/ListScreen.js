@@ -15,22 +15,22 @@ import { filter } from "./model/MapData";
 export default ListScreen = ({ route, navigation }) => {
   const [toilets, setToilets] = useState(route.params);
   const filterPress = (filter) => {
-    const sorted = [...toilets]
+    const sorted = [...toilets];
 
-    switch(filter) {
-      case 'nearest':
-        setToilets(sorted.sort((a, b) => (a.distance > b.distance) ? 1 : -1))
+    switch (filter) {
+      case "nearest":
+        setToilets(sorted.sort((a, b) => (a.distance > b.distance ? 1 : -1)));
         break;
-      case 'top rated':
-        setToilets(sorted.sort((a, b) => (a.rating < b.rating) ? 1 : -1))
+      case "top rated":
+        setToilets(sorted.sort((a, b) => (a.rating < b.rating ? 1 : -1)));
         break;
-      case 'most reviewed':
-        setToilets(sorted.sort((a, b) => (a.reviews < b.reviews) ? 1 : -1))
+      case "most reviewed":
+        setToilets(sorted.sort((a, b) => (a.reviews < b.reviews ? 1 : -1)));
         break;
-      case 'open now':
+      case "open now":
         break;
     }
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -75,11 +75,11 @@ export default ListScreen = ({ route, navigation }) => {
         </TouchableOpacity>
 
         {filter.map((category, index) => (
-          <TouchableOpacity 
-            key={index} 
+          <TouchableOpacity
+            key={index}
             style={styles.chipsItem}
             onPress={() => {
-              filterPress(category.type)
+              filterPress(category.type);
             }}
           >
             <Text>{category.type}</Text>
@@ -95,16 +95,16 @@ export default ListScreen = ({ route, navigation }) => {
       >
         {toilets.map((item, index) => {
           return (
-          <ToiletCard
-            key={index}
-            title ={item.title}
-            address={item.address}
-            ratings={item.rating}
-            reviews={item.reviews}
-            item={item}
-            navigation={navigation}
-          />
-          )
+            <ToiletCard
+              key={index}
+              title={item.title}
+              address={item.address}
+              ratings={item.rating}
+              reviews={item.reviews}
+              item={item}
+              navigation={navigation}
+            />
+          );
         })}
       </ScrollView>
 
@@ -140,8 +140,8 @@ export default ListScreen = ({ route, navigation }) => {
         {/* USER SCREEN */}
         <TouchableOpacity
           onPress={() => {
-              //if there is a user logged in, retrieve them and skip having to go through login screen again
-              firebase.auth().onAuthStateChanged((user) => {
+            //if there is a user logged in, retrieve them and skip having to go through login screen again
+            firebase.auth().onAuthStateChanged((user) => {
               if (user) {
                 navigation.navigate("Account");
               } else {

@@ -159,7 +159,8 @@ export default MapScreen = ({ navigation }) => {
       ${state.userLocation.latitude},${state.userLocation.longitude}
       &destinations=
       ${toilet.coordinate.latitude},${toilet.coordinate.longitude}
-      &key=${MAP_API_KEY}`
+      &key=${MAP_API_KEY}
+      &mode=${state.mode.toLowerCase()}`
       )
       .then(async (response) => {
         return await Promise.resolve({
@@ -169,8 +170,14 @@ export default MapScreen = ({ navigation }) => {
           address: toilet.address,
           rating: toilet.rating,
           reviews: toilet.reviews,
-          distance: response.data.rows[0].elements[0].distance.value / 1000,
-          duration: response.data.rows[0].elements[0].duration.value / 60,
+          distance:
+            Math.round(
+              (response.data.rows[0].elements[0].distance.value / 1000) * 100
+            ) / 100,
+          duration:
+            Math.round(
+              (response.data.rows[0].elements[0].duration.value / 60) * 100
+            ) / 100,
           open: toilet.open,
         });
       })
@@ -392,12 +399,10 @@ export default MapScreen = ({ navigation }) => {
               flexDirection: "row",
               justifyContent: "space-between",
               paddingTop: 10,
-              paddingHorizontal: 10
+              paddingHorizontal: 10,
             }}
           >
-            <View
-              style={{ flexDirection: "row", marginVertical: 8, left: 10 }}
-            >
+            <View style={{ flexDirection: "row", marginVertical: 8, left: 10 }}>
               <Text style={{ color: "#777", right: 6 }}>{toilet.rating}</Text>
               <StarRating ratings={toilet.rating} />
               <Text style={{ color: "#777" }}>({toilet.reviews})</Text>
@@ -423,27 +428,23 @@ export default MapScreen = ({ navigation }) => {
           <View
             style={{
               flexDirection: "row",
-              paddingHorizontal: 10
+              paddingHorizontal: 10,
             }}
           >
-            <View
-              style={{ flexDirection: "row", left: 5 }}
-            >
+            <View style={{ flexDirection: "row", left: 5 }}>
               <Text
                 style={[
-                  (toilet.open == "closed"
+                  toilet.open == "closed"
                     ? { color: "#962d2d" }
                     : toilet.open == "open now"
                     ? { color: "#9fe6a0" }
-                    : {}),
-                  {fontSize: 16}
+                    : {},
+                  { fontSize: 16 },
                 ]}
               >
                 {toilet.open}
               </Text>
-              <Text>
-
-              </Text>
+              <Text>{toilet.duration}</Text>
               {/* add travel duration when api call for distance is fixed */}
             </View>
           </View>
