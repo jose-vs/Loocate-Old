@@ -211,7 +211,6 @@ export default MapScreen = ({ navigation }) => {
    */
   const onAreaSearchPress = () => {
     toiletApiFetch(state.region.latitude, state.region.longitude);
-    setState({...state, selectedToiletDest: null})
   };
 
   let mapAnimation = new Animated.Value(0);
