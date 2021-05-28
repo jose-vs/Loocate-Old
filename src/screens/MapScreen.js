@@ -31,6 +31,7 @@ import { firebase } from "../firebase/config";
 import MapViewDirections from "react-native-maps-directions";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import Geocoder from "react-native-geocoding";
+
 const mapDarkStyle = [
   {
     elementType: "geometry",
@@ -667,10 +668,10 @@ export default MapScreen = ({ navigation }) => {
           {/* Dark Mode Button */}
           <TouchableOpacity
             onPress={() => {
-              if (state.customMapStyle == false) {
+              if (state.customMapStyle == null) {
                 setState({ ...state, customMapStyle: mapDarkStyle });
               } else if (state.customMapStyle == mapDarkStyle) {
-                setState({ ...state, customMapStyle: false });
+                setState({ ...state, customMapStyle: null });
               }
             }}
           >
