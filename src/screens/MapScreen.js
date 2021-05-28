@@ -30,6 +30,178 @@ import { firebase } from "../firebase/config";
 import MapViewDirections from "react-native-maps-directions";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import Geocoder from "react-native-geocoding";
+const mapDarkStyle = [
+  {
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#242f3e",
+      },
+    ],
+  },
+  {
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#746855",
+      },
+    ],
+  },
+  {
+    elementType: "labels.text.stroke",
+    stylers: [
+      {
+        color: "#242f3e",
+      },
+    ],
+  },
+  {
+    featureType: "administrative.locality",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#d59563",
+      },
+    ],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#d59563",
+      },
+    ],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#263c3f",
+      },
+    ],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#6b9a76",
+      },
+    ],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#38414e",
+      },
+    ],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry.stroke",
+    stylers: [
+      {
+        color: "#212a37",
+      },
+    ],
+  },
+  {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#9ca5b3",
+      },
+    ],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#746855",
+      },
+    ],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry.stroke",
+    stylers: [
+      {
+        color: "#1f2835",
+      },
+    ],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#f3d19c",
+      },
+    ],
+  },
+  {
+    featureType: "transit",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#2f3948",
+      },
+    ],
+  },
+  {
+    featureType: "transit.station",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#d59563",
+      },
+    ],
+  },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#17263c",
+      },
+    ],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#515c6d",
+      },
+    ],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.stroke",
+    stylers: [
+      {
+        color: "#17263c",
+      },
+    ],
+  },
+];
+
+const mapLightStyle = [
+  {
+    elementTyle: "labels.icons",
+    stylers: [
+      {
+        visability: "off",
+      },
+    ],
+  },
+];
 
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
@@ -62,7 +234,7 @@ export default MapScreen = ({ navigation }) => {
           longitude: location.coords.longitude,
         },
       });
-      toiletApiFetch(location.coords.latitude, location.coords.longitude)
+      toiletApiFetch(location.coords.latitude, location.coords.longitude);
 
       setPerms(true);
     })();
@@ -81,7 +253,6 @@ export default MapScreen = ({ navigation }) => {
           &key=${MAP_API_KEY}`
       )
       .then(async (response) => {
-
         await response.data.results.map((toiletData) => {
           const newToilet = {
             id: toiletData.place_id,
@@ -95,9 +266,13 @@ export default MapScreen = ({ navigation }) => {
             reviews: toiletData.user_ratings_total,
             distance: null,
             duration: null,
-            open: (toiletData.opening_hours === undefined) ? "gay" : 
-            (toiletData.opening_hours.open_now == true) ? "open" : "closed"
-          }
+            open:
+              toiletData.opening_hours === undefined
+                ? "gay"
+                : toiletData.opening_hours.open_now == true
+                ? "open"
+                : "closed",
+          };
           fetchedToilets.push(newToilet);
         });
       })
@@ -114,7 +289,10 @@ export default MapScreen = ({ navigation }) => {
       })
     )
       .then((result) => {
-        setState({ ...state, markers: result.sort((a, b) => (a.distance > b.distance) ? 1 : -1)})  
+        setState({
+          ...state,
+          markers: result.sort((a, b) => (a.distance > b.distance ? 1 : -1)),
+        });
       })
       .catch((errorMessage) => {
         return Promise.reject(errorMessage);
@@ -282,8 +460,7 @@ export default MapScreen = ({ navigation }) => {
   };
 
   const onLocationButtonPress = () => {
-    if (state.userLocation != null)
-    {
+    if (state.userLocation != null) {
       _map.current.animateToRegion(
         {
           latitude: state.userLocation.latitude,
@@ -293,11 +470,10 @@ export default MapScreen = ({ navigation }) => {
         },
         350
       );
-    }
-    else{
+    } else {
       console.log("No user location given (PERMISIONS MAY NOT BE GIVEN");
     }
-  }
+  };
 
   /**
    * creates bottom sheet content
@@ -339,7 +515,7 @@ export default MapScreen = ({ navigation }) => {
           <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
         </TouchableOpacity>
       )}
-        {marker && marker.length && (
+      {marker && marker.length && (
         <Text style={styles.toiletSubtitle}>Open/Closed? {toilet.open}</Text>
       )}
     </View>
@@ -348,65 +524,70 @@ export default MapScreen = ({ navigation }) => {
   if (state.userLocation.latitude) {
     return (
       <View style={styles.container}>
-        <View style = {styles.searchContainer}> 
-       <SafeAreaView style = {{ flex: 1}}>
-        <GooglePlacesAutocomplete
-          placeholder="Search"
-          listViewDisplayed="auto"
-          fetchDetails={true}
-          minLength={2}
-          debounce={200}
-          onPress={(data, details = null) => {
-            _map.current.animateToRegion(
-              {
-                latitude: details.geometry.location.lat,
-                longitude: details.geometry.location.lng,
-                latitudeDelta: 0.04,
-                longitudeDelta: 0.05,
-              },
-              350
-            );
-            toiletApiFetch(details.geometry.location.lat, details.geometry.location.lng);
-          }}
-          query={{
-            key: MAP_API_KEY,
-            language: "en",
-          }}
-          styles={{
-            textInputContainer: {
-              width: '95%',
-              position: 'absolute',
-              //borderRadius: 40,
-              padding: 10,
-              alignSelf: "center",
-              height: 40,
-            },
-            textInput: {
-              height: 40,
-              color: 'black',
-              fontSize: 16,
-              paddingLeft: 15,
-              borderRadius: 25,
-            },
-            listView: {
-              zIndex: 2,
-              width: '90%',
-              position: 'absolute',
-              marginTop: 60,
-              padding: 10,
-              alignSelf: "center",
-              backgroundColor: 'white',
-              borderRadius: 25,
-              elevation: 1,
-            },
-            separator: {
-              opacity: 0
-            },
-          }}
-        /></SafeAreaView>
+        <View style={styles.searchContainer}>
+          <SafeAreaView style={{ flex: 1 }}>
+            <GooglePlacesAutocomplete
+              placeholder="Search"
+              listViewDisplayed="auto"
+              fetchDetails={true}
+              minLength={2}
+              debounce={200}
+              onPress={(data, details = null) => {
+                _map.current.animateToRegion(
+                  {
+                    latitude: details.geometry.location.lat,
+                    longitude: details.geometry.location.lng,
+                    latitudeDelta: 0.04,
+                    longitudeDelta: 0.05,
+                  },
+                  350
+                );
+                toiletApiFetch(
+                  details.geometry.location.lat,
+                  details.geometry.location.lng
+                );
+              }}
+              query={{
+                key: MAP_API_KEY,
+                language: "en",
+              }}
+              styles={{
+                textInputContainer: {
+                  width: "95%",
+                  position: "absolute",
+                  //borderRadius: 40,
+                  padding: 10,
+                  alignSelf: "center",
+                  height: 40,
+                },
+                textInput: {
+                  height: 40,
+                  color: "black",
+                  fontSize: 16,
+                  paddingLeft: 15,
+                  borderRadius: 25,
+                },
+                listView: {
+                  zIndex: 2,
+                  width: "90%",
+                  position: "absolute",
+                  marginTop: 60,
+                  padding: 10,
+                  alignSelf: "center",
+                  backgroundColor: "white",
+                  borderRadius: 25,
+                  elevation: 1,
+                },
+                separator: {
+                  opacity: 0,
+                },
+              }}
+            />
+          </SafeAreaView>
         </View>
         <MapView
           ref={_map}
+          customMapStyle={mapDarkStyle}
           showuserLocation={true} // may not be needed, deprecated by 'showsuserlocation={true}'
           loadingEnabled={true}
           loadingIndicatorColor="#75CFB8"
@@ -468,7 +649,7 @@ export default MapScreen = ({ navigation }) => {
           </TouchableOpacity>
         </Animatable.View>
         <View style={styles.buttonContainer}>
-        <TouchableOpacity
+          <TouchableOpacity
             onPress={() => {
               onLocationButtonPress();
             }}
@@ -477,6 +658,21 @@ export default MapScreen = ({ navigation }) => {
               <MaterialIcons
                 name="my-location"
                 size={26}
+                color="black"
+                style={{ top: 6, left: 6, opacity: 0.6 }}
+              />
+            </View>
+          </TouchableOpacity>
+          {/* Dark Mode Button */}
+          <TouchableOpacity
+            onPress={() => {
+              onStyleButtonPress();
+            }}
+          >
+            <View style={styles.circleButton}>
+              <MaterialCommunityIcons
+                name="theme-light-dark"
+                size={24}
                 color="black"
                 style={{ top: 6, left: 6, opacity: 0.6 }}
               />
