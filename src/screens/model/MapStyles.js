@@ -160,10 +160,10 @@ export const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
-  chipsScrollView: {
+  chipsScrollView: { //scrollview
     position: "relative",
-    top: 200,
-    paddingHorizontal: 10,
+    top: 160,
+    marginBottom: -30
   },
   listContainer: { 
     position: "relative",

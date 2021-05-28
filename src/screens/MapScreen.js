@@ -79,6 +79,8 @@ export default MapScreen = ({ navigation }) => {
 
   //triggers on setToilet which only happens on marker press, retrieves toilet reviews
   useEffect(() => {
+    setIsLoading(true); //activity indicator set to load at all times, unless the toilet marker is mounted in the if below
+
     if (mounted.current) {
       var addToReviewsArray = [];
       const reviewsRef = firebase.firestore().collection('reviews');
@@ -89,16 +91,18 @@ export default MapScreen = ({ navigation }) => {
             addToReviewsArray = ([...addToReviewsArray , snapshot.data()]);
           }
         }
-      )    
-          setReviewsArray(addToReviewsArray);
-          setIsLoading(false);
+      )  
+        setReviewsArray(addToReviewsArray);
+        setIsLoading(false);         
       });
     }
-    else {
-      setIsLoading(true);
-      mounted.current = true;     
+    else if (!mounted.current) {      
+      mounted.current = true;   
+      setIsLoading(true)  
     }
   }, [toilet]); 
+
+
 
   toiletApiFetch = async (lat, lng) => {
     const fetchedToilets = [];
@@ -283,7 +287,6 @@ export default MapScreen = ({ navigation }) => {
    */
   const onMarkerPress = (mapEventData) => {
     // get the event data on press
-    setIsLoading(true);
     const markerID = mapEventData._targetInst.return.key;
     setToilet(state.markers[markerID]);
     setMarker(markerID);
@@ -428,8 +431,14 @@ export default MapScreen = ({ navigation }) => {
         scrollEventThrottle={1}
         showsVerticalScrollIndicator={true}
         style={styles.listContainer}
-      >       
+      >   
         {reviewsArray.map((item, index) => {
+          if (!reviewsArray.length){
+            Alert.alert(
+              'No reviews found',
+              'Be the first to place a review for this toilet!'); 
+            <Text>No reviews yet. Be the first to place one for this toilet!</Text>
+          }
           return (
           <ReviewCard
             name={item.name}                   
