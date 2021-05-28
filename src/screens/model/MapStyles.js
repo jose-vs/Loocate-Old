@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
   searchContainer: {
     position: 'relative',
     height: 20,
-    paddingTop: 30,
+    paddingTop: 40,
     flexGrow: 0,
     flexShrink: 0
   }, 
@@ -100,7 +100,7 @@ export const styles = StyleSheet.create({
   buttonContainer: {
     position: "absolute",
     flexDirection: "row",
-    top: 90,
+    top: 100,
     paddingHorizontal: 10,
     paddingRight: 20,
     alignSelf: "flex-end",

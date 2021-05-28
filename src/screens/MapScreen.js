@@ -381,9 +381,7 @@ export default MapScreen = ({ navigation }) => {
       {marker && marker.length && (
         <View style={{ flexDirection: "column" }}>
           <Text style={styles.toiletTitle}>{toilet.title}</Text>
-          <Text style={styles.toiletSubtitle}>
-            {toilet.address} ({toilet.distance} km)
-          </Text>
+          <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
         </View>
       )}
     </View>
@@ -391,88 +389,89 @@ export default MapScreen = ({ navigation }) => {
 
   renderInner = () => (
     <KeyboardAvoidingView style={styles.bottomPanel} behavior="height">
-      {marker && marker.length && (
-        <View>
-          {/* contains rating number icons and review number in row direction */}
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingTop: 10,
-              paddingHorizontal: 10,
-            }}
-          >
-            <View style={{ flexDirection: "row", marginVertical: 8, left: 10 }}>
-              <Text style={{ color: "#777", right: 6 }}>{toilet.rating}</Text>
-              <StarRating ratings={toilet.rating} />
-              <Text style={{ color: "#777" }}>({toilet.reviews})</Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => {
-                onGetDirectionsPress();
-              }}
-            >
-              <View style={styles.directionsButton}>
-                <FontAwesome5
-                  name="directions"
-                  size={24}
-                  color="#fff"
-                  style={{ top: 6, left: 6 }}
-                />
-                <Text style={{ left: 20, top: 7, color: "#fff" }}>
-                  Directions
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              paddingHorizontal: 10,
-            }}
-          >
-            <View style={{ flexDirection: "row", left: 5 }}>
-              <Text
-                style={[
-                  toilet.open == "closed"
-                    ? { color: "#962d2d" }
-                    : toilet.open == "open now"
-                    ? { color: "#9fe6a0" }
-                    : {},
-                  { fontSize: 16 },
-                ]}
-              >
-                {toilet.open}
-              </Text>
-              <Text>{toilet.duration}</Text>
-              {/* add travel duration when api call for distance is fixed */}
-            </View>
-          </View>
-        </View>
-      )}
-      <ScrollView
-        horizontal
-        scrollEventThrottle={1}
-        showsHorizontalScrollIndicator={false}
-        height={80}
-        style={styles.chipsScrollView}
-        contentInset={{
-          // iOS only
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 20,
-        }}
-        contentContainerStyle={{
-          paddingRight: Platform.OS === "android" ? 20 : 0,
-        }}
-      ></ScrollView>
       <ScrollView
         vertical
         scrollEventThrottle={1}
         showsVerticalScrollIndicator={true}
         style={styles.listContainer}
       >
+        {marker && marker.length && (
+          <View>
+            {/* contains rating number icons and review number in row direction */}
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginBottom: 10,
+                paddingHorizontal: 30,
+              }}
+            >
+              <View
+                style={{ flexDirection: "row", marginVertical: 8, left: 10 }}
+              >
+                <Text style={{ color: "#777", right: 6 }}>{toilet.rating}</Text>
+                <StarRating ratings={toilet.rating} />
+                <Text style={{ color: "#777" }}>({toilet.reviews})</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => {
+                  onGetDirectionsPress();
+                }}
+              >
+                <View style={styles.directionsButton}>
+                  <FontAwesome5
+                    name="directions"
+                    size={24}
+                    color="#fff"
+                    style={{ top: 6, left: 6 }}
+                  />
+                  <Text style={{ left: 20, top: 7, color: "#fff" }}>
+                    Directions
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                left: 5,
+                justifyContent: "space-around",
+                paddingHorizontal: 30,
+              }}
+            >
+              <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                <Text
+                  style={[
+                    toilet.open == "closed"
+                      ? { color: "#962d2d" }
+                      : toilet.open == "open now"
+                      ? { color: "#9fe6a0" }
+                      : {},
+                    { fontSize: 16 },
+                  ]}
+                >
+                  {toilet.open}
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                paddingHorizontal: 28,
+                paddingVertical: 5
+              }}
+            >
+              <RenderBsMode />
+              <Text style={{ opacity: 0.6, right: 10 }}>
+                {toilet.duration} min
+              </Text>
+              <Text style={{ opacity: 0.6 }}>({toilet.distance} km)</Text>
+            </View>
+          </View>
+        )}
         {reviewsArray.map((item, index) => {
           return (
             <ReviewCard
@@ -486,29 +485,69 @@ export default MapScreen = ({ navigation }) => {
             />
           );
         })}
+        <TextInput
+          onChangeText={() => {}}
+          style={styles.reviewTextInputContainer}
+          placeholder="Write your review here:"
+          placeholderTextColor="#aaaaaa"
+          multiline={true}
+          numberOfLines={10}
+          textAlign="left"
+          onChangeText={(userInput) => (review = userInput)}
+          ref={(input) => {
+            this.textInput = input;
+          }}
+          underlineColorAndroid="transparent"
+        />
+        <TouchableOpacity
+          style={styles.reviewButton}
+          onPress={() => onSubmitReviewPress()}
+        >
+          <Text style={styles.reviewButtonTitle}>Submit review</Text>
+        </TouchableOpacity>
       </ScrollView>
-      <TextInput
-        onChangeText={() => {}}
-        style={styles.reviewTextInputContainer}
-        placeholder="Write your review here:"
-        placeholderTextColor="#aaaaaa"
-        multiline={true}
-        numberOfLines={10}
-        textAlign="left"
-        onChangeText={(userInput) => (review = userInput)}
-        ref={(input) => {
-          this.textInput = input;
-        }}
-        underlineColorAndroid="transparent"
-      />
-      <TouchableOpacity
-        style={styles.reviewButton}
-        onPress={() => onSubmitReviewPress()}
-      >
-        <Text style={styles.reviewButtonTitle}>Submit review</Text>
-      </TouchableOpacity>
     </KeyboardAvoidingView>
   );
+
+  const RenderBsMode = () => {
+    switch (state.mode) {
+      case "WALKING":
+        return (
+          <View>
+            <FontAwesome5
+              name="walking"
+              size={18}
+              color="black"
+              style={{ marginHorizontal: 14, opacity: 0.6 }}
+            />
+          </View>
+        );
+      case "DRIVING":
+        return (
+          <View>
+            <MaterialIcons
+              name="drive-eta"
+              size={18}
+              color="black"
+              style={{ marginHorizontal: 14, opacity: 0.6 }}
+            />
+          </View>
+        );
+      case "BICYCLING":
+        return (
+          <View>
+            <MaterialIcons
+              name="directions-bike"
+              size={18}
+              color="black"
+              style={{ marginHorizontal: 14, opacity: 0.6 }}
+            />
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
 
   if (state.userLocation.latitude) {
     return (
