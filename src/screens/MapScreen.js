@@ -68,8 +68,7 @@ export default MapScreen = ({ navigation }) => {
         },
       });
 
-      toiletApiFetch(location.coords.latitude, location.coords.longitude)
-
+      toiletApiFetch(location.coords.latitude, location.coords.longitude);
 
       setPerms(true);
     })();
@@ -79,19 +78,17 @@ export default MapScreen = ({ navigation }) => {
   useEffect(() => {
     if (mounted.current) {
       var addToReviewsArray = [];
-      const reviewsRef = firebase.firestore().collection('reviews');
+      const reviewsRef = firebase.firestore().collection("reviews");
 
       reviewsRef.get().then((querySnapshot) => {
-        querySnapshot.forEach(snapshot => {
+        querySnapshot.forEach((snapshot) => {
           if (snapshot.data().toiletID == toilet.id) {
-            addToReviewsArray = ([...addToReviewsArray , snapshot.data()]);
+            addToReviewsArray = [...addToReviewsArray, snapshot.data()];
           }
-        }
-      )
-          setReviewsArray(addToReviewsArray);
+        });
+        setReviewsArray(addToReviewsArray);
       });
-    }
-    else {
+    } else {
       mounted.current = true;
     }
   }, [toilet]);
@@ -109,7 +106,6 @@ export default MapScreen = ({ navigation }) => {
           &key=${MAP_API_KEY}`
       )
       .then(async (response) => {
-
         await response.data.results.map((toiletData) => {
           const newToilet = {
             id: toiletData.place_id,
@@ -123,12 +119,15 @@ export default MapScreen = ({ navigation }) => {
             reviews: toiletData.user_ratings_total,
             distance: null,
             duration: null,
-            open: (toiletData.opening_hours === undefined) ? "Not Avaliable" :
-            (toiletData.opening_hours.open_now == true) ? "Open" : "Closed"
-          }
+            open:
+              toiletData.opening_hours === undefined
+                ? ""
+                : toiletData.opening_hours.open_now == true
+                ? "open now"
+                : "closed",
+          };
           fetchedToilets.push(newToilet);
         });
-
       })
       .catch((err) => console.log("Error:", err));
     Promise.all(
@@ -143,7 +142,10 @@ export default MapScreen = ({ navigation }) => {
       })
     )
       .then((result) => {
-        setState({ ...state, markers: result.sort((a, b) => (a.distance > b.distance) ? 1 : -1)})
+        setState({
+          ...state,
+          markers: result.sort((a, b) => (a.distance > b.distance ? 1 : -1)),
+        });
       })
       .catch((errorMessage) => {
         return Promise.reject(errorMessage);
@@ -209,6 +211,7 @@ export default MapScreen = ({ navigation }) => {
    */
   const onAreaSearchPress = () => {
     toiletApiFetch(state.region.latitude, state.region.longitude);
+    setState({...state, selectedToiletDest: null})
   };
 
   let mapAnimation = new Animated.Value(0);
@@ -303,8 +306,7 @@ export default MapScreen = ({ navigation }) => {
   };
 
   const onLocationButtonPress = () => {
-    if (state.userLocation != null)
-    {
+    if (state.userLocation != null) {
       _map.current.animateToRegion(
         {
           latitude: state.userLocation.latitude,
@@ -314,96 +316,139 @@ export default MapScreen = ({ navigation }) => {
         },
         350
       );
-    }
-    else{
+    } else {
       console.log("No user location given (PERMISIONS MAY NOT BE GIVEN");
     }
-  }
+  };
 
-      //Submit review on selected toilet if logged in. If not logged in, alert and do nothing.
-      const onSubmitReviewPress = () => {
-        const usersRef = firebase.firestore().collection("users");
-        const reviewsRef = firebase.firestore().collection('reviews');
-        firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-          usersRef
+  //Submit review on selected toilet if logged in. If not logged in, alert and do nothing.
+  const onSubmitReviewPress = () => {
+    const usersRef = firebase.firestore().collection("users");
+    const reviewsRef = firebase.firestore().collection("reviews");
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        usersRef
           .doc(user.uid)
           .get()
           .then((document) => {
-          const data = document.data();
+            const data = document.data();
 
-          reviewsRef.add({
-            title: review,
-            name: data.fullName,
-            address: toilet.address,
-            toiletID: toilet.id,
-            userID: data.id,
-            rating: toilet.rating,
-            })
+            reviewsRef.add({
+              title: review,
+              name: data.fullName,
+              address: toilet.address,
+              toiletID: toilet.id,
+              userID: data.id,
+              rating: toilet.rating,
+            });
 
-          setReviewsArray([...reviewsArray , {title: review, address: toilet.address, toiletID: toilet.id,
-            userID: data.id, rating: toilet.rating}]);
-        })
+            setReviewsArray([
+              ...reviewsArray,
+              {
+                title: review,
+                address: toilet.address,
+                toiletID: toilet.id,
+                userID: data.id,
+                rating: toilet.rating,
+              },
+            ]);
+          });
 
+        Alert.alert("Submission success", "Your review has been placed.");
+        this.textInput.clear();
+      } else {
         Alert.alert(
-          'Submission success',
-          'Your review has been placed.');
-          this.textInput.clear()
-        }
-        else {
-          Alert.alert(
-            'Authentication required',
-            'You must be logged in to place a review.');
-          return;
-        }
-        });
-    }
+          "Authentication required",
+          "You must be logged in to place a review."
+        );
+        return;
+      }
+    });
+  };
 
   /**
    * creates bottom sheet content
    */
   const bs = React.createRef();
   renderHeader = () => (
-    <View style={styles.panelHeader}>
-      <View style={styles.panelHandle} />
+    <View style={styles.header}>
+      {marker && marker.length && (
+        <View style={{ flexDirection: "column" }}>
+          <Text style={styles.toiletTitle}>{toilet.title}</Text>
+          <Text style={styles.toiletSubtitle}>
+            {toilet.address} ({toilet.distance} km)
+          </Text>
+        </View>
+      )}
     </View>
   );
 
   renderInner = () => (
-    <KeyboardAvoidingView style={styles.bottomPanel}
-      behavior="height">
-      {marker && marker.length && (
-        <Text
-          style={
-            styles.toiletTitle //check for null in useState otherwise crash on startup as undefined
-          }
-        >
-          {toilet.title}
-        </Text>
-      )}
+    <KeyboardAvoidingView style={styles.bottomPanel} behavior="height">
       {marker && marker.length && (
         <View>
-            <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
+          {/* contains rating number icons and review number in row direction */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              paddingTop: 10,
+              paddingHorizontal: 10
+            }}
+          >
+            <View
+              style={{ flexDirection: "row", marginVertical: 8, left: 10 }}
+            >
+              <Text style={{ color: "#777", right: 6 }}>{toilet.rating}</Text>
+              <StarRating ratings={toilet.rating} />
+              <Text style={{ color: "#777" }}>({toilet.reviews})</Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                onGetDirectionsPress();
+              }}
+            >
+              <View style={styles.directionsButton}>
+                <FontAwesome5
+                  name="directions"
+                  size={24}
+                  color="#fff"
+                  style={{ top: 6, left: 6 }}
+                />
+                <Text style={{ left: 20, top: 7, color: "#fff" }}>
+                  Directions
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              paddingHorizontal: 10
+            }}
+          >
+            <View
+              style={{ flexDirection: "row", left: 5 }}
+            >
+              <Text
+                style={[
+                  (toilet.open == "closed"
+                    ? { color: "#962d2d" }
+                    : toilet.open == "open now"
+                    ? { color: "#9fe6a0" }
+                    : {}),
+                  {fontSize: 16}
+                ]}
+              >
+                {toilet.open}
+              </Text>
+              <Text>
+
+              </Text>
+              {/* add travel duration when api call for distance is fixed */}
+            </View>
+          </View>
         </View>
-      )}
-      <View style={styles.hairline} />
-      {marker && marker.length && (
-        <TouchableOpacity onPress={() => onGetDirectionsPress()}>
-          <Text style={styles.textSubheading}>Get Directions</Text>
-        </TouchableOpacity>
-      )}
-      {marker && marker.length && (
-        <Text style={styles.textSubheading}>
-          Overall Rating: <StarRating ratings={toilet.rating} />
-        </Text>
-      )}
-      {marker && marker.length && (
-        <TouchableOpacity onPress={() => onReviewPress()}>
-          <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
-        </TouchableOpacity>
-      )}
-        {marker && marker.length && (
-        <Text style={styles.textSubheading}>Status: {toilet.open}</Text>
       )}
       <ScrollView
         horizontal
@@ -421,8 +466,7 @@ export default MapScreen = ({ navigation }) => {
         contentContainerStyle={{
           paddingRight: Platform.OS === "android" ? 20 : 0,
         }}
-      >
-      </ScrollView>
+      ></ScrollView>
       <ScrollView
         vertical
         scrollEventThrottle={1}
@@ -431,32 +475,36 @@ export default MapScreen = ({ navigation }) => {
       >
         {reviewsArray.map((item, index) => {
           return (
-          <ReviewCard
-            name={item.name}
-            title={item.title}
-            userID={item.userID}
-            key={index}
-            rating={item.rating}
-            item={item}
-            navigation={navigation}
-          />
-          )
+            <ReviewCard
+              name={item.name}
+              title={item.title}
+              userID={item.userID}
+              key={index}
+              rating={item.rating}
+              item={item}
+              navigation={navigation}
+            />
+          );
         })}
       </ScrollView>
-      <TextInput onChangeText={() => {}}
+      <TextInput
+        onChangeText={() => {}}
         style={styles.reviewTextInputContainer}
-        placeholder='Write your review here:'
+        placeholder="Write your review here:"
         placeholderTextColor="#aaaaaa"
         multiline={true}
         numberOfLines={10}
-        textAlign='left'
-        onChangeText={(userInput) => review = (userInput)}
-        ref={input => { this.textInput = input }}
+        textAlign="left"
+        onChangeText={(userInput) => (review = userInput)}
+        ref={(input) => {
+          this.textInput = input;
+        }}
         underlineColorAndroid="transparent"
       />
       <TouchableOpacity
         style={styles.reviewButton}
-        onPress={() => onSubmitReviewPress()}>
+        onPress={() => onSubmitReviewPress()}
+      >
         <Text style={styles.reviewButtonTitle}>Submit review</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
@@ -465,62 +513,66 @@ export default MapScreen = ({ navigation }) => {
   if (state.userLocation.latitude) {
     return (
       <View style={styles.container}>
-        <View style = {styles.searchContainer}>
-       <SafeAreaView style = {{ flex: 1}}>
-        <GooglePlacesAutocomplete
-          placeholder="Search"
-          listViewDisplayed="auto"
-          fetchDetails={true}
-          minLength={2}
-          debounce={200}
-          onPress={(data, details = null) => {
-            _map.current.animateToRegion(
-              {
-                latitude: details.geometry.location.lat,
-                longitude: details.geometry.location.lng,
-                latitudeDelta: 0.04,
-                longitudeDelta: 0.05,
-              },
-              350
-            );
-            toiletApiFetch(details.geometry.location.lat, details.geometry.location.lng);
-          }}
-          query={{
-            key: MAP_API_KEY,
-            language: "en",
-          }}
-          styles={{
-            textInputContainer: {
-              width: '95%',
-              position: 'absolute',
-              //borderRadius: 40,
-              padding: 10,
-              alignSelf: "center",
-              height: 40,
-            },
-            textInput: {
-              height: 40,
-              color: 'black',
-              fontSize: 16,
-              paddingLeft: 15,
-              borderRadius: 25,
-            },
-            listView: {
-              zIndex: 2,
-              width: '90%',
-              position: 'absolute',
-              marginTop: 60,
-              padding: 10,
-              alignSelf: "center",
-              backgroundColor: 'white',
-              borderRadius: 25,
-              elevation: 1,
-            },
-            separator: {
-              opacity: 0
-            },
-          }}
-        /></SafeAreaView>
+        <View style={styles.searchContainer}>
+          <SafeAreaView style={{ flex: 1 }}>
+            <GooglePlacesAutocomplete
+              placeholder="Search"
+              listViewDisplayed="auto"
+              fetchDetails={true}
+              minLength={2}
+              debounce={200}
+              onPress={(data, details = null) => {
+                _map.current.animateToRegion(
+                  {
+                    latitude: details.geometry.location.lat,
+                    longitude: details.geometry.location.lng,
+                    latitudeDelta: 0.04,
+                    longitudeDelta: 0.05,
+                  },
+                  350
+                );
+                toiletApiFetch(
+                  details.geometry.location.lat,
+                  details.geometry.location.lng
+                );
+              }}
+              query={{
+                key: MAP_API_KEY,
+                language: "en",
+              }}
+              styles={{
+                textInputContainer: {
+                  width: "95%",
+                  position: "absolute",
+                  //borderRadius: 40,
+                  padding: 10,
+                  alignSelf: "center",
+                  height: 40,
+                },
+                textInput: {
+                  height: 40,
+                  color: "black",
+                  fontSize: 16,
+                  paddingLeft: 15,
+                  borderRadius: 25,
+                },
+                listView: {
+                  zIndex: 2,
+                  width: "90%",
+                  position: "absolute",
+                  marginTop: 60,
+                  padding: 10,
+                  alignSelf: "center",
+                  backgroundColor: "white",
+                  borderRadius: 25,
+                  elevation: 1,
+                },
+                separator: {
+                  opacity: 0,
+                },
+              }}
+            />
+          </SafeAreaView>
         </View>
         <MapView
           ref={_map}
@@ -569,7 +621,6 @@ export default MapScreen = ({ navigation }) => {
               }}
               onError={(errorMessage) => {
                 console.log(errorMessage);
-                onAreaSearchPress();
               }}
             />
           )}
@@ -585,7 +636,7 @@ export default MapScreen = ({ navigation }) => {
           </TouchableOpacity>
         </Animatable.View>
         <View style={styles.buttonContainer}>
-        <TouchableOpacity
+          <TouchableOpacity
             onPress={() => {
               onLocationButtonPress();
             }}
@@ -699,7 +750,7 @@ export default MapScreen = ({ navigation }) => {
         </View>
         <BottomSheet
           ref={bs}
-          snapPoints={['32%', '0%', '96.5%']}
+          snapPoints={["25%", "0%", "101.5%"]}
           renderContent={renderInner}
           renderHeader={renderHeader}
           borderRadius={10}
