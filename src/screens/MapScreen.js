@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import * as Animatable from "react-native-animatable";
@@ -40,6 +41,7 @@ export default MapScreen = ({ navigation }) => {
   const [reviewsArray, setReviewsArray] = useState([]);
   const [toilet, setToilet] = useState(toilet);
   const [grantedPerms, setPerms] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const mounted = useRef(false);
 
   const _map = React.useRef(null);
@@ -89,10 +91,12 @@ export default MapScreen = ({ navigation }) => {
         }
       )    
           setReviewsArray(addToReviewsArray);
+          setIsLoading(false);
       });
     }
     else {
-      mounted.current = true;
+      setIsLoading(true);
+      mounted.current = true;     
     }
   }, [toilet]); 
 
@@ -279,6 +283,7 @@ export default MapScreen = ({ navigation }) => {
    */
   const onMarkerPress = (mapEventData) => {
     // get the event data on press
+    setIsLoading(true);
     const markerID = mapEventData._targetInst.return.key;
     setToilet(state.markers[markerID]);
     setMarker(markerID);
@@ -413,10 +418,12 @@ export default MapScreen = ({ navigation }) => {
         }}
         contentContainerStyle={{
           paddingRight: Platform.OS === "android" ? 20 : 0,
+          paddingVertical: 60
         }}
       >
       </ScrollView>
-      <ScrollView
+      {isLoading ? <ActivityIndicator style={styles.loading} 
+      size="large" color="#007965"/> : <ScrollView
         vertical
         scrollEventThrottle={1}
         showsVerticalScrollIndicator={true}
@@ -435,7 +442,7 @@ export default MapScreen = ({ navigation }) => {
           />
           )          
         })}
-      </ScrollView>
+      </ScrollView>}
       <TextInput onChangeText={() => {}}        
         style={styles.reviewTextInputContainer}
         placeholder='Write your review here:'

@@ -161,8 +161,8 @@ export const styles = StyleSheet.create({
     height: 30,
   },
   chipsScrollView: {
-    position: "absolute",
-    top: 20,
+    position: "relative",
+    top: 200,
     paddingHorizontal: 10,
   },
   listContainer: { 
@@ -173,11 +173,22 @@ export const styles = StyleSheet.create({
   reviewTextInputContainer: {
     position: "relative",
     top: 100,
-    left: 10,
-    marginBottom: 20,
+    marginLeft: 1,
+    marginRight: 1,
+    marginBottom: 1,
     backgroundColor: 'white',
-    textAlignVertical: 'top'
-
+    textAlignVertical: 'top',
+    //borderWidth : 1.0,
+    //borderColor: 'grey'
+  },
+  loading: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   footer: {
     position: "relative",
