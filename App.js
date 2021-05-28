@@ -12,6 +12,7 @@ import ListScreen from "./src/screens/ListScreen";
 import MapScreen from "./src/screens/MapScreen";
 import ReviewViewAndCreateScreen from './src/screens/ReviewViewAndCreateScreen';
 import DisplayReviewsScreen from './src/screens/DisplayReviewsScreen';
+import EditDeleteReviewScreen from './src/screens/EditDeleteReviewScreen';
 import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs() 
 
@@ -33,6 +34,7 @@ export default function App() {
         <Stack.Screen name="Map" component={MapScreen} />
         <Stack.Screen name="List" component={ListScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="EditDeleteReview" component={EditDeleteReviewScreen} />
         <Stack.Screen name="Registration" component={RegistrationScreen} />
         <Stack.Screen name="Account" component={AccountScreen} />
         <Stack.Screen name="ReviewViewAndCreate" component={ReviewViewAndCreateScreen} />
