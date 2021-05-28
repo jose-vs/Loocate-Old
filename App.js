@@ -1,5 +1,9 @@
 import React from "react";
-import { NavigationContainer, DarkTheme } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  DarkTheme,
+  DefaultTheme,
+} from "@react-navigation/native";
 import {
   createStackNavigator,
   TransitionPresets,
@@ -23,26 +27,31 @@ const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer theme={DarkTheme}>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          gestureEnabled: true,
-          gestureDirection: "horizontal",
-          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-        }}
-      >
-        <Stack.Screen name="Map" component={MapScreen} />
-        <Stack.Screen name="List" component={ListScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Registration" component={RegistrationScreen} />
-        <Stack.Screen name="Account" component={AccountScreen} />
-        <Stack.Screen
-          name="ReviewViewAndCreate"
-          component={ReviewViewAndCreateScreen}
-        />
-        <Stack.Screen name="DisplayReviews" component={DisplayReviewsScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <PaperProvider theme={PaperDarkTheme}>
+      <NavigationContainer theme={DarkTheme}>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            gestureEnabled: true,
+            gestureDirection: "horizontal",
+            cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+          }}
+        >
+          <Stack.Screen name="Map" component={MapScreen} />
+          <Stack.Screen name="List" component={ListScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Registration" component={RegistrationScreen} />
+          <Stack.Screen name="Account" component={AccountScreen} />
+          <Stack.Screen
+            name="ReviewViewAndCreate"
+            component={ReviewViewAndCreateScreen}
+          />
+          <Stack.Screen
+            name="DisplayReviews"
+            component={DisplayReviewsScreen}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </PaperProvider>
   );
 }
