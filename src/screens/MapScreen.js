@@ -34,15 +34,24 @@ import { firebase } from "../firebase/config";
 import MapViewDirections from "react-native-maps-directions";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import Geocoder from "react-native-geocoding";
+import { Item } from "native-base";
+import { doc } from "prettier";
 
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
   const [state, setState] = useState(initialMapState);
-  const [reviewsArray, setReviewsArray] = useState([]);
   const [toilet, setToilet] = useState(toilet);
   const [grantedPerms, setPerms] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const mounted = useRef(false);
+  const [isLoading, setIsLoading] = useState(true); //controls whether reviews are being rendered or not
+  const mounted = useRef(false); //used to determine if marker is mounted or not
+
+  //Refactor this code later, needs to be turned into one big useState
+  const [reviewsArray, setReviewsArray] = useState([]); 
+  const [editReview, setEditReview] = useState(null); //used for conditional rendering of edit textInput vs place review textInput
+  const [reviewToEdit, setReviewToEdit] = useState(null); //used in edit review process
+  const [editReviewText, setEditReviewText] = useState(null)
+
+
 
   const _map = React.useRef(null);
   Geocoder.init(MAP_API_KEY);
@@ -203,11 +212,6 @@ export default MapScreen = ({ navigation }) => {
     bs.current.snapTo(1);
   };
 
-  //Navigates to review screen and takes current toilet being accessed there to have its reviews manipulated.
-  const onReviewPress = () => {
-    navigation.navigate("ReviewViewAndCreate", toilet);
-  };
-
   /**
    * list will be updated based on the current region the
    * user is at on the map
@@ -325,44 +329,95 @@ export default MapScreen = ({ navigation }) => {
     }
   }
 
-      //Submit review on selected toilet if logged in. If not logged in, alert and do nothing.
-      const onSubmitReviewPress = () => {      
-        const usersRef = firebase.firestore().collection("users"); 
-        const reviewsRef = firebase.firestore().collection('reviews');
-        firebase.auth().onAuthStateChanged((user) => {
-        if (user) {       
-          usersRef
-          .doc(user.uid)
-          .get()
-          .then((document) => {
-          const data = document.data();
+  //Navigates to review screen and takes current toilet being accessed there to have its reviews manipulated.
+  const onReviewPress = () => {
+    navigation.navigate("ReviewViewAndCreate", toilet);
+  };
 
-          reviewsRef.add({
-            title: review,
-            name: data.fullName,
-            address: toilet.address,
-            toiletID: toilet.id,
-            userID: data.id,
-            rating: toilet.rating,
-            })
-            
-          setReviewsArray([...reviewsArray , {title: review, name: data.fullName, address: toilet.address, toiletID: toilet.id, 
-            userID: data.id, rating: toilet.rating}]); 
+  //Submit review on selected toilet if logged in. If not logged in, alert and do nothing.
+  const onSubmitReviewPress = () => {      
+    const usersRef = firebase.firestore().collection("users"); 
+    const reviewsRef = firebase.firestore().collection('reviews');
+    firebase.auth().onAuthStateChanged((user) => {
+    if (user) {       
+      usersRef
+      .doc(user.uid)
+      .get()
+      .then((document) => {
+      const data = document.data();
+
+      reviewsRef.add({
+        title: review,
+        name: data.fullName,
+        address: toilet.address,
+        toiletID: toilet.id,
+        userID: data.id,
+        rating: toilet.rating,
+        reviewID: 0,
         })
+        .then ((doc))
+        reviewsRef.update = doc.data(); //will this work I wonder...
 
-        Alert.alert(
-          'Submission success',
-          'Your review has been placed.'); 
-          this.textInput.clear()
-          return;
-        } 
-        else {
-          Alert.alert(
-            'Authentication required',
-            'You must be logged in to place a review.');  
-          return;      
+
+        
+      setReviewsArray([...reviewsArray , {title: review, name: data.fullName, address: toilet.address, toiletID: toilet.id, 
+        userID: data.id, rating: toilet.rating}]); 
+    })
+
+    Alert.alert(
+      'Submission success',
+      'Your review has been placed.'); 
+      this.textInput.clear()
+      return;
+    } 
+    else {
+      Alert.alert(
+        'Authentication required',
+        'You must be logged in to place a review.');  
+      return;      
+    }
+    });
+  }
+
+    //Update edited review text in database, then change text input back to submit review.
+    const onEditReviewPress = () => {     
+        
+      //first, update local review with the correct field
+      reviewToEdit.title = editReviewText;
+
+      //then iterate through the reviews collection till we find the matching review...
+      const reviewsRef = firebase.firestore().collection('reviews');
+
+      reviewsRef.get().then((querySnapshot) => {
+        querySnapshot.forEach(snapshot => {
+            if (snapshot.data().userID == reviewToEdit.userID){
+              var existingReview = snapshot.data(); 
+              addToReviewsArray = ([...addToReviewsArray , existingReview]);          
+            } 
         }
-        });
+      )    
+        setExistingReviewsArray(addToReviewsArray);
+      });
+
+        reviewsRef.add({
+          title: review,
+          name: data.fullName,
+          address: toilet.address,
+          toiletID: toilet.id,
+          userID: data.id,
+          rating: toilet.rating,
+          })
+          
+        setReviewsArray([...reviewsArray , {title: review, name: data.fullName, address: toilet.address, toiletID: toilet.id, 
+          userID: data.id, rating: toilet.rating}]); 
+      
+  
+      Alert.alert(
+        'Edit success',
+        'Your review has been updated.'); 
+        this.textInput.clear();
+        setEditReview(false);
+        return;   
     }
 
   /**
@@ -433,12 +488,7 @@ export default MapScreen = ({ navigation }) => {
         style={styles.listContainer}
       >   
         {reviewsArray.map((item, index) => {
-          if (!reviewsArray.length){
-            Alert.alert(
-              'No reviews found',
-              'Be the first to place a review for this toilet!'); 
-            <Text>No reviews yet. Be the first to place one for this toilet!</Text>
-          }
+          editedReview = item;
           return (
           <ReviewCard
             name={item.name}                   
@@ -447,12 +497,23 @@ export default MapScreen = ({ navigation }) => {
             key={index}
             rating={item.rating}  
             item={item}  
-            navigation={navigation}             
+            navigation={navigation} 
+            setEditReview={setEditReview}
+            setReviewToEdit={setReviewToEdit}  
+            setEditReviewText={setEditReviewText}
           />
           )          
         })}
-      </ScrollView>}
-      <TextInput onChangeText={() => {}}        
+      </ScrollView>} 
+      {editReview ? <TextInput       
+        style={styles.reviewTextInputContainer}
+        multiline={true}        
+        numberOfLines={10}
+        textAlign='left'
+        onChangeText={setEditReviewText}
+        value = {editReviewText}  
+        ref={input => { this.textInput = input }} 
+        underlineColorAndroid="transparent"/> : <TextInput onChangeText={() => {}}       
         style={styles.reviewTextInputContainer}
         placeholder='Write your review here:'
         placeholderTextColor="#aaaaaa"
@@ -462,15 +523,18 @@ export default MapScreen = ({ navigation }) => {
         onChangeText={(userInput) => review = (userInput)}
         ref={input => { this.textInput = input }} 
         underlineColorAndroid="transparent"
-      />     
-      <TouchableOpacity
+      />}    
+      {editReview ? <TouchableOpacity
+        style={styles.reviewButton}
+        onPress={() => onEditReviewPress()}> 
+        <Text style={styles.reviewButtonTitle}>Edit Review</Text>    
+      </TouchableOpacity> : <TouchableOpacity
         style={styles.reviewButton}
         onPress={() => onSubmitReviewPress()}> 
         <Text style={styles.reviewButtonTitle}>Submit review</Text>    
-      </TouchableOpacity> 
+      </TouchableOpacity>}     
     </KeyboardAvoidingView>
   );
-
 
   if (state.userLocation.latitude) {
     return (

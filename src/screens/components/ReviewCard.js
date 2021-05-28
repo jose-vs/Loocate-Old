@@ -39,10 +39,10 @@ export default ReviewCard = (props) => {
             <Text><StarRating rating={props.rating}/>{props.rating}</Text>  
             <Text numberOfLine={1} style = {styles.listAddress}>{props.title}</Text>        
             {isLoggedIn ? <TouchableOpacity
-                onPress={() => {props.navigation.navigate("ReviewViewAndCreate", props.item)}}>
+                onPress={() => {props.setEditReview(true), props.setReviewToEdit(props.item), props.setEditReviewText(props.item.title)}}> 
                     <Entypo
                     style={{position: "relative", bottom: 0, marginLeft: 280, marginRight: 0}}
-                    name="trash"
+                    name="pencil"
                     size={30}
                     color="grey"               
                     /> 
@@ -52,7 +52,7 @@ export default ReviewCard = (props) => {
                     <Entypo
                     style={{position: "relative", bottom: 0, marginLeft: 240, marginRight: 0, marginVertical: -30, 
                     marginHorizontal: 10}}
-                    name="pencil"
+                    name="trash"
                     size={30}
                     color="grey"               
                     /> 
