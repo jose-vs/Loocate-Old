@@ -39,7 +39,6 @@ export default MapScreen = ({ navigation }) => {
   const [state, setState] = useState(initialMapState);
   const [reviewsArray, setReviewsArray] = useState([]);
   const [toilet, setToilet] = useState(toilet);
-  const [showDirectionsButton, setDirectionsButton] = useState(false);
   const [grantedPerms, setPerms] = useState(null);
   const mounted = useRef(false);
 
@@ -68,9 +67,13 @@ export default MapScreen = ({ navigation }) => {
           longitude: location.coords.longitude,
         },
       });
+<<<<<<< HEAD
 
       toiletApiFetch(location.coords.latitude, location.coords.longitude)
 
+=======
+      toiletApiFetch(location.coords.latitude, location.coords.longitude)
+>>>>>>> parent of 8275566 (redesign toilet bottomsheet)
 
       setPerms(true);
     })();
@@ -144,10 +147,7 @@ export default MapScreen = ({ navigation }) => {
       })
     )
       .then((result) => {
-        setState({
-          ...state,
-          markers: result.sort((a, b) => (a.distance > b.distance ? 1 : -1)),
-        });
+        setState({ ...state, markers: result.sort((a, b) => (a.distance > b.distance) ? 1 : -1)})  
       })
       .catch((errorMessage) => {
         return Promise.reject(errorMessage);
@@ -171,9 +171,7 @@ export default MapScreen = ({ navigation }) => {
           address: toilet.address,
           rating: toilet.rating,
           reviews: toilet.reviews,
-          distance:
-            Math.floor(response.data.rows[0].elements[0].distance.value * 10) /
-            10000,
+          distance: response.data.rows[0].elements[0].distance.value / 1000,
           duration: response.data.rows[0].elements[0].duration.value / 60,
           open: toilet.open,
         });
@@ -201,7 +199,7 @@ export default MapScreen = ({ navigation }) => {
    */
   const onGetDirectionsPress = () => {
     setState({ ...state, selectedToiletDest: toilet.coordinate });
-    bs.current.snapTo(0);
+    bs.current.snapTo(1);
   };
 
   //Navigates to review screen and takes current toilet being accessed there to have its reviews manipulated.
@@ -291,7 +289,7 @@ export default MapScreen = ({ navigation }) => {
     const markerID = mapEventData._targetInst.return.key;
     setToilet(state.markers[markerID]);
     setMarker(markerID);
-    bs.current.snapTo(1);
+    bs.current.snapTo(0);
   };
 
   /**
@@ -370,44 +368,40 @@ export default MapScreen = ({ navigation }) => {
    */
   const bs = React.createRef();
   renderHeader = () => (
-    <View style={styles.header}>
-      {marker && marker.length && (
-        <View style={{ flexDirection: "column" }}>
-          <Text style={styles.toiletTitle}>{toilet.title}</Text>
-          <Text style={styles.toiletSubtitle}>
-            {toilet.address} ({toilet.distance} km)
-          </Text>
-        </View>
-      )}
+    <View style={styles.panelHeader}>
+      <View style={styles.panelHandle} />
     </View>
   );
 
   renderInner = () => (
-
-    // add ratings and review number with directions button in the same line
-
     <View style={styles.bottomPanel}>
       {marker && marker.length && (
-        <View style={styles.bottomPanel}>
-          <TouchableOpacity
-            onPress={() => {
-              onGetDirectionsPress();
-            }}
-          >
-            <View style={styles.directionsButton}>
-              <FontAwesome5
-                name="directions"
-                size={24}
-                color="black"
-                style={{ top: 6, left: 6, opacity: 0.6 }}
-              />
-              <Text styles={{ paddingLeft: 6 }}>directions</Text>
-            </View>
-          </TouchableOpacity>
-          <Text style={styles.textSubheading}>
-            Rating: <StarRating ratings={toilet.rating} />
-          </Text>
-        </View>
+        <Text
+          style={
+            styles.toiletTitle //check for null in useState otherwise crash on startup as undefined
+          }
+        >
+          {toilet.title}
+        </Text>
+      )}
+      {marker && marker.length && (
+        <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
+      )}
+      <View style={styles.hairline} />
+      {marker && marker.length && (
+        <TouchableOpacity onPress={() => onGetDirectionsPress()}>
+          <Text style={styles.textSubheading}>Get Directions</Text>
+        </TouchableOpacity>
+      )}
+      {marker && marker.length && (
+        <Text style={styles.textSubheading}>
+          Rating: <StarRating ratings={toilet.rating} />
+        </Text>
+      )}
+      {marker && marker.length && (
+        <TouchableOpacity onPress={() => onReviewPress()}>
+          <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
+        </TouchableOpacity>
       )}
         {marker && marker.length && (
         <Text style={styles.textSubheading}>Status: {toilet.open}</Text>
@@ -552,6 +546,7 @@ export default MapScreen = ({ navigation }) => {
             setState({ ...state, region: region })
           }
         >
+<<<<<<< HEAD
           {state.selectedToiletDest.latitude && (
             <MapViewDirections
               origin={state.userLocation}
@@ -579,6 +574,35 @@ export default MapScreen = ({ navigation }) => {
               }}
             />
           )}
+=======
+          {state.selectedToiletDest.latitude && 
+          <MapViewDirections
+            origin={state.userLocation}
+            destination={state.selectedToiletDest}
+            apikey={MAP_API_KEY}
+            strokeWidth={5}
+            strokeColor="#00ced1"
+            optimizeWaypoints={true}
+            mode={state.mode}
+            onReady={(result) => {
+              toilet.distance = result.distance;
+              toilet.duration = result.duration;
+              console.log(toilet);
+              _map.current.fitToCoordinates(result.coordinates, {
+                edgePadding: {
+                  right: width / 20,
+                  bottom: height / 20,
+                  left: width / 20,
+                  top: height / 20,
+                },
+              });
+            }}
+            onError={(errorMessage) => {
+              console.log(errorMessage);
+            }}
+          />}
+
+>>>>>>> parent of 8275566 (redesign toilet bottomsheet)
           <RenderMarkers />
         </MapView>
         <Animatable.View style={styles.searchHere} animation="fadeInLeft">
@@ -705,10 +729,15 @@ export default MapScreen = ({ navigation }) => {
         </View>
         <BottomSheet
           ref={bs}
+<<<<<<< HEAD
           snapPoints={['32%', '0%', '96.5%']}
+=======
+          snapPoints={[320, 0]}
+>>>>>>> parent of 8275566 (redesign toilet bottomsheet)
           renderContent={renderInner}
           renderHeader={renderHeader}
-          initialSnap={0}
+          borderRadius={10}
+          initialSnap={1}
           borderRadius={10}
           enabledGestureInteraction={true}
           enabledContentTapInteraction={false} //this line needed to be added to make markers in bottomsheet respond to onpress
