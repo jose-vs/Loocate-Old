@@ -24,8 +24,7 @@ export const styles = StyleSheet.create({
   }, 
   textInput: {
     position: "absolute",
-    //backgroundColor: "red",
-    height: 44,
+    height: -25,
     borderRadius: 5,
     paddingVertical: 30,
     paddingHorizontal: 10,
@@ -161,6 +160,25 @@ export const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
+  chipsScrollView: {
+    position: "absolute",
+    top: 20,
+    paddingHorizontal: 10,
+  },
+  listContainer: { 
+    position: "relative",
+    top: 20,
+    marginBottom: -100
+  },
+  reviewTextInputContainer: {
+    position: "relative",
+    top: 100,
+    left: 10,
+    marginBottom: 30,
+    backgroundColor: 'white',
+    textAlignVertical: 'top'
+
+  },
   footer: {
     position: "relative",
     flexDirection: "row",
@@ -186,6 +204,22 @@ export const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: "center",
     justifyContent: "center",
+  },
+  reviewButton: {
+    //using for directions screen
+    backgroundColor: "#007965",
+    marginLeft: 80,
+    marginRight: 80,
+    marginTop: 30,
+    marginBottom: 5,
+    height: 25,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  reviewButtonTitle: {
+    color: "white",
+    fontWeight: "bold",
   },
   icon: {
     top: 200,

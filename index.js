@@ -5,6 +5,7 @@ export { default as MapScreen } from './src/screens/MapScreen'
 export { default as RegistrationScreen } from './src/screens/RegistrationScreen'
 export { default as ReviewViewAndCreateSceen } from './src/screens/ReviewViewAndCreateScreen'
 export { default as DisplayReviewsScreen} from './src/screens/DisplayReviewsScreen'
+export { default as EditDeleteReviewScreen} from './src/screens/EditDeleteReviewScreen'
 import App from './App';
 import _ from 'lodash';
 

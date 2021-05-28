@@ -3,11 +3,11 @@ import { StyleSheet } from "react-native";
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#fffa",
   },
   searchBox: {
     position: "absolute",
-    marginTop: 50,
+    marginTop: 35,
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: "#fff",
@@ -21,6 +21,16 @@ export default StyleSheet.create({
     shadowRadius: 5,
     elevation: 1,
   },
+  placeNewReviewButton: {
+    position: "absolute",
+    marginTop: 80,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "120%",
+    alignSelf: "center",
+    borderRadius: 25,
+    padding: 10,
+  },
   searchBoxText: {
     paddingLeft: 8,
     paddingRight: 8,
@@ -30,9 +40,7 @@ export default StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 10,
     paddingLeft: 15,
-    backgroundColor: "#fff",
-    borderTopWidth: 2,
-    borderTopColor: "#eee"
+    backgroundColor: "#FFF",
   },
   chipsScrollView: {
     position: "absolute",
@@ -90,13 +98,26 @@ export default StyleSheet.create({
     padding: 10
   },
   appButtonContainer: {
-    width: 120,
+    width: 225,
     elevation: 8,
     backgroundColor: "#009688",
     borderRadius: 15,
     alignSelf: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 20,
+    paddingHorizontal: 24,
+    bottom: '0%',
+    right: '-140%'
+ 
+  },
+  newReviewButtonList: {
+    width: 215,
+    elevation: 8,
+    backgroundColor: "#009688",
+    borderRadius: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    marginLeft: 95,
+    marginRight: 70,
   },
   appButtonContainerTwo: {
     width: 120,
@@ -119,7 +140,7 @@ export default StyleSheet.create({
     bottom: '-5%'
   },
   appButtonText: {
-    fontSize: 10,
+    fontSize: 17,
     color: "#fff",
     alignSelf: 'center',
     fontWeight: "bold",

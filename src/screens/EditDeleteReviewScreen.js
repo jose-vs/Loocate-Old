@@ -5,10 +5,9 @@ import { firebase } from "../firebase/config";
 import { TextInput } from 'react-native-paper';
 import { StackActions } from '@react-navigation/native';
 
-export default function ReviewViewAndCreateScreen({ route, navigation }) {
+export default function EditDeleteReviewScreen({ route, navigation }) {
   
-  var review = (''); 
-  const [existingReviewsArray, setExistingReviewsArray] = useState([]);
+ // const [review, setReview] = useState([]);
   const usersRef = firebase.firestore().collection("users"); 
   const reviewsRef = firebase.firestore().collection('reviews');
   const popAction = StackActions.pop(1); //go back one screen in stack (number represents how many screens to go back by)

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Animated,
   Text,
@@ -8,6 +8,8 @@ import {
   Image,
   Dimensions,
   SafeAreaView,
+  KeyboardAvoidingView,
+  Alert,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import * as Animatable from "react-native-animatable";
@@ -18,6 +20,7 @@ import {
   FontAwesome5,
 } from "@expo/vector-icons";
 import { MAP_API_KEY } from "@env";
+import { ScrollView } from "react-native-gesture-handler";
 import toiletApi from "../../api/googlePlaces";
 import distanceMatrixApi from "../../api/distanceMatrixApi";
 import { initialMapState, toilet } from "./model/MapData";
@@ -34,8 +37,10 @@ import Geocoder from "react-native-geocoding";
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
   const [state, setState] = useState(initialMapState);
+  const [reviewsArray, setReviewsArray] = useState([]);
   const [toilet, setToilet] = useState(toilet);
   const [grantedPerms, setPerms] = useState(null);
+  const mounted = useRef(false);
 
   const _map = React.useRef(null);
   Geocoder.init(MAP_API_KEY);
@@ -62,11 +67,34 @@ export default MapScreen = ({ navigation }) => {
           longitude: location.coords.longitude,
         },
       });
+
       toiletApiFetch(location.coords.latitude, location.coords.longitude)
+
 
       setPerms(true);
     })();
   }, []);
+
+  //triggers on setToilet which only happens on marker press, retrieves toilet reviews
+  useEffect(() => {
+    if (mounted.current) {
+      var addToReviewsArray = [];
+      const reviewsRef = firebase.firestore().collection('reviews');
+
+      reviewsRef.get().then((querySnapshot) => {
+        querySnapshot.forEach(snapshot => {
+          if (snapshot.data().toiletID == toilet.id) {
+            addToReviewsArray = ([...addToReviewsArray , snapshot.data()]);
+          }
+        }
+      )
+          setReviewsArray(addToReviewsArray);
+      });
+    }
+    else {
+      mounted.current = true;
+    }
+  }, [toilet]);
 
   toiletApiFetch = async (lat, lng) => {
     const fetchedToilets = [];
@@ -95,11 +123,12 @@ export default MapScreen = ({ navigation }) => {
             reviews: toiletData.user_ratings_total,
             distance: null,
             duration: null,
-            open: (toiletData.opening_hours === undefined) ? "Not Avaliable" : 
+            open: (toiletData.opening_hours === undefined) ? "Not Avaliable" :
             (toiletData.opening_hours.open_now == true) ? "Open" : "Closed"
           }
           fetchedToilets.push(newToilet);
         });
+
       })
       .catch((err) => console.log("Error:", err));
     Promise.all(
@@ -114,7 +143,7 @@ export default MapScreen = ({ navigation }) => {
       })
     )
       .then((result) => {
-        setState({ ...state, markers: result.sort((a, b) => (a.distance > b.distance) ? 1 : -1)})  
+        setState({ ...state, markers: result.sort((a, b) => (a.distance > b.distance) ? 1 : -1)})
       })
       .catch((errorMessage) => {
         return Promise.reject(errorMessage);
@@ -152,15 +181,7 @@ export default MapScreen = ({ navigation }) => {
     //if there is a user logged in, retrieve them and skip having to go through login screen again
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        //if user is signed in
-        const usersRef = firebase.firestore().collection("users"); //get user collection from firestore
-        usersRef //call the database of user data (NOT the users in auth())
-          .doc(user.uid)
-          .get()
-          .then((document) => {
-            const data = document.data(); //this is the specific data (not userAuth, but the data I made in the users collection) of the user
-            navigation.navigate("Account", { user: data }); //revisit this later, accessing data on account screen is of issue
-          });
+        navigation.navigate("Account");
       } else {
         navigation.navigate("Login");
       }
@@ -299,6 +320,45 @@ export default MapScreen = ({ navigation }) => {
     }
   }
 
+      //Submit review on selected toilet if logged in. If not logged in, alert and do nothing.
+      const onSubmitReviewPress = () => {
+        const usersRef = firebase.firestore().collection("users");
+        const reviewsRef = firebase.firestore().collection('reviews');
+        firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          usersRef
+          .doc(user.uid)
+          .get()
+          .then((document) => {
+          const data = document.data();
+
+          reviewsRef.add({
+            title: review,
+            name: data.fullName,
+            address: toilet.address,
+            toiletID: toilet.id,
+            userID: data.id,
+            rating: toilet.rating,
+            })
+
+          setReviewsArray([...reviewsArray , {title: review, address: toilet.address, toiletID: toilet.id,
+            userID: data.id, rating: toilet.rating}]);
+        })
+
+        Alert.alert(
+          'Submission success',
+          'Your review has been placed.');
+          this.textInput.clear()
+        }
+        else {
+          Alert.alert(
+            'Authentication required',
+            'You must be logged in to place a review.');
+          return;
+        }
+        });
+    }
+
   /**
    * creates bottom sheet content
    */
@@ -310,7 +370,8 @@ export default MapScreen = ({ navigation }) => {
   );
 
   renderInner = () => (
-    <View style={styles.bottomPanel}>
+    <KeyboardAvoidingView style={styles.bottomPanel}
+      behavior="height">
       {marker && marker.length && (
         <Text
           style={
@@ -333,7 +394,7 @@ export default MapScreen = ({ navigation }) => {
       )}
       {marker && marker.length && (
         <Text style={styles.textSubheading}>
-          Rating: <StarRating ratings={toilet.rating} />
+          Overall Rating: <StarRating ratings={toilet.rating} />
         </Text>
       )}
       {marker && marker.length && (
@@ -341,16 +402,67 @@ export default MapScreen = ({ navigation }) => {
           <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
         </TouchableOpacity>
       )}
-        {marker && marker.length && (
-        <Text style={styles.textSubheading}>Status: {toilet.open}</Text>
-      )}
-    </View>
+      <ScrollView
+        horizontal
+        scrollEventThrottle={1}
+        showsHorizontalScrollIndicator={false}
+        height={80}
+        style={styles.chipsScrollView}
+        contentInset={{
+          // iOS only
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 20,
+        }}
+        contentContainerStyle={{
+          paddingRight: Platform.OS === "android" ? 20 : 0,
+        }}
+      >
+      </ScrollView>
+      <ScrollView
+        vertical
+        scrollEventThrottle={1}
+        showsVerticalScrollIndicator={true}
+        style={styles.listContainer}
+      >
+        {reviewsArray.map((item, index) => {
+          return (
+          <ReviewCard
+            name={item.name}
+            title={item.title}
+            userID={item.userID}
+            key={index}
+            rating={item.rating}
+            item={item}
+            navigation={navigation}
+          />
+          )
+        })}
+      </ScrollView>
+      <TextInput onChangeText={() => {}}
+        style={styles.reviewTextInputContainer}
+        placeholder='Write your review here:'
+        placeholderTextColor="#aaaaaa"
+        multiline={true}
+        numberOfLines={10}
+        textAlign='left'
+        onChangeText={(userInput) => review = (userInput)}
+        ref={input => { this.textInput = input }}
+        underlineColorAndroid="transparent"
+      />
+      <TouchableOpacity
+        style={styles.reviewButton}
+        onPress={() => onSubmitReviewPress()}>
+        <Text style={styles.reviewButtonTitle}>Submit review</Text>
+      </TouchableOpacity>
+    </KeyboardAvoidingView>
   );
 
   if (state.userLocation.latitude) {
     return (
       <View style={styles.container}>
-        <View style = {styles.searchContainer}> 
+        <View style = {styles.searchContainer}>
        <SafeAreaView style = {{ flex: 1}}>
         <GooglePlacesAutocomplete
           placeholder="Search"
@@ -584,7 +696,7 @@ export default MapScreen = ({ navigation }) => {
         </View>
         <BottomSheet
           ref={bs}
-          snapPoints={[320, 0]}
+          snapPoints={['32%', '0%', '96.5%']}
           renderContent={renderInner}
           renderHeader={renderHeader}
           borderRadius={10}
