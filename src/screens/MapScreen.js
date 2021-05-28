@@ -646,8 +646,8 @@ export default MapScreen = ({ navigation }) => {
               optimizeWaypoints={true}
               mode={state.mode}
               onReady={(result) => {
-                toilet.distance = result.distance;
-                toilet.duration = result.duration;
+                toilet.distance = Math.round(result.distance * 100) / 100;
+                toilet.duration = Math.round(result.duration * 100) / 100;
                 console.log(toilet);
                 _map.current.fitToCoordinates(result.coordinates, {
                   edgePadding: {
@@ -789,7 +789,7 @@ export default MapScreen = ({ navigation }) => {
         </View>
         <BottomSheet
           ref={bs}
-          snapPoints={["25%", "0%", "101.5%"]}
+          snapPoints={["30%", "0%", "101.5%"]}
           renderContent={renderInner}
           renderHeader={renderHeader}
           borderRadius={10}
