@@ -1,4 +1,4 @@
-import React, { useState, useEffect, } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Image, Text, ActivityIndicator, TouchableOpacity, View, Alert } from "react-native";
 import styles from "./model/AccountStyles.js";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -9,10 +9,10 @@ export default function AccountScreen({navigation }) {
   const [existingReviewsArray, setExistingReviewsArray] = useState([]);
   const [userId, setUserId] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const reviewsFetched = useRef(false);
 
   // Create a useEffect [with no dependencies] that runs once to get the userId
-  useEffect(() => {
-    
+  useEffect(() => {   
     firebase.auth().onAuthStateChanged((user) => {
       const usersRef = firebase.firestore().collection("users");
       usersRef
@@ -40,10 +40,18 @@ export default function AccountScreen({navigation }) {
           } 
       }
     )    
-      setExistingReviewsArray(addToReviewsArray);
-      setIsLoading(false);
+      setExistingReviewsArray(addToReviewsArray);      
+      reviewsFetched.current = true;
     });
+    
   }, [userId]); 
+
+  useEffect(() => {
+    if (reviewsFetched.current == true)
+    {
+      setIsLoading(false);
+    }
+  }, [reviewsFetched.current])
 
   const onLogOutPress = () => {    
     firebase.auth().signOut()
@@ -68,7 +76,8 @@ export default function AccountScreen({navigation }) {
 
   return (
     <View style={styles.container}>
-      {isLoading ? <ActivityIndicator /> : <KeyboardAwareScrollView
+      {isLoading ? <ActivityIndicator style={styles.loading} 
+      size="large" color="white"/> : <KeyboardAwareScrollView
         style={{ flex: 1, width: "100%" }}
         keyboardShouldPersistTaps="always">
         <Image
