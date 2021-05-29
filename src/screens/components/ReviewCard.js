@@ -58,7 +58,6 @@ export default ReviewCard = (props) => {
                     /> 
             </TouchableOpacity> : null}                 
            </View>
-            <View style={styles.hairline}/>
         </View>
     )
 }    

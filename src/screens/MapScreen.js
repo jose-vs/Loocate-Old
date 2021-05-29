@@ -45,7 +45,7 @@ export default MapScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true); //controls whether reviews are being rendered or not
   const mounted = useRef(false); //used to determine if marker is mounted or not
 
-  //Refactor this code later, needs to be turned into one big useState
+  //Refactor this code later, should probably be added into one big useState or maybe added to the one above...will see
   const [reviewsArray, setReviewsArray] = useState([]); 
   const [editReview, setEditReview] = useState(null); //used for conditional rendering of edit textInput vs place review textInput
   const [reviewToEdit, setReviewToEdit] = useState(null); //used in edit review process
@@ -345,23 +345,22 @@ export default MapScreen = ({ navigation }) => {
       .get()
       .then((document) => {
       const data = document.data();
-
-      reviewsRef.add({
+        
+      //get reviews db, create blank doc, get its id, add the following fields to that new doc via set
+      const reviewsRef = firebase.firestore().collection('reviews')
+      const id = firebase.firestore().collection('reviews').doc().id
+      firebase.firestore().collection('reviews').doc(id).set({
         title: review,
         name: data.fullName,
         address: toilet.address,
         toiletID: toilet.id,
         userID: data.id,
         rating: toilet.rating,
-        reviewID: 0,
-        })
-        .then ((doc))
-        reviewsRef.update = doc.data(); //will this work I wonder...
-
-
-        
+        reviewID: id,
+      })
+            
       setReviewsArray([...reviewsArray , {title: review, name: data.fullName, address: toilet.address, toiletID: toilet.id, 
-        userID: data.id, rating: toilet.rating}]); 
+        userID: data.id, reviewID: id, rating: toilet.rating}]); 
     })
 
     Alert.alert(
@@ -379,46 +378,36 @@ export default MapScreen = ({ navigation }) => {
     });
   }
 
-    //Update edited review text in database, then change text input back to submit review.
-    const onEditReviewPress = () => {     
-        
-      //first, update local review with the correct field
-      reviewToEdit.title = editReviewText;
-
-      //then iterate through the reviews collection till we find the matching review...
-      const reviewsRef = firebase.firestore().collection('reviews');
-
-      reviewsRef.get().then((querySnapshot) => {
-        querySnapshot.forEach(snapshot => {
-            if (snapshot.data().userID == reviewToEdit.userID){
-              var existingReview = snapshot.data(); 
-              addToReviewsArray = ([...addToReviewsArray , existingReview]);          
-            } 
-        }
-      )    
-        setExistingReviewsArray(addToReviewsArray);
-      });
-
-        reviewsRef.add({
-          title: review,
-          name: data.fullName,
-          address: toilet.address,
-          toiletID: toilet.id,
-          userID: data.id,
-          rating: toilet.rating,
-          })
-          
-        setReviewsArray([...reviewsArray , {title: review, name: data.fullName, address: toilet.address, toiletID: toilet.id, 
-          userID: data.id, rating: toilet.rating}]); 
+  //Update edited review text in database, then change text input back to submit review.
+  const onEditReviewPress = () => { 
       
-  
-      Alert.alert(
-        'Edit success',
-        'Your review has been updated.'); 
-        this.textInput.clear();
-        setEditReview(false);
-        return;   
-    }
+    //set temp array to initial value of reviewsArray at time of button press
+    var addToReviewsArray = [reviewsArray];
+    
+    //first, update local review with the correct field
+    reviewToEdit.title = editReviewText;
+
+    //then iterate through the reviews collection till we find the matching review, and update title field with editReviewText
+    const reviewsRef = firebase.firestore().collection('reviews');
+    reviewsRef.get().then((querySnapshot) => {
+      querySnapshot.forEach(snapshot => {
+          if (snapshot.data().reviewID == reviewToEdit.reviewID){
+            reviewsRef.doc(snapshot.data().reviewID).update({
+              "title": reviewToEdit.title,
+            })
+            //add updated review to local array..
+            setReviewsArray([...reviewsArray , reviewToEdit]);          
+          } 
+      }
+    )});
+
+    Alert.alert(
+      'Edit success',
+      'Your review has been updated.'); 
+      this.textInput.clear();
+      setEditReview(false);
+      return;   
+  }
 
   /**
    * creates bottom sheet content
@@ -461,24 +450,7 @@ export default MapScreen = ({ navigation }) => {
           <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
         </TouchableOpacity>
       )} 
-      <ScrollView
-        horizontal
-        scrollEventThrottle={1}
-        showsHorizontalScrollIndicator={false}
-        height={80}
-        style={styles.chipsScrollView}
-        contentInset={{
-          // iOS only
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 20,
-        }}
-        contentContainerStyle={{
-          paddingRight: Platform.OS === "android" ? 20 : 0,
-          paddingVertical: 60
-        }}
-      >
+      <ScrollView>
       </ScrollView>
       {isLoading ? <ActivityIndicator style={styles.loading} 
       size="large" color="#007965"/> : <ScrollView
@@ -486,6 +458,9 @@ export default MapScreen = ({ navigation }) => {
         scrollEventThrottle={1}
         showsVerticalScrollIndicator={true}
         style={styles.listContainer}
+        contentContainerStyle={{
+          paddingBottom: 60
+        }}
       >   
         {reviewsArray.map((item, index) => {
           editedReview = item;

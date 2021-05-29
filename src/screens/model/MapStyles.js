@@ -167,7 +167,7 @@ export const styles = StyleSheet.create({
   },
   listContainer: { 
     position: "relative",
-    top: 20,
+    top: 10,
     marginBottom: -150
   },
   reviewTextInputContainer: {
@@ -219,8 +219,8 @@ export const styles = StyleSheet.create({
   reviewButton: {
     //using for directions screen
     backgroundColor: "#007965",
-    marginLeft: 80,
-    marginRight: 80,
+    marginLeft: 100,
+    marginRight: 100,
     marginTop: 30,
     marginBottom: 5,
     height: 25,
