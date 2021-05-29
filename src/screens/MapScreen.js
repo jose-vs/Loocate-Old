@@ -194,16 +194,8 @@ const mapDarkStyle = [
   },
 ];
 
-// const mapLightStyle = [
-//   {
-//     elementTyle: "labels.icons",
-//     stylers: [
-//       {
-//         visability: "off",
-//       },
-//     ],
-//   },
-// ];
+/* mapLightStyle is needed to be empty*/
+const mapLightStyle = [];
 
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
@@ -671,7 +663,9 @@ export default MapScreen = ({ navigation }) => {
               if (state.customMapStyle == null) {
                 setState({ ...state, customMapStyle: mapDarkStyle });
               } else if (state.customMapStyle == mapDarkStyle) {
-                setState({ ...state, customMapStyle: null });
+                setState({ ...state, customMapStyle: mapLightStyle });
+              } else if (state.customMapStyle == mapLightStyle) {
+                setState({ ...state, customMapStyle: mapDarkStyle });
               }
             }}
           >
