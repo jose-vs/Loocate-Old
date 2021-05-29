@@ -12,7 +12,8 @@ export default StyleSheet.create({
     height: 130,
     width: 110,
     alignSelf: "center",
-    margin: 30,
+    marginTop: 60,
+    marginBottom: 60,
   },
   button: { //using for log out
     backgroundColor: "red",
@@ -34,7 +35,7 @@ export default StyleSheet.create({
     justifyContent: 'center'
   },
   buttonTwo: { //using for view reviews
-    backgroundColor: "#788eec",
+    backgroundColor: "#007965",
     marginLeft: 30,
     marginRight: 30,
     marginTop: 30,
@@ -49,9 +50,23 @@ export default StyleSheet.create({
     fontWeight: "bold",
   },
   titleText: {
-    marginTop: -30,
+    marginTop: -55,
     fontSize: 25,
     textAlign:"center",
     color: "white",
+  },
+  footer: {
+    // needs changing as the footer box is visible when navigating
+    // to other screens
+    position: "relative",
+    flexDirection: "row",
+    alignSelf: "stretch",
+    backgroundColor: "#007965",
+    padding: 20,
+    marginBottom: 165,
+    marginTop: 165,
+  },
+  footerButton: {
+    paddingHorizontal: 50,
   },
 });

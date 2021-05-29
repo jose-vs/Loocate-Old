@@ -34,8 +34,7 @@ import { firebase } from "../firebase/config";
 import MapViewDirections from "react-native-maps-directions";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import Geocoder from "react-native-geocoding";
-import { Item } from "native-base";
-import { doc } from "prettier";
+import ReviewCard from "./components/ReviewCard";
 
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");

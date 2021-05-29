@@ -1,7 +1,7 @@
 import { TextInput, Text, Alert, TouchableOpacity, View, ScrollView, KeyboardAvoidingView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { FontAwesome, Entypo, Ionicons } from "@expo/vector-icons";
-import ReviewCard from "./components/ReviewCard";
+import AccountCard from "./components/AccountCard";
 import styles from "./model/ListStylesTwo";
 import { firebase } from "../firebase/config";
 
@@ -13,49 +13,46 @@ export default function DisplayReviewsScreen({ route, navigation }) {
   //use the map in the reviewcard section to iterate through these and display them on the cards, similar to listscreen.
 
 const [reviewsArray, setReviewsArray] = useState(route.params);
-const [editReview, setEditReview] = useState(null); //used for conditional rendering of edit textInput vs place review textInput
-const [reviewToEdit, setReviewToEdit] = useState(null); //used in edit review process
-const [editReviewText, setEditReviewText] = useState(null)
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior="height">
+    <KeyboardAvoidingView 
+      style={styles.container} behavior="height">
       <ScrollView>
       </ScrollView>
+      <Text 
+        style={styles.superTitleText}>
+        Your Reviews
+      </Text>
+      <Entypo
+        style={styles.book}
+        name="book"
+        size={100}
+        color="white"               
+        /> 
       <ScrollView
         vertical
         scrollEventThrottle={1}
         showsVerticalScrollIndicator={true}
         style={styles.listContainer}
         contentContainerStyle={{
-          paddingBottom: 60
+          paddingBottom: 165,
         }}
       >   
         {reviewsArray.map((item, index) => {
           editedReview = item;
           return (
-          <ReviewCard
-            name={item.name}                   
-            title={item.title}  
-            userID={item.userID}
-            key={index}
-            rating={item.rating}  
-            item={item}  
-            navigation={navigation} 
-            setEditReview={setEditReview}
-            setReviewToEdit={setReviewToEdit}  
-            setEditReviewText={setEditReviewText}
+          <AccountCard
+              name={item.name}                   
+              title={item.title}  
+              userID={item.userID}
+              key={index}
+              rating={item.rating}  
+              item={item}  
+              address={item.address}
+              navigation={navigation} 
           />
           )          
         })}
-        <TextInput       
-        style={styles.reviewTextInputContainer}
-        multiline={true}        
-        numberOfLines={10}
-        textAlign='left'
-        onChangeText={setEditReviewText}
-        value = {editReviewText}  
-        ref={input => { this.textInput = input }} 
-        underlineColorAndroid="transparent"/>
       </ScrollView>
 
       {/* FOOTER */}
