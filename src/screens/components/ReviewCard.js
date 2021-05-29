@@ -46,8 +46,10 @@ export default ReviewCard = (props) => {
                     size={30}
                     color="grey"               
                     /> 
-            </TouchableOpacity> : null}
-            {isLoggedIn ? <TouchableOpacity
+            </TouchableOpacity> : null}              
+           </View>
+        </View>
+        /*            {isLoggedIn ? <TouchableOpacity
                 onPress={() => {props.navigation.navigate("ReviewViewAndCreate", props.item)}}>
                     <Entypo
                     style={{position: "relative", bottom: 0, marginLeft: 240, marginRight: 0, marginVertical: -30, 
@@ -56,8 +58,7 @@ export default ReviewCard = (props) => {
                     size={30}
                     color="grey"               
                     /> 
-            </TouchableOpacity> : null}                 
-           </View>
-        </View>
+            </TouchableOpacity> : null}   
+        */
     )
 }    

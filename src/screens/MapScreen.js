@@ -42,7 +42,7 @@ export default MapScreen = ({ navigation }) => {
   const [state, setState] = useState(initialMapState);
   const [toilet, setToilet] = useState(toilet);
   const [grantedPerms, setPerms] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); //controls whether reviews are being rendered or not
+  const [isLoading, setIsLoading] = useState(false); //controls whether reviews are being rendered or not
   const mounted = useRef(false); //used to determine if marker is mounted or not
 
   //Refactor this code later, should probably be added into one big useState or maybe added to the one above...will see
@@ -88,6 +88,7 @@ export default MapScreen = ({ navigation }) => {
 
   //triggers on setToilet which only happens on marker press, retrieves toilet reviews
   useEffect(() => {
+    setEditReview(false); //done so that if a review in the process of being edited, this is switched back to submitReview
     setIsLoading(true); //activity indicator set to load at all times, unless the toilet marker is mounted in the if below
 
     if (mounted.current) {
@@ -110,8 +111,6 @@ export default MapScreen = ({ navigation }) => {
       setIsLoading(true)  
     }
   }, [toilet]); 
-
-
 
   toiletApiFetch = async (lat, lng) => {
     const fetchedToilets = [];

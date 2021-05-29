@@ -20,6 +20,11 @@ const initialMapState = {
   radius: 2000,
   mapType: "standard",
   mode: "WALKING",
+
+  //reviews
+  reviewsArrayx:  [], //stores all reviews 
+  editReview: false, //variable used to conditionally render bottomsheets text input between edit and submit review
+  reviewToEdit:  "", //single review object being sent to have its text updated in editreviewpress
 };
 
 const filter = [
@@ -35,7 +40,6 @@ const filter = [
   {
     type: "open now",
   },
-
 ];
 
 const toilet = {
