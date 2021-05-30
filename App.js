@@ -17,10 +17,6 @@ import MapScreen from "./src/screens/MapScreen";
 import ReviewViewAndCreateScreen from "./src/screens/ReviewViewAndCreateScreen";
 import DisplayReviewsScreen from "./src/screens/DisplayReviewsScreen";
 import { LogBox } from "react-native";
-import {
-  provider as PaperProvider,
-  DarkTheme as PaperDarkTheme,
-} from "react-native-paper";
 LogBox.ignoreAllLogs();
 
 const Stack = createStackNavigator();
