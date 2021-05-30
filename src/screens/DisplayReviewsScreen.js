@@ -1,7 +1,7 @@
-import { TextInput, Text, Alert, TouchableOpacity, View, ScrollView } from "react-native";
+import { TextInput, Text, Alert, TouchableOpacity, View, ScrollView, KeyboardAvoidingView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { FontAwesome, Entypo, Ionicons } from "@expo/vector-icons";
-import ReviewCard from "./components/ReviewCard";
+import AccountCard from "./components/AccountCard";
 import styles from "./model/ListStylesTwo";
 import { firebase } from "../firebase/config";
 
@@ -15,60 +15,41 @@ export default function DisplayReviewsScreen({ route, navigation }) {
 const [reviewsArray, setReviewsArray] = useState(route.params);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.searchBox}>
-        <TextInput
-          placeholder="Search here"
-          placeholderTextColor="#777"
-          autoCapitalize="none"
-          style={styles.searchBoxText}
-        />
-        <FontAwesome
-          name="search"
-          size={24}
-          color="black"
-          style={{ right: 8, opacity: 0.6 }}
-        />
-      </View>
-      <View style={styles.placeNewReviewButton}>
-        <TouchableOpacity
-          style={styles.newReviewButtonList}>
-          <Text style={styles.appButtonText}>Create New Review</Text> 
-        </TouchableOpacity>
-      </View>
-      <ScrollView
-        horizontal
-        scrollEventThrottle={1}
-        showsHorizontalScrollIndicator={false}
-        height={50}
-        style={styles.chipsScrollView}
-        contentInset={{
-          // iOS only
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 20,
-        }}
-        contentContainerStyle={{
-          paddingRight: Platform.OS === "android" ? 20 : 0,
-        }}
-      >
+    <KeyboardAvoidingView 
+      style={styles.container} behavior="height">
+      <ScrollView>
       </ScrollView>
+      <Text 
+        style={styles.superTitleText}>
+        Your Reviews
+      </Text>
+      <Entypo
+        style={styles.book}
+        name="book"
+        size={100}
+        color="white"               
+        /> 
       <ScrollView
         vertical
         scrollEventThrottle={1}
         showsVerticalScrollIndicator={true}
         style={styles.listContainer}
-      >
+        contentContainerStyle={{
+          paddingBottom: 165,
+        }}
+      >   
         {reviewsArray.map((item, index) => {
+          editedReview = item;
           return (
-          <ReviewCard                   
-            title={item.title}  
-            userID={item.userID}
-            key={index}
-            rating={item.rating}  
-            item={item}  
-            navigation={navigation}             
+          <AccountCard
+              name={item.name}                   
+              title={item.title}  
+              userID={item.userID}
+              key={index}
+              rating={item.rating}  
+              item={item}  
+              address={item.address}
+              navigation={navigation} 
           />
           )          
         })}
@@ -124,6 +105,6 @@ const [reviewsArray, setReviewsArray] = useState(route.params);
           />
         </TouchableOpacity>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }

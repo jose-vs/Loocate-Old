@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import * as Animatable from "react-native-animatable";
@@ -18,6 +19,7 @@ import {
   MaterialIcons,
   Entypo,
   FontAwesome5,
+  MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { MAP_API_KEY } from "@env";
 import { ScrollView } from "react-native-gesture-handler";
@@ -33,14 +35,188 @@ import { firebase } from "../firebase/config";
 import MapViewDirections from "react-native-maps-directions";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import Geocoder from "react-native-geocoding";
+import ReviewCard from "./components/ReviewCard";
+
+const mapDarkStyle = [
+  {
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#242f3e",
+      },
+    ],
+  },
+  {
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#746855",
+      },
+    ],
+  },
+  {
+    elementType: "labels.text.stroke",
+    stylers: [
+      {
+        color: "#242f3e",
+      },
+    ],
+  },
+  {
+    featureType: "administrative.locality",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#d59563",
+      },
+    ],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#d59563",
+      },
+    ],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#263c3f",
+      },
+    ],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#6b9a76",
+      },
+    ],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#38414e",
+      },
+    ],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry.stroke",
+    stylers: [
+      {
+        color: "#212a37",
+      },
+    ],
+  },
+  {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#9ca5b3",
+      },
+    ],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#746855",
+      },
+    ],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry.stroke",
+    stylers: [
+      {
+        color: "#1f2835",
+      },
+    ],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#f3d19c",
+      },
+    ],
+  },
+  {
+    featureType: "transit",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#2f3948",
+      },
+    ],
+  },
+  {
+    featureType: "transit.station",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#d59563",
+      },
+    ],
+  },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#17263c",
+      },
+    ],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#515c6d",
+      },
+    ],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.stroke",
+    stylers: [
+      {
+        color: "#17263c",
+      },
+    ],
+  },
+];
+
+/* mapLightStyle is needed to be empty*/
+const mapLightStyle = [];
 
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
   const [state, setState] = useState(initialMapState);
-  const [reviewsArray, setReviewsArray] = useState([]);
   const [toilet, setToilet] = useState(toilet);
   const [grantedPerms, setPerms] = useState(null);
-  const mounted = useRef(false);
+  const [isLoading, setIsLoading] = useState(false); //controls whether reviews are being rendered or not
+  const mounted = useRef(false); //used to determine if marker is mounted or not
+
+  //Refactor this code later, should probably be added into one big useState or maybe added to the one above...will see
+  const [reviewsArray, setReviewsArray] = useState([]); 
+  const [editReview, setEditReview] = useState(null); //used for conditional rendering of edit textInput vs place review textInput
+  const [reviewToEdit, setReviewToEdit] = useState(null); //used in edit review process
+  const [editReviewText, setEditReviewText] = useState(null)
+
+
 
   const _map = React.useRef(null);
   Geocoder.init(MAP_API_KEY);
@@ -67,7 +243,6 @@ export default MapScreen = ({ navigation }) => {
           longitude: location.coords.longitude,
         },
       });
-
       toiletApiFetch(location.coords.latitude, location.coords.longitude);
 
       setPerms(true);
@@ -76,6 +251,9 @@ export default MapScreen = ({ navigation }) => {
 
   //triggers on setToilet which only happens on marker press, retrieves toilet reviews
   useEffect(() => {
+    setEditReview(false); //done so that if a review in the process of being edited, this is switched back to submitReview
+    setIsLoading(true); //activity indicator set to load at all times, unless the toilet marker is mounted in the if below
+
     if (mounted.current) {
       var addToReviewsArray = [];
       const reviewsRef = firebase.firestore().collection("reviews");
@@ -85,11 +263,15 @@ export default MapScreen = ({ navigation }) => {
           if (snapshot.data().toiletID == toilet.id) {
             addToReviewsArray = [...addToReviewsArray, snapshot.data()];
           }
-        });
+        }
+      )  
         setReviewsArray(addToReviewsArray);
+        setIsLoading(false);         
       });
-    } else {
-      mounted.current = true;
+    }
+    else if (!mounted.current) {      
+      mounted.current = true;   
+      setIsLoading(true)  
     }
   }, [toilet]);
 
@@ -207,11 +389,6 @@ export default MapScreen = ({ navigation }) => {
     bs.current.snapTo(1);
   };
 
-  //Navigates to review screen and takes current toilet being accessed there to have its reviews manipulated.
-  const onReviewPress = () => {
-    navigation.navigate("ReviewViewAndCreate", toilet);
-  };
-
   /**
    * list will be updated based on the current region the
    * user is at on the map
@@ -327,51 +504,6 @@ export default MapScreen = ({ navigation }) => {
     }
   };
 
-  //Submit review on selected toilet if logged in. If not logged in, alert and do nothing.
-  const onSubmitReviewPress = () => {
-    const usersRef = firebase.firestore().collection("users");
-    const reviewsRef = firebase.firestore().collection("reviews");
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        usersRef
-          .doc(user.uid)
-          .get()
-          .then((document) => {
-            const data = document.data();
-
-            reviewsRef.add({
-              title: review,
-              name: data.fullName,
-              address: toilet.address,
-              toiletID: toilet.id,
-              userID: data.id,
-              rating: toilet.rating,
-            });
-
-            setReviewsArray([
-              ...reviewsArray,
-              {
-                title: review,
-                address: toilet.address,
-                toiletID: toilet.id,
-                userID: data.id,
-                rating: toilet.rating,
-              },
-            ]);
-          });
-
-        Alert.alert("Submission success", "Your review has been placed.");
-        this.textInput.clear();
-      } else {
-        Alert.alert(
-          "Authentication required",
-          "You must be logged in to place a review."
-        );
-        return;
-      }
-    });
-  };
-
   /**
    * creates bottom sheet content
    */
@@ -394,6 +526,9 @@ export default MapScreen = ({ navigation }) => {
         scrollEventThrottle={1}
         showsVerticalScrollIndicator={true}
         style={styles.listContainer}
+        contentContainerStyle={{
+          paddingBottom: 60
+        }}
       >
         {marker && marker.length && (
           <View>
@@ -473,39 +608,51 @@ export default MapScreen = ({ navigation }) => {
           </View>
         )}
         {reviewsArray.map((item, index) => {
+          editedReview = item;
           return (
             <ReviewCard
-              name={item.name}
-              title={item.title}
-              userID={item.userID}
-              key={index}
-              rating={item.rating}
-              item={item}
-              navigation={navigation}
+            name={item.name}                   
+            title={item.title}  
+            userID={item.userID}
+            key={index}
+            rating={item.rating}  
+            item={item}  
+            navigation={navigation} 
+            setEditReview={setEditReview}
+            setReviewToEdit={setReviewToEdit}  
+            setEditReviewText={setEditReviewText}
             />
           );
         })}
-        <TextInput
-          onChangeText={() => {}}
-          style={styles.reviewTextInputContainer}
-          placeholder="Write your review here:"
-          placeholderTextColor="#aaaaaa"
-          multiline={true}
-          numberOfLines={10}
-          textAlign="left"
-          onChangeText={(userInput) => (review = userInput)}
-          ref={(input) => {
-            this.textInput = input;
-          }}
-          underlineColorAndroid="transparent"
-        />
-        <TouchableOpacity
-          style={styles.reviewButton}
-          onPress={() => onSubmitReviewPress()}
-        >
-          <Text style={styles.reviewButtonTitle}>Submit review</Text>
-        </TouchableOpacity>
       </ScrollView>
+      {editReview ? <TextInput       
+          style={styles.reviewTextInputContainer}
+          multiline={true}        
+          numberOfLines={10}
+          textAlign='left'
+          onChangeText={setEditReviewText}
+          value = {editReviewText}  
+          ref={input => { this.textInput = input }} 
+          underlineColorAndroid="transparent"/> : <TextInput onChangeText={() => {}}       
+          style={styles.reviewTextInputContainer}
+          placeholder='Write your review here:'
+          placeholderTextColor="#aaaaaa"
+          multiline={true}          
+          numberOfLines={10}
+          textAlign='left'
+          onChangeText={(userInput) => review = (userInput)}
+          ref={input => { this.textInput = input }} 
+          underlineColorAndroid="transparent"
+        />} 
+        {editReview ? <TouchableOpacity
+          style={styles.reviewButton}
+          onPress={() => onEditReviewPress()}> 
+          <Text style={styles.reviewButtonTitle}>Edit Review</Text>    
+        </TouchableOpacity> : <TouchableOpacity
+          style={styles.reviewButton}
+          onPress={() => onSubmitReviewPress()}> 
+          <Text style={styles.reviewButtonTitle}>Submit review</Text>    
+        </TouchableOpacity>} 
     </KeyboardAvoidingView>
   );
 
@@ -615,6 +762,7 @@ export default MapScreen = ({ navigation }) => {
         </View>
         <MapView
           ref={_map}
+          customMapStyle={state.customMapStyle}
           showuserLocation={true} // may not be needed, deprecated by 'showsuserlocation={true}'
           loadingEnabled={true}
           loadingIndicatorColor="#75CFB8"
@@ -674,6 +822,7 @@ export default MapScreen = ({ navigation }) => {
             <Text style={styles.searchHereText}>Search this area</Text>
           </TouchableOpacity>
         </Animatable.View>
+
         <TouchableOpacity
           style={styles.locationButtonContainer}
           onPress={() => {
@@ -690,6 +839,27 @@ export default MapScreen = ({ navigation }) => {
           </View>
         </TouchableOpacity>
         <View style={styles.buttonContainer}>
+          {/* Dark Mode Button */}
+          <TouchableOpacity
+            onPress={() => {
+              if (state.customMapStyle == null) {
+                setState({ ...state, customMapStyle: mapDarkStyle });
+              } else if (state.customMapStyle == mapDarkStyle) {
+                setState({ ...state, customMapStyle: mapLightStyle });
+              } else if (state.customMapStyle == mapLightStyle) {
+                setState({ ...state, customMapStyle: mapDarkStyle });
+              }
+            }}
+          >
+            <View style={styles.circleButton}>
+              <MaterialCommunityIcons
+                name="theme-light-dark"
+                size={24}
+                color="black"
+                style={{ top: 6, left: 6, opacity: 0.6 }}
+              />
+            </View>
+          </TouchableOpacity>
           {/* Map Style Button */}
           <TouchableOpacity
             onPress={() => {

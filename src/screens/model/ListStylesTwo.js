@@ -3,7 +3,8 @@ import { StyleSheet } from "react-native";
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fffa",
+    alignItems: "center",
+    backgroundColor: '#75CFB8'
   },
   searchBox: {
     position: "absolute",
@@ -40,7 +41,7 @@ export default StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 10,
     paddingLeft: 15,
-    backgroundColor: "#FFF",
+    backgroundColor: '#75CFB8'
   },
   chipsScrollView: {
     position: "absolute",
@@ -78,13 +79,29 @@ export default StyleSheet.create({
     shadowRadius: 5,
     elevation: 1,
   },
+  book: {
+    position: "relative", 
+    marginTop: 30,
+    marginLeft: 20,
+    marginRight: 20,
+    flex: 0
+  },
   listTitle: {
     fontSize: 20,
     fontWeight: "bold",
+    color: "#FFF",
   },
   listAddress: {
     fontSize: 15,
     fontStyle: "italic",
+    color: "#FFF",
+  },
+  superTitleText: {
+    marginTop: 60,
+    fontSize: 25,
+    textAlign:"center",
+    color: "white",
+    flex: 0
   },
   listButton: {
     fontSize: 18,
@@ -155,11 +172,11 @@ export default StyleSheet.create({
   },
   listContainer: { 
     position: "relative",
-    top: 160,
-    marginBottom:160
+    marginTop: 40,
+    marginBottom: -180,
   },
   hairline: {
-    backgroundColor: "#A2A2A2",
+    backgroundColor: "#FFF",
     height: 2,
     alignSelf: 'center',
     width: 350,

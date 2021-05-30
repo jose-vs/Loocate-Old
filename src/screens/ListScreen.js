@@ -11,6 +11,7 @@ import { FontAwesome, Entypo, Ionicons } from "@expo/vector-icons";
 import ToiletCard from "./components/ToiletCard";
 import styles from "./model/ListStyles";
 import { filter } from "./model/MapData";
+import { firebase } from "../firebase/config";
 
 export default ListScreen = ({ route, navigation }) => {
   const [toilets, setToilets] = useState(route.params);

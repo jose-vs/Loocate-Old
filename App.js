@@ -1,9 +1,13 @@
-import React from 'react'
-import { NavigationContainer } from "@react-navigation/native";
-import { 
-    createStackNavigator, 
-    TransitionPresets, 
-    CardStyleInterpolators 
+import React from "react";
+import {
+  NavigationContainer,
+  DarkTheme,
+  DefaultTheme,
+} from "@react-navigation/native";
+import {
+  createStackNavigator,
+  TransitionPresets,
+  CardStyleInterpolators,
 } from "@react-navigation/stack";
 import LoginScreen from "./src/screens/LoginScreen";
 import AccountScreen from "./src/screens/AccountScreen";
@@ -16,10 +20,9 @@ import EditDeleteReviewScreen from './src/screens/EditDeleteReviewScreen';
 import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs() 
 
-const Stack = createStackNavigator(); 
+const Stack = createStackNavigator();
 
 export default function App() {
-
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -29,7 +32,6 @@ export default function App() {
           gestureDirection: "horizontal",
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
         }}
-        
       >
         <Stack.Screen name="Map" component={MapScreen} />
         <Stack.Screen name="List" component={ListScreen} />
@@ -37,10 +39,12 @@ export default function App() {
         <Stack.Screen name="EditDeleteReview" component={EditDeleteReviewScreen} />
         <Stack.Screen name="Registration" component={RegistrationScreen} />
         <Stack.Screen name="Account" component={AccountScreen} />
-        <Stack.Screen name="ReviewViewAndCreate" component={ReviewViewAndCreateScreen} />
+        <Stack.Screen
+          name="ReviewViewAndCreate"
+          component={ReviewViewAndCreateScreen}
+        />
         <Stack.Screen name="DisplayReviews" component={DisplayReviewsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
-    
   );
 }

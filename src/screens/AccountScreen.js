@@ -1,18 +1,19 @@
-import React, { useState, useEffect, } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Image, Text, ActivityIndicator, TouchableOpacity, View, Alert } from "react-native";
 import styles from "./model/AccountStyles.js";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { firebase } from "../firebase/config";
+import { FontAwesome, Entypo, Ionicons } from "@expo/vector-icons";
 
-export default function AccountScreen({navigation }) {
+export default function AccountScreen({ navigation }) {
 
   const [existingReviewsArray, setExistingReviewsArray] = useState([]);
   const [userId, setUserId] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const reviewsFetched = useRef(false);
 
   // Create a useEffect [with no dependencies] that runs once to get the userId
-  useEffect(() => {
-    
+  useEffect(() => {   
     firebase.auth().onAuthStateChanged((user) => {
       const usersRef = firebase.firestore().collection("users");
       usersRef
@@ -40,10 +41,19 @@ export default function AccountScreen({navigation }) {
           } 
       }
     )    
-      setExistingReviewsArray(addToReviewsArray);
-      setIsLoading(false);
+      setExistingReviewsArray(addToReviewsArray);      
+      reviewsFetched.current = true;
     });
+    
   }, [userId]); 
+
+  //keeps page loading till review data is collected
+  useEffect(() => {
+    if (reviewsFetched.current == true)
+    {
+      setIsLoading(false);
+    }
+  }, [reviewsFetched.current])
 
   const onLogOutPress = () => {    
     firebase.auth().signOut()
@@ -68,18 +78,25 @@ export default function AccountScreen({navigation }) {
 
   return (
     <View style={styles.container}>
-      {isLoading ? <ActivityIndicator /> : <KeyboardAwareScrollView
-        style={{ flex: 1, width: "100%" }}
-        keyboardShouldPersistTaps="always">
+      {isLoading ? <ActivityIndicator style={styles.loading} 
+      size="large" color="white"/> : <KeyboardAwareScrollView
+        style={{ flex: 1, width: "100%"}}
+        keyboardShouldPersistTaps="always"
+        scrollEnabled={false}
+        >
         <Image
-        style={styles.logo}
-        source={require('../../assets/loocate_icon.png')}
-        tintColor='white'/>
+          style={styles.logo}
+          source={require('../../assets/loocate_icon.png')}
+          tintColor='white'
+        />
       <Text style={styles.titleText}>
-      Your Account
+        Your Account
       </Text>
-        <TouchableOpacity style={styles.buttonTwo} onPress={() => viewMyReviewsPress()}>
-          <Text style={styles.buttonTitle}>My reviews</Text>
+        <TouchableOpacity 
+          style={styles.buttonTwo} onPress={() => viewMyReviewsPress()}>
+          <Text style={styles.buttonTitle}>
+            My reviews
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.buttonTwo}
@@ -89,7 +106,57 @@ export default function AccountScreen({navigation }) {
         <TouchableOpacity style={styles.button} onPress={() => onLogOutPress()}>
           <Text style={styles.buttonTitle}>Log out</Text>
         </TouchableOpacity>
-      </KeyboardAwareScrollView>}
+
+        {/* FOOTER */}
+      <View style={styles.footer}>
+        {/* MAP BUTTON */}
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("Map");
+          }}
+        >
+          <Entypo
+            name="map"
+            size={24}
+            color="white"
+            style={styles.footerButton}
+          />
+        </TouchableOpacity>
+        {/* LIST SCREEN */}
+        <TouchableOpacity
+          onPress={() => {
+            //navigation.navigate("List");
+          }}
+        >
+          <Entypo
+            name="list"
+            size={24}
+            color="white"
+            style={styles.footerButton}
+          />
+        </TouchableOpacity>
+        {/* USER SCREEN */}
+        <TouchableOpacity
+          onPress={() => {
+              //if there is a user logged in, retrieve them and skip having to go through login screen again
+              firebase.auth().onAuthStateChanged((user) => {
+              if (user) {
+                navigation.navigate("Account");
+              } else {
+                navigation.navigate("Login");
+              }
+            });
+          }}
+        >
+          <FontAwesome
+            name="user"
+            size={24}
+            color="white"
+            style={styles.footerButton}
+          />
+        </TouchableOpacity>
+      </View>       
+      </KeyboardAwareScrollView>}     
     </View>
   );
 }

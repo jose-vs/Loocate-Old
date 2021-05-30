@@ -196,24 +196,35 @@ export const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
-  chipsScrollView: {
-    position: "absolute",
-    top: 20,
-    paddingHorizontal: 10,
+  chipsScrollView: { //scrollview
+    position: "relative",
+    top: 160,
+    marginBottom: -30
   },
   listContainer: { 
     position: "relative",
-    top: 20,
-    marginBottom: -100
+    top: 10,
+    marginBottom: -150
   },
   reviewTextInputContainer: {
     position: "relative",
     top: 100,
-    left: 10,
-    marginBottom: 30,
+    marginLeft: 1,
+    marginRight: 1,
+    marginBottom: 1,
     backgroundColor: 'white',
-    textAlignVertical: 'top'
-
+    textAlignVertical: 'top',
+    //borderWidth : 1.0,
+    //borderColor: 'grey'
+  },
+  loading: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   footer: {
     position: "relative",
@@ -244,9 +255,8 @@ export const styles = StyleSheet.create({
   reviewButton: {
     //using for directions screen
     backgroundColor: "#007965",
-    marginLeft: 80,
-    marginRight: 80,
-    marginTop: 30,
+    marginLeft: 100,
+    marginRight: 100,
     marginBottom: 5,
     height: 25,
     borderRadius: 5,
