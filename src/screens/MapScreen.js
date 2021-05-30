@@ -19,6 +19,7 @@ import {
   MaterialIcons,
   Entypo,
   FontAwesome5,
+  MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { MAP_API_KEY } from "@env";
 import { ScrollView } from "react-native-gesture-handler";
@@ -35,6 +36,171 @@ import MapViewDirections from "react-native-maps-directions";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import Geocoder from "react-native-geocoding";
 import ReviewCard from "./components/ReviewCard";
+
+const mapDarkStyle = [
+  {
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#242f3e",
+      },
+    ],
+  },
+  {
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#746855",
+      },
+    ],
+  },
+  {
+    elementType: "labels.text.stroke",
+    stylers: [
+      {
+        color: "#242f3e",
+      },
+    ],
+  },
+  {
+    featureType: "administrative.locality",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#d59563",
+      },
+    ],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#d59563",
+      },
+    ],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#263c3f",
+      },
+    ],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#6b9a76",
+      },
+    ],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#38414e",
+      },
+    ],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry.stroke",
+    stylers: [
+      {
+        color: "#212a37",
+      },
+    ],
+  },
+  {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#9ca5b3",
+      },
+    ],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#746855",
+      },
+    ],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry.stroke",
+    stylers: [
+      {
+        color: "#1f2835",
+      },
+    ],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#f3d19c",
+      },
+    ],
+  },
+  {
+    featureType: "transit",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#2f3948",
+      },
+    ],
+  },
+  {
+    featureType: "transit.station",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#d59563",
+      },
+    ],
+  },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#17263c",
+      },
+    ],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#515c6d",
+      },
+    ],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.stroke",
+    stylers: [
+      {
+        color: "#17263c",
+      },
+    ],
+  },
+];
+
+/* mapLightStyle is needed to be empty*/
+const mapLightStyle = [];
 
 export default MapScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
@@ -77,7 +243,10 @@ export default MapScreen = ({ navigation }) => {
           longitude: location.coords.longitude,
         },
       });
+<<<<<<< HEAD
 
+=======
+>>>>>>> Darkstyle
       toiletApiFetch(location.coords.latitude, location.coords.longitude);
 
       setPerms(true);
@@ -138,9 +307,15 @@ export default MapScreen = ({ navigation }) => {
             duration: null,
             open:
               toiletData.opening_hours === undefined
+<<<<<<< HEAD
                 ? ""
                 : toiletData.opening_hours.open_now == true
                 ? "open now"
+=======
+                ? "gay"
+                : toiletData.opening_hours.open_now == true
+                ? "open"
+>>>>>>> Darkstyle
                 : "closed",
           };
           fetchedToilets.push(newToilet);
@@ -338,6 +513,7 @@ export default MapScreen = ({ navigation }) => {
       console.log("No user location given (PERMISIONS MAY NOT BE GIVEN");
     }
   };
+<<<<<<< HEAD
 
   //Navigates to review screen and takes current toilet being accessed there to have its reviews manipulated.
   const onReviewPress = () => {
@@ -418,6 +594,8 @@ export default MapScreen = ({ navigation }) => {
       setEditReview(false);
       return;   
   }
+=======
+>>>>>>> Darkstyle
 
   /**
    * creates bottom sheet content
@@ -435,6 +613,7 @@ export default MapScreen = ({ navigation }) => {
   );
 
   renderInner = () => (
+<<<<<<< HEAD
     <KeyboardAvoidingView style={styles.bottomPanel} behavior="height">
       <ScrollView
         vertical
@@ -569,6 +748,41 @@ export default MapScreen = ({ navigation }) => {
           <Text style={styles.reviewButtonTitle}>Submit review</Text>    
         </TouchableOpacity>} 
     </KeyboardAvoidingView>
+=======
+    <View style={styles.bottomPanel}>
+      {marker && marker.length && (
+        <Text
+          style={
+            styles.toiletTitle //check for null in useState otherwise crash on startup as undefined
+          }
+        >
+          {toilet.title}
+        </Text>
+      )}
+      {marker && marker.length && (
+        <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
+      )}
+      <View style={styles.hairline} />
+      {marker && marker.length && (
+        <TouchableOpacity onPress={() => onGetDirectionsPress()}>
+          <Text style={styles.textSubheading}>Get Directions</Text>
+        </TouchableOpacity>
+      )}
+      {marker && marker.length && (
+        <Text style={styles.textSubheading}>
+          Rating: <StarRating ratings={toilet.rating} />
+        </Text>
+      )}
+      {marker && marker.length && (
+        <TouchableOpacity onPress={() => onReviewPress()}>
+          <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
+        </TouchableOpacity>
+      )}
+      {marker && marker.length && (
+        <Text style={styles.toiletSubtitle}>Open/Closed? {toilet.open}</Text>
+      )}
+    </View>
+>>>>>>> Darkstyle
   );
 
   const RenderBsMode = () => {
@@ -677,6 +891,7 @@ export default MapScreen = ({ navigation }) => {
         </View>
         <MapView
           ref={_map}
+          customMapStyle={state.customMapStyle}
           showuserLocation={true} // may not be needed, deprecated by 'showsuserlocation={true}'
           loadingEnabled={true}
           loadingIndicatorColor="#75CFB8"
@@ -736,6 +951,7 @@ export default MapScreen = ({ navigation }) => {
             <Text style={styles.searchHereText}>Search this area</Text>
           </TouchableOpacity>
         </Animatable.View>
+<<<<<<< HEAD
         <TouchableOpacity
           style={styles.locationButtonContainer}
           onPress={() => {
@@ -752,6 +968,44 @@ export default MapScreen = ({ navigation }) => {
           </View>
         </TouchableOpacity>
         <View style={styles.buttonContainer}>
+=======
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              onLocationButtonPress();
+            }}
+          >
+            <View style={styles.locationButton}>
+              <MaterialIcons
+                name="my-location"
+                size={26}
+                color="black"
+                style={{ top: 6, left: 6, opacity: 0.6 }}
+              />
+            </View>
+          </TouchableOpacity>
+          {/* Dark Mode Button */}
+          <TouchableOpacity
+            onPress={() => {
+              if (state.customMapStyle == null) {
+                setState({ ...state, customMapStyle: mapDarkStyle });
+              } else if (state.customMapStyle == mapDarkStyle) {
+                setState({ ...state, customMapStyle: mapLightStyle });
+              } else if (state.customMapStyle == mapLightStyle) {
+                setState({ ...state, customMapStyle: mapDarkStyle });
+              }
+            }}
+          >
+            <View style={styles.circleButton}>
+              <MaterialCommunityIcons
+                name="theme-light-dark"
+                size={24}
+                color="black"
+                style={{ top: 6, left: 6, opacity: 0.6 }}
+              />
+            </View>
+          </TouchableOpacity>
+>>>>>>> Darkstyle
           {/* Map Style Button */}
           <TouchableOpacity
             onPress={() => {
