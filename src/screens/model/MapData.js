@@ -55,7 +55,8 @@ const toilet = {
   loocateReviews: null,
   reviews: null,
   distance: null,
-  duration: null
+  duration: null,
+  open: "",
 };
 
 export { initialMapState, filter, toilet };

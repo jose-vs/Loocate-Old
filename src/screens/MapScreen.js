@@ -78,12 +78,11 @@ export default MapScreen = ({ navigation }) => {
         },
       });
 
-      toiletApiFetch(location.coords.latitude, location.coords.longitude)
-
+      toiletApiFetch(location.coords.latitude, location.coords.longitude);
 
       setPerms(true);
     })();
-  }, []); 
+  }, []);
 
   //triggers on setToilet which only happens on marker press, retrieves toilet reviews
   useEffect(() => {
@@ -92,12 +91,12 @@ export default MapScreen = ({ navigation }) => {
 
     if (mounted.current) {
       var addToReviewsArray = [];
-      const reviewsRef = firebase.firestore().collection('reviews');
+      const reviewsRef = firebase.firestore().collection("reviews");
 
       reviewsRef.get().then((querySnapshot) => {
-        querySnapshot.forEach(snapshot => {
+        querySnapshot.forEach((snapshot) => {
           if (snapshot.data().toiletID == toilet.id) {
-            addToReviewsArray = ([...addToReviewsArray , snapshot.data()]);
+            addToReviewsArray = [...addToReviewsArray, snapshot.data()];
           }
         }
       )  
@@ -109,7 +108,7 @@ export default MapScreen = ({ navigation }) => {
       mounted.current = true;   
       setIsLoading(true)  
     }
-  }, [toilet]); 
+  }, [toilet]);
 
   toiletApiFetch = async (lat, lng) => {
     const fetchedToilets = [];
@@ -134,16 +133,20 @@ export default MapScreen = ({ navigation }) => {
             title: toiletData.name,
             address: toiletData.vicinity,
             rating: toiletData.rating,
-            reviews: toiletData.user_ratings_total,     
+            reviews: toiletData.user_ratings_total,
             distance: null,
             duration: null,
+            open:
+              toiletData.opening_hours === undefined
+                ? ""
+                : toiletData.opening_hours.open_now == true
+                ? "open now"
+                : "closed",
           };
           fetchedToilets.push(newToilet);
         });
-
       })
       .catch((err) => console.log("Error:", err));
-
     Promise.all(
       fetchedToilets.map(async (current) => {
         return await distanceApiFetch(current)
@@ -156,7 +159,10 @@ export default MapScreen = ({ navigation }) => {
       })
     )
       .then((result) => {
-        setState({ ...state, markers: result.sort((a, b) => (a.distance > b.distance) ? 1 : -1)})  
+        setState({
+          ...state,
+          markers: result.sort((a, b) => (a.distance > b.distance ? 1 : -1)),
+        });
       })
       .catch((errorMessage) => {
         return Promise.reject(errorMessage);
@@ -170,7 +176,8 @@ export default MapScreen = ({ navigation }) => {
       ${state.userLocation.latitude},${state.userLocation.longitude}
       &destinations=
       ${toilet.coordinate.latitude},${toilet.coordinate.longitude}
-      &key=${MAP_API_KEY}`
+      &key=${MAP_API_KEY}
+      &mode=${state.mode.toLowerCase()}`
       )
       .then(async (response) => {
         return await Promise.resolve({
@@ -180,8 +187,15 @@ export default MapScreen = ({ navigation }) => {
           address: toilet.address,
           rating: toilet.rating,
           reviews: toilet.reviews,
-          distance: response.data.rows[0].elements[0].distance.value / 1000,
-          duration: response.data.rows[0].elements[0].duration.value / 60,
+          distance:
+            Math.round(
+              (response.data.rows[0].elements[0].distance.value / 1000) * 100
+            ) / 100,
+          duration:
+            Math.round(
+              (response.data.rows[0].elements[0].duration.value / 60) * 100
+            ) / 100,
+          open: toilet.open,
         });
       })
       .catch((err) => {
@@ -310,8 +324,7 @@ export default MapScreen = ({ navigation }) => {
   };
 
   const onLocationButtonPress = () => {
-    if (state.userLocation != null)
-    {
+    if (state.userLocation != null) {
       _map.current.animateToRegion(
         {
           latitude: state.userLocation.latitude,
@@ -321,11 +334,10 @@ export default MapScreen = ({ navigation }) => {
         },
         350
       );
-    }
-    else{
+    } else {
       console.log("No user location given (PERMISIONS MAY NOT BE GIVEN");
     }
-  }
+  };
 
   //Navigates to review screen and takes current toilet being accessed there to have its reviews manipulated.
   const onReviewPress = () => {
@@ -412,58 +424,105 @@ export default MapScreen = ({ navigation }) => {
    */
   const bs = React.createRef();
   renderHeader = () => (
-    <View style={styles.panelHeader}>
-      <View style={styles.panelHandle} />
+    <View style={styles.header}>
+      {marker && marker.length && (
+        <View style={{ flexDirection: "column" }}>
+          <Text style={styles.toiletTitle}>{toilet.title}</Text>
+          <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
+        </View>
+      )}
     </View>
   );
 
   renderInner = () => (
-    <KeyboardAvoidingView style={styles.bottomPanel}
-      behavior="height">
-      {marker && marker.length && (
-        <Text
-          style={
-            styles.toiletTitle //check for null in useState otherwise crash on startup as undefined
-          }
-        >
-          {toilet.title}
-        </Text>
-      )}
-      {marker && marker.length && (
-        <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
-      )}
-      <View style={styles.hairline} />
-      {marker && marker.length && (
-        <TouchableOpacity onPress={() => onGetDirectionsPress()}>
-          <Text style={styles.textSubheading}>Get Directions</Text>
-        </TouchableOpacity>
-      )}
-      {marker && marker.length && (
-        <Text style={styles.textSubheading}>
-          Overall Rating: <StarRating ratings={toilet.rating} />
-        </Text>
-      )}
-      {marker && marker.length && (
-        <TouchableOpacity onPress={() => onReviewPress()}>
-          <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
-        </TouchableOpacity>
-      )} 
-      <ScrollView>
-      </ScrollView>
-      {isLoading ? <ActivityIndicator style={styles.loading} 
-      size="large" color="#007965"/> : <ScrollView
+    <KeyboardAvoidingView style={styles.bottomPanel} behavior="height">
+      <ScrollView
         vertical
         scrollEventThrottle={1}
         showsVerticalScrollIndicator={true}
         style={styles.listContainer}
-        contentContainerStyle={{
-          paddingBottom: 60
-        }}
-      >   
+      >
+        {marker && marker.length && (
+          <View>
+            {/* contains rating number icons and review number in row direction */}
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginBottom: 10,
+                paddingHorizontal: 30,
+              }}
+            >
+              <View
+                style={{ flexDirection: "row", marginVertical: 8, left: 10 }}
+              >
+                <Text style={{ color: "#777", right: 6 }}>{toilet.rating}</Text>
+                <StarRating ratings={toilet.rating} />
+                <Text style={{ color: "#777" }}>({toilet.reviews})</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => {
+                  onGetDirectionsPress();
+                }}
+              >
+                <View style={styles.directionsButton}>
+                  <FontAwesome5
+                    name="directions"
+                    size={24}
+                    color="#fff"
+                    style={{ top: 6, left: 6 }}
+                  />
+                  <Text style={{ left: 20, top: 7, color: "#fff" }}>
+                    Directions
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                left: 5,
+                justifyContent: "space-around",
+                paddingHorizontal: 30,
+              }}
+            >
+              <View style={{ flex: 1, justifyContent: "flex-start" }}>
+                <Text
+                  style={[
+                    toilet.open == "closed"
+                      ? { color: "#962d2d" }
+                      : toilet.open == "open now"
+                      ? { color: "#9fe6a0" }
+                      : {},
+                    { fontSize: 16 },
+                  ]}
+                >
+                  {toilet.open}
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                paddingHorizontal: 28,
+                paddingVertical: 5,
+              }}
+            >
+              <RenderBsMode />
+              <Text style={{ opacity: 0.6, right: 10 }}>
+                {toilet.duration} min
+              </Text>
+              <Text style={{ opacity: 0.6 }}>({toilet.distance} km)</Text>
+            </View>
+          </View>
+        )}
         {reviewsArray.map((item, index) => {
           editedReview = item;
           return (
-          <ReviewCard
+            <ReviewCard
             name={item.name}                   
             title={item.title}  
             userID={item.userID}
@@ -474,100 +533,144 @@ export default MapScreen = ({ navigation }) => {
             setEditReview={setEditReview}
             setReviewToEdit={setReviewToEdit}  
             setEditReviewText={setEditReviewText}
-          />
-          )          
+            />
+          );
         })}
-      </ScrollView>} 
-      {editReview ? <TextInput       
-        style={styles.reviewTextInputContainer}
-        multiline={true}        
-        numberOfLines={10}
-        textAlign='left'
-        onChangeText={setEditReviewText}
-        value = {editReviewText}  
-        ref={input => { this.textInput = input }} 
-        underlineColorAndroid="transparent"/> : <TextInput onChangeText={() => {}}       
-        style={styles.reviewTextInputContainer}
-        placeholder='Write your review here:'
-        placeholderTextColor="#aaaaaa"
-        multiline={true}          
-        numberOfLines={10}
-        textAlign='left'
-        onChangeText={(userInput) => review = (userInput)}
-        ref={input => { this.textInput = input }} 
-        underlineColorAndroid="transparent"
-      />}    
-      {editReview ? <TouchableOpacity
-        style={styles.reviewButton}
-        onPress={() => onEditReviewPress()}> 
-        <Text style={styles.reviewButtonTitle}>Edit Review</Text>    
-      </TouchableOpacity> : <TouchableOpacity
-        style={styles.reviewButton}
-        onPress={() => onSubmitReviewPress()}> 
-        <Text style={styles.reviewButtonTitle}>Submit review</Text>    
-      </TouchableOpacity>}     
+        {editReview ? <TextInput       
+          style={styles.reviewTextInputContainer}
+          multiline={true}        
+          numberOfLines={10}
+          textAlign='left'
+          onChangeText={setEditReviewText}
+          value = {editReviewText}  
+          ref={input => { this.textInput = input }} 
+          underlineColorAndroid="transparent"/> : <TextInput onChangeText={() => {}}       
+          style={styles.reviewTextInputContainer}
+          placeholder='Write your review here:'
+          placeholderTextColor="#aaaaaa"
+          multiline={true}          
+          numberOfLines={10}
+          textAlign='left'
+          onChangeText={(userInput) => review = (userInput)}
+          ref={input => { this.textInput = input }} 
+          underlineColorAndroid="transparent"
+        />} 
+        {editReview ? <TouchableOpacity
+          style={styles.reviewButton}
+          onPress={() => onEditReviewPress()}> 
+          <Text style={styles.reviewButtonTitle}>Edit Review</Text>    
+        </TouchableOpacity> : <TouchableOpacity
+          style={styles.reviewButton}
+          onPress={() => onSubmitReviewPress()}> 
+          <Text style={styles.reviewButtonTitle}>Submit review</Text>    
+        </TouchableOpacity>} 
+      </ScrollView>
     </KeyboardAvoidingView>
   );
+
+  const RenderBsMode = () => {
+    switch (state.mode) {
+      case "WALKING":
+        return (
+          <View>
+            <FontAwesome5
+              name="walking"
+              size={18}
+              color="black"
+              style={{ marginHorizontal: 14, opacity: 0.6 }}
+            />
+          </View>
+        );
+      case "DRIVING":
+        return (
+          <View>
+            <MaterialIcons
+              name="drive-eta"
+              size={18}
+              color="black"
+              style={{ marginHorizontal: 14, opacity: 0.6 }}
+            />
+          </View>
+        );
+      case "BICYCLING":
+        return (
+          <View>
+            <MaterialIcons
+              name="directions-bike"
+              size={18}
+              color="black"
+              style={{ marginHorizontal: 14, opacity: 0.6 }}
+            />
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
 
   if (state.userLocation.latitude) {
     return (
       <View style={styles.container}>
-        <View style = {styles.searchContainer}> 
-       <SafeAreaView style = {{ flex: 1}}>
-        <GooglePlacesAutocomplete
-          placeholder="Search"
-          listViewDisplayed="auto"
-          fetchDetails={true}
-          minLength={2}
-          debounce={200}
-          onPress={(data, details = null) => {
-            _map.current.animateToRegion(
-              {
-                latitude: details.geometry.location.lat,
-                longitude: details.geometry.location.lng,
-                latitudeDelta: 0.04,
-                longitudeDelta: 0.05,
-              },
-              350
-            );
-            toiletApiFetch(details.geometry.location.lat, details.geometry.location.lng);
-          }}
-          query={{
-            key: MAP_API_KEY,
-            language: "en",
-          }}
-          styles={{
-            textInputContainer: {
-              width: '95%',
-              position: 'absolute',
-              //borderRadius: 40,
-              padding: 10,
-              alignSelf: "center",
-              height: 40,
-            },
-            textInput: {
-              height: 40,
-              color: 'black',
-              fontSize: 16,
-              paddingLeft: 15,
-              borderRadius: 25,
-            },
-            listView: {
-              zIndex: 2,
-              width: '90%',
-              position: 'absolute',
-              marginTop: 60,
-              padding: 10,
-              alignSelf: "center",
-              backgroundColor: 'white',
-              borderRadius: 25,
-              elevation: 1,
-            },
-            separator: {
-              opacity: 0
-            },
-          }}
-        /></SafeAreaView>
+        <View style={styles.searchContainer}>
+          <SafeAreaView style={{ flex: 1 }}>
+            <GooglePlacesAutocomplete
+              placeholder="Search"
+              listViewDisplayed="auto"
+              fetchDetails={true}
+              minLength={2}
+              debounce={200}
+              onPress={(data, details = null) => {
+                _map.current.animateToRegion(
+                  {
+                    latitude: details.geometry.location.lat,
+                    longitude: details.geometry.location.lng,
+                    latitudeDelta: 0.04,
+                    longitudeDelta: 0.05,
+                  },
+                  350
+                );
+                toiletApiFetch(
+                  details.geometry.location.lat,
+                  details.geometry.location.lng
+                );
+              }}
+              query={{
+                key: MAP_API_KEY,
+                language: "en",
+              }}
+              styles={{
+                textInputContainer: {
+                  width: "95%",
+                  position: "absolute",
+                  //borderRadius: 40,
+                  padding: 10,
+                  alignSelf: "center",
+                  height: 40,
+                },
+                textInput: {
+                  height: 40,
+                  color: "black",
+                  fontSize: 16,
+                  paddingLeft: 15,
+                  borderRadius: 25,
+                },
+                listView: {
+                  zIndex: 2,
+                  width: "90%",
+                  position: "absolute",
+                  marginTop: 60,
+                  padding: 10,
+                  alignSelf: "center",
+                  backgroundColor: "white",
+                  borderRadius: 25,
+                  elevation: 1,
+                },
+                separator: {
+                  opacity: 0,
+                },
+              }}
+            />
+          </SafeAreaView>
         </View>
         <MapView
           ref={_map}
@@ -602,8 +705,8 @@ export default MapScreen = ({ navigation }) => {
               optimizeWaypoints={true}
               mode={state.mode}
               onReady={(result) => {
-                toilet.distance = result.distance;
-                toilet.duration = result.duration;
+                toilet.distance = Math.round(result.distance * 100) / 100;
+                toilet.duration = Math.round(result.duration * 100) / 100;
                 console.log(toilet);
                 _map.current.fitToCoordinates(result.coordinates, {
                   edgePadding: {
@@ -616,7 +719,6 @@ export default MapScreen = ({ navigation }) => {
               }}
               onError={(errorMessage) => {
                 console.log(errorMessage);
-                onAreaSearchPress();
               }}
             />
           )}
@@ -631,21 +733,22 @@ export default MapScreen = ({ navigation }) => {
             <Text style={styles.searchHereText}>Search this area</Text>
           </TouchableOpacity>
         </Animatable.View>
-        <View style={styles.buttonContainer}>
         <TouchableOpacity
-            onPress={() => {
-              onLocationButtonPress();
-            }}
-          >
-            <View style={styles.locationButton}>
-              <MaterialIcons
-                name="my-location"
-                size={26}
-                color="black"
-                style={{ top: 6, left: 6, opacity: 0.6 }}
-              />
-            </View>
-          </TouchableOpacity>
+          style={styles.locationButtonContainer}
+          onPress={() => {
+            onLocationButtonPress();
+          }}
+        >
+          <View style={styles.locationButton}>
+            <MaterialIcons
+              name="my-location"
+              size={26}
+              color="black"
+              style={{ top: 6, left: 6, opacity: 0.6 }}
+            />
+          </View>
+        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
           {/* Map Style Button */}
           <TouchableOpacity
             onPress={() => {
@@ -666,7 +769,12 @@ export default MapScreen = ({ navigation }) => {
               setState({ ...state, mode: "WALKING" });
             }}
           >
-            <View style={styles.modeCircleButton}>
+            <View
+              style={[
+                styles.modeCircleButton,
+                state.mode != "WALKING" ? {} : { backgroundColor: "#009688" },
+              ]}
+            >
               <FontAwesome5
                 name="walking"
                 size={24}
@@ -680,7 +788,12 @@ export default MapScreen = ({ navigation }) => {
               setState({ ...state, mode: "DRIVING" });
             }}
           >
-            <View style={styles.modeCircleButton}>
+            <View
+              style={[
+                styles.modeCircleButton,
+                state.mode != "DRIVING" ? {} : { backgroundColor: "#009688" },
+              ]}
+            >
               <MaterialIcons
                 name="drive-eta"
                 size={24}
@@ -694,7 +807,12 @@ export default MapScreen = ({ navigation }) => {
               setState({ ...state, mode: "BICYCLING" });
             }}
           >
-            <View style={styles.modeCircleButton}>
+            <View
+              style={[
+                styles.modeCircleButton,
+                state.mode != "BICYCLING" ? {} : { backgroundColor: "#009688" },
+              ]}
+            >
               <MaterialIcons
                 name="directions-bike"
                 size={24}
@@ -746,7 +864,7 @@ export default MapScreen = ({ navigation }) => {
         </View>
         <BottomSheet
           ref={bs}
-          snapPoints={['32%', '0%', '96.5%']}
+          snapPoints={["30%", "0%", "101.5%"]}
           renderContent={renderInner}
           renderHeader={renderHeader}
           borderRadius={10}

@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
   searchContainer: {
     position: 'relative',
     height: 20,
-    paddingTop: 30,
+    paddingTop: 40,
     flexGrow: 0,
     flexShrink: 0
   }, 
@@ -29,6 +29,26 @@ export const styles = StyleSheet.create({
     paddingVertical: 30,
     paddingHorizontal: 10,
     fontSize: 15,
+  },
+  searchBox: {
+    position: "absolute",
+    marginTop: 50,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#fff",
+    width: "90%",
+    alignSelf: "center",
+    borderRadius: 25,
+    padding: 10,
+    shadowColor: "#ccc",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 10,
+  },
+  searchBoxText: {
+    paddingLeft: 8,
+    paddingRight: 8,
   },
   searchHere: {
     position: "absolute",
@@ -51,7 +71,7 @@ export const styles = StyleSheet.create({
   },
   locationButton: {
     marginRight: 50,
-    marginLeft: 5,
+    marginLeft: 10,
     width: 38,
     height: 38,
     borderRadius: 20,
@@ -77,10 +97,18 @@ export const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 10,
   },
+  locationButtonContainer: { 
+    position: "absolute",
+    flexDirection: "row",
+    top: 100,
+    paddingHorizontal: 10,
+    paddingRight: 20,
+    alignSelf: "flex-start",
+  },
   buttonContainer: {
     position: "absolute",
     flexDirection: "row",
-    top: 90,
+    top: 100,
     paddingHorizontal: 10,
     paddingRight: 20,
     alignSelf: "flex-end",
@@ -106,13 +134,6 @@ export const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 10,
   },
-  modeButtonContainer: {
-    position: "absolute",
-    flexDirection: "row",
-    top: 220,
-    paddingHorizontal: 10,
-    alignSelf: "flex-end",
-  },
   modeButton: {
     padding: 60,
   },
@@ -121,26 +142,41 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   toiletTitle: {
-    paddingLeft: 30,
-    fontSize: 30,
-    height: 35,
+    padding: 15,
+    fontSize: 22,
+    color: "#fff"
   },
   toiletSubtitle: {
-    paddingLeft: 31,
+    paddingBottom:10,
+    paddingLeft: 15,
     fontSize: 14,
-    color: "gray",
-    height: 20,
+    color: "#fff",
+  },
+  toiletDistance: {
+    fontSize: 14,
+    color: "#ddd",
+  },
+  directionsButton: {
+    right: 0,
+    marginRight: 5,
+    marginLeft: 5,
+    width: 150,
+    height: 38,
+    borderRadius: 20,
+    flexDirection: "row",
+    backgroundColor: "#f98404"
   },
   hairline: {
     backgroundColor: "#A2A2A2",
     height: 2,
     width: 500,
   },
-  textSubheading: {
+  ratings: {
     paddingTop: 15,
     flexDirection: "row",
     paddingLeft: 30,
-    fontSize: 22,
+    fontSize: 18,
+    color: "#777",
   },
   bottomPanel: {
     backgroundColor: "#FFFFFF",
@@ -238,5 +274,18 @@ export const styles = StyleSheet.create({
     alignSelf: "center",
     height: 292,
     width: 261,
+  },
+  header: { 
+    flex: 1,
+    backgroundColor: "#009688", 
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingTop:5,
+    alignSelf: 'stretch',
+    shadowColor: "#ccc",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 10,
   },
 });
