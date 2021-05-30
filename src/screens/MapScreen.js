@@ -441,6 +441,9 @@ export default MapScreen = ({ navigation }) => {
         scrollEventThrottle={1}
         showsVerticalScrollIndicator={true}
         style={styles.listContainer}
+        contentContainerStyle={{
+          paddingBottom: 60
+        }}
       >
         {marker && marker.length && (
           <View>
@@ -536,7 +539,8 @@ export default MapScreen = ({ navigation }) => {
             />
           );
         })}
-        {editReview ? <TextInput       
+      </ScrollView>
+      {editReview ? <TextInput       
           style={styles.reviewTextInputContainer}
           multiline={true}        
           numberOfLines={10}
@@ -564,7 +568,6 @@ export default MapScreen = ({ navigation }) => {
           onPress={() => onSubmitReviewPress()}> 
           <Text style={styles.reviewButtonTitle}>Submit review</Text>    
         </TouchableOpacity>} 
-      </ScrollView>
     </KeyboardAvoidingView>
   );
 

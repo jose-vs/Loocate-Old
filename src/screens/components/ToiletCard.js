@@ -5,11 +5,7 @@ import StarRating from "./StarRating";
 
 export default ToiletCard = (props) => {
   return (
-    <TouchableOpacity
-      onPress={() => {
-        props.navigation.navigate("ReviewViewAndCreate", props.item);
-      }}
-    >
+
       <View style={styles.textContent}>
         <View style={{ padding: 15 }}>
           <Text numberOfLine={1} style={styles.listTitle}>
@@ -24,6 +20,5 @@ export default ToiletCard = (props) => {
           </Text>
         </View>
       </View>
-    </TouchableOpacity>
   );
 };
