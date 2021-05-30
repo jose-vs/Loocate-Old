@@ -226,6 +226,11 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
+  noReviewsText: {
+    textAlign: 'center',
+    fontSize: 16,
+    flex: 1,
+  },
   footer: {
     position: "relative",
     flexDirection: "row",

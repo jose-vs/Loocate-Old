@@ -303,10 +303,10 @@ export default MapScreen = ({ navigation }) => {
             duration: null,
             open:
               toiletData.opening_hours === undefined
-                ? ""
+                ? "N/A"
                 : toiletData.opening_hours.open_now == true
-                ? "open now"
-                : "closed",
+                ? "Open now"
+                : "Closed",
           };
           fetchedToilets.push(newToilet);
         });
@@ -504,6 +504,80 @@ export default MapScreen = ({ navigation }) => {
     }
   };
 
+  //Submit review on selected toilet if logged in. If not logged in, alert and do nothing.
+  const onSubmitReviewPress = () => {      
+    const usersRef = firebase.firestore().collection("users"); 
+    const reviewsRef = firebase.firestore().collection('reviews');
+    firebase.auth().onAuthStateChanged((user) => {
+    if (user) {       
+      usersRef
+      .doc(user.uid)
+      .get()
+      .then((document) => {
+      const data = document.data();
+        
+      //get reviews db, create blank doc, get its id, add the following fields to that new doc via set
+      const reviewsRef = firebase.firestore().collection('reviews')
+      const id = firebase.firestore().collection('reviews').doc().id
+      firebase.firestore().collection('reviews').doc(id).set({
+        title: review,
+        name: data.fullName,
+        address: toilet.address,
+        toiletID: toilet.id,
+        userID: data.id,
+        rating: toilet.rating,
+        reviewID: id,
+      })
+            
+      setReviewsArray([...reviewsArray , {title: review, name: data.fullName, address: toilet.address, toiletID: toilet.id, 
+        userID: data.id, reviewID: id, rating: toilet.rating}]); 
+    })
+
+    Alert.alert(
+      'Submission success',
+      'Your review has been placed.'); 
+      this.textInput.clear()
+      return;
+    } 
+    else {
+      Alert.alert(
+        'Authentication required',
+        'You must be logged in to place a review.');  
+      return;      
+    }
+    });
+  }
+
+  //Update edited review text in database, then change text input back to submit review.
+  const onEditReviewPress = () => { 
+      
+    //first, update local review with the correct field
+    reviewToEdit.title = editReviewText;
+
+    //then iterate through the reviews collection till we find the matching review, and update title field with editReviewText
+    const reviewsRef = firebase.firestore().collection('reviews');
+    reviewsRef.get().then((querySnapshot) => {
+      querySnapshot.forEach(snapshot => {
+          if (snapshot.data().reviewID == reviewToEdit.reviewID){
+            reviewsRef.doc(snapshot.data().reviewID).update({
+              "title": reviewToEdit.title,
+            })
+
+            //add updated review to local array..
+            setReviewsArray([...reviewsArray]);          
+          } 
+      }
+    )});
+
+    Alert.alert(
+      'Edit success',
+      'Your review has been updated.'); 
+      this.textInput.clear();
+      setEditReview(false);
+      return;   
+  }
+
+
   /**
    * creates bottom sheet content
    */
@@ -521,110 +595,116 @@ export default MapScreen = ({ navigation }) => {
 
   renderInner = () => (
     <KeyboardAvoidingView style={styles.bottomPanel} behavior="height">
-      <ScrollView
-        vertical
-        scrollEventThrottle={1}
-        showsVerticalScrollIndicator={true}
-        style={styles.listContainer}
-        contentContainerStyle={{
-          paddingBottom: 60
-        }}
-      >
-        {marker && marker.length && (
-          <View>
-            {/* contains rating number icons and review number in row direction */}
+      {isLoading ? <ActivityIndicator style={styles.loading} 
+      size="large" color="#007965"/> :       <ScrollView
+      vertical
+      scrollEventThrottle={1}
+      showsVerticalScrollIndicator={true}
+      style={styles.listContainer}
+      contentContainerStyle={{
+        paddingBottom: 80
+      }}
+    >
+      {marker && marker.length && (
+        <View>
+          {/* contains rating number icons and review number in row direction */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginBottom: 10,
+              paddingHorizontal: 30,
+            }}
+          >
             <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: 10,
-                paddingHorizontal: 30,
-              }}
+              style={{ flexDirection: "row", marginVertical: 8, left: 10 }}
             >
-              <View
-                style={{ flexDirection: "row", marginVertical: 8, left: 10 }}
-              >
-                <Text style={{ color: "#777", right: 6 }}>{toilet.rating}</Text>
-                <StarRating ratings={toilet.rating} />
-                <Text style={{ color: "#777" }}>({toilet.reviews})</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => {
-                  onGetDirectionsPress();
-                }}
-              >
-                <View style={styles.directionsButton}>
-                  <FontAwesome5
-                    name="directions"
-                    size={24}
-                    color="#fff"
-                    style={{ top: 6, left: 6 }}
-                  />
-                  <Text style={{ left: 20, top: 7, color: "#fff" }}>
-                    Directions
-                  </Text>
-                </View>
-              </TouchableOpacity>
+              <Text style={{ color: "#777", right: 6 }}>{toilet.rating}</Text>
+              <StarRating ratings={toilet.rating} />
+              <Text style={{ color: "#777" }}>({toilet.reviews})</Text>
             </View>
-            <View
-              style={{
-                flex: 1,
-                flexDirection: "row",
-                left: 5,
-                justifyContent: "space-around",
-                paddingHorizontal: 30,
+            <TouchableOpacity
+              onPress={() => {
+                onGetDirectionsPress();
               }}
             >
-              <View style={{ flex: 1, justifyContent: "flex-start" }}>
-                <Text
-                  style={[
-                    toilet.open == "closed"
-                      ? { color: "#962d2d" }
-                      : toilet.open == "open now"
-                      ? { color: "#9fe6a0" }
-                      : {},
-                    { fontSize: 16 },
-                  ]}
-                >
-                  {toilet.open}
+              <View style={styles.directionsButton}>
+                <FontAwesome5
+                  name="directions"
+                  size={24}
+                  color="#fff"
+                  style={{ top: 6, left: 6 }}
+                />
+                <Text style={{ left: 20, top: 7, color: "#fff" }}>
+                  Directions
                 </Text>
               </View>
-            </View>
-            <View
-              style={{
-                flex: 1,
-                flexDirection: "row",
-                justifyContent: "flex-start",
-                paddingHorizontal: 28,
-                paddingVertical: 5,
-              }}
-            >
-              <RenderBsMode />
-              <Text style={{ opacity: 0.6, right: 10 }}>
-                {toilet.duration} min
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              left: 5,
+              justifyContent: "space-around",
+              paddingHorizontal: 30,
+            }}
+          >
+            <View style={{ flex: 1, justifyContent: "flex-start" }}>
+              <Text
+                style={[
+                  toilet.open == "Closed"
+                    ? { color: "#962d2d" }
+                    : toilet.open == "Open now"
+                    ? { color: "#9fe6a0" }
+                    : {},
+                  { fontSize: 16 },
+                ]}
+              >
+                {toilet.open}
               </Text>
-              <Text style={{ opacity: 0.6 }}>({toilet.distance} km)</Text>
             </View>
           </View>
-        )}
-        {reviewsArray.map((item, index) => {
-          editedReview = item;
-          return (
-            <ReviewCard
-            name={item.name}                   
-            title={item.title}  
-            userID={item.userID}
-            key={index}
-            rating={item.rating}  
-            item={item}  
-            navigation={navigation} 
-            setEditReview={setEditReview}
-            setReviewToEdit={setReviewToEdit}  
-            setEditReviewText={setEditReviewText}
-            />
-          );
-        })}
-      </ScrollView>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              paddingHorizontal: 28,
+              paddingVertical: 5,
+            }}
+          >
+            <RenderBsMode />
+            <Text style={{ opacity: 0.6, right: 10 }}>
+              {toilet.duration} min
+            </Text>
+            <Text style={{ opacity: 0.6, textAlign: 'center' }}>({toilet.distance} km)</Text>
+          </View>
+        </View>
+      )}
+      {!reviewsArray.length ? <Text style={styles.noReviewsText}>No reviews yet. Be 
+      the first to place one!</Text> : <View>
+      {reviewsArray.map((item, index) => {
+        editedReview = item;
+        return (
+          <ReviewCard
+          name={item.name}                   
+          title={item.title}  
+          userID={item.userID}
+          key={index}
+          rating={item.rating}  
+          item={item}  
+          navigation={navigation} 
+          setEditReview={setEditReview}
+          setReviewToEdit={setReviewToEdit}  
+          setEditReviewText={setEditReviewText}
+          />
+        );
+      })}
+      </View>}
+    </ScrollView>}
+    {isLoading ? <ActivityIndicator style={styles.loading} 
+      size="large" color="#007965"/> : <View>    
       {editReview ? <TextInput       
           style={styles.reviewTextInputContainer}
           multiline={true}        
@@ -653,6 +733,7 @@ export default MapScreen = ({ navigation }) => {
           onPress={() => onSubmitReviewPress()}> 
           <Text style={styles.reviewButtonTitle}>Submit review</Text>    
         </TouchableOpacity>} 
+      </View>}
     </KeyboardAvoidingView>
   );
 
@@ -796,7 +877,6 @@ export default MapScreen = ({ navigation }) => {
               onReady={(result) => {
                 toilet.distance = Math.round(result.distance * 100) / 100;
                 toilet.duration = Math.round(result.duration * 100) / 100;
-                console.log(toilet);
                 _map.current.fitToCoordinates(result.coordinates, {
                   edgePadding: {
                     right: width / 20,
@@ -975,7 +1055,7 @@ export default MapScreen = ({ navigation }) => {
         </View>
         <BottomSheet
           ref={bs}
-          snapPoints={["30%", "0%", "101.5%"]}
+          snapPoints={["30%", "0%", "100%"]}
           renderContent={renderInner}
           renderHeader={renderHeader}
           borderRadius={10}
