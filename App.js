@@ -14,18 +14,11 @@ import AccountScreen from "./src/screens/AccountScreen";
 import RegistrationScreen from "./src/screens/RegistrationScreen";
 import ListScreen from "./src/screens/ListScreen";
 import MapScreen from "./src/screens/MapScreen";
-<<<<<<< HEAD
 import ReviewViewAndCreateScreen from './src/screens/ReviewViewAndCreateScreen';
 import DisplayReviewsScreen from './src/screens/DisplayReviewsScreen';
 import EditDeleteReviewScreen from './src/screens/EditDeleteReviewScreen';
 import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs() 
-=======
-import ReviewViewAndCreateScreen from "./src/screens/ReviewViewAndCreateScreen";
-import DisplayReviewsScreen from "./src/screens/DisplayReviewsScreen";
-import { LogBox } from "react-native";
-LogBox.ignoreAllLogs();
->>>>>>> Darkstyle
 
 const Stack = createStackNavigator();
 

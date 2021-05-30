@@ -243,10 +243,6 @@ export default MapScreen = ({ navigation }) => {
           longitude: location.coords.longitude,
         },
       });
-<<<<<<< HEAD
-
-=======
->>>>>>> Darkstyle
       toiletApiFetch(location.coords.latitude, location.coords.longitude);
 
       setPerms(true);
@@ -307,15 +303,9 @@ export default MapScreen = ({ navigation }) => {
             duration: null,
             open:
               toiletData.opening_hours === undefined
-<<<<<<< HEAD
                 ? ""
                 : toiletData.opening_hours.open_now == true
                 ? "open now"
-=======
-                ? "gay"
-                : toiletData.opening_hours.open_now == true
-                ? "open"
->>>>>>> Darkstyle
                 : "closed",
           };
           fetchedToilets.push(newToilet);
@@ -513,89 +503,6 @@ export default MapScreen = ({ navigation }) => {
       console.log("No user location given (PERMISIONS MAY NOT BE GIVEN");
     }
   };
-<<<<<<< HEAD
-
-  //Navigates to review screen and takes current toilet being accessed there to have its reviews manipulated.
-  const onReviewPress = () => {
-    navigation.navigate("ReviewViewAndCreate", toilet);
-  };
-
-  //Submit review on selected toilet if logged in. If not logged in, alert and do nothing.
-  const onSubmitReviewPress = () => {      
-    const usersRef = firebase.firestore().collection("users"); 
-    const reviewsRef = firebase.firestore().collection('reviews');
-    firebase.auth().onAuthStateChanged((user) => {
-    if (user) {       
-      usersRef
-      .doc(user.uid)
-      .get()
-      .then((document) => {
-      const data = document.data();
-        
-      //get reviews db, create blank doc, get its id, add the following fields to that new doc via set
-      const reviewsRef = firebase.firestore().collection('reviews')
-      const id = firebase.firestore().collection('reviews').doc().id
-      firebase.firestore().collection('reviews').doc(id).set({
-        title: review,
-        name: data.fullName,
-        address: toilet.address,
-        toiletID: toilet.id,
-        userID: data.id,
-        rating: toilet.rating,
-        reviewID: id,
-      })
-            
-      setReviewsArray([...reviewsArray , {title: review, name: data.fullName, address: toilet.address, toiletID: toilet.id, 
-        userID: data.id, reviewID: id, rating: toilet.rating}]); 
-    })
-
-    Alert.alert(
-      'Submission success',
-      'Your review has been placed.'); 
-      this.textInput.clear()
-      return;
-    } 
-    else {
-      Alert.alert(
-        'Authentication required',
-        'You must be logged in to place a review.');  
-      return;      
-    }
-    });
-  }
-
-  //Update edited review text in database, then change text input back to submit review.
-  const onEditReviewPress = () => { 
-      
-    //set temp array to initial value of reviewsArray at time of button press
-    var addToReviewsArray = [reviewsArray];
-    
-    //first, update local review with the correct field
-    reviewToEdit.title = editReviewText;
-
-    //then iterate through the reviews collection till we find the matching review, and update title field with editReviewText
-    const reviewsRef = firebase.firestore().collection('reviews');
-    reviewsRef.get().then((querySnapshot) => {
-      querySnapshot.forEach(snapshot => {
-          if (snapshot.data().reviewID == reviewToEdit.reviewID){
-            reviewsRef.doc(snapshot.data().reviewID).update({
-              "title": reviewToEdit.title,
-            })
-            //add updated review to local array..
-            setReviewsArray([...reviewsArray , reviewToEdit]);          
-          } 
-      }
-    )});
-
-    Alert.alert(
-      'Edit success',
-      'Your review has been updated.'); 
-      this.textInput.clear();
-      setEditReview(false);
-      return;   
-  }
-=======
->>>>>>> Darkstyle
 
   /**
    * creates bottom sheet content
@@ -613,7 +520,6 @@ export default MapScreen = ({ navigation }) => {
   );
 
   renderInner = () => (
-<<<<<<< HEAD
     <KeyboardAvoidingView style={styles.bottomPanel} behavior="height">
       <ScrollView
         vertical
@@ -748,41 +654,6 @@ export default MapScreen = ({ navigation }) => {
           <Text style={styles.reviewButtonTitle}>Submit review</Text>    
         </TouchableOpacity>} 
     </KeyboardAvoidingView>
-=======
-    <View style={styles.bottomPanel}>
-      {marker && marker.length && (
-        <Text
-          style={
-            styles.toiletTitle //check for null in useState otherwise crash on startup as undefined
-          }
-        >
-          {toilet.title}
-        </Text>
-      )}
-      {marker && marker.length && (
-        <Text style={styles.toiletSubtitle}>{toilet.address}</Text>
-      )}
-      <View style={styles.hairline} />
-      {marker && marker.length && (
-        <TouchableOpacity onPress={() => onGetDirectionsPress()}>
-          <Text style={styles.textSubheading}>Get Directions</Text>
-        </TouchableOpacity>
-      )}
-      {marker && marker.length && (
-        <Text style={styles.textSubheading}>
-          Rating: <StarRating ratings={toilet.rating} />
-        </Text>
-      )}
-      {marker && marker.length && (
-        <TouchableOpacity onPress={() => onReviewPress()}>
-          <Text style={styles.textSubheading}>Reviews: {toilet.reviews}</Text>
-        </TouchableOpacity>
-      )}
-      {marker && marker.length && (
-        <Text style={styles.toiletSubtitle}>Open/Closed? {toilet.open}</Text>
-      )}
-    </View>
->>>>>>> Darkstyle
   );
 
   const RenderBsMode = () => {
@@ -951,7 +822,7 @@ export default MapScreen = ({ navigation }) => {
             <Text style={styles.searchHereText}>Search this area</Text>
           </TouchableOpacity>
         </Animatable.View>
-<<<<<<< HEAD
+
         <TouchableOpacity
           style={styles.locationButtonContainer}
           onPress={() => {
@@ -968,22 +839,6 @@ export default MapScreen = ({ navigation }) => {
           </View>
         </TouchableOpacity>
         <View style={styles.buttonContainer}>
-=======
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={() => {
-              onLocationButtonPress();
-            }}
-          >
-            <View style={styles.locationButton}>
-              <MaterialIcons
-                name="my-location"
-                size={26}
-                color="black"
-                style={{ top: 6, left: 6, opacity: 0.6 }}
-              />
-            </View>
-          </TouchableOpacity>
           {/* Dark Mode Button */}
           <TouchableOpacity
             onPress={() => {
@@ -1005,7 +860,6 @@ export default MapScreen = ({ navigation }) => {
               />
             </View>
           </TouchableOpacity>
->>>>>>> Darkstyle
           {/* Map Style Button */}
           <TouchableOpacity
             onPress={() => {
