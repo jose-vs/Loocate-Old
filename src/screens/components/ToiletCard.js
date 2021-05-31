@@ -12,8 +12,8 @@ export default ToiletCard = (props) => {
             {props.title}
           </Text>
           <Text>
-            <StarRating ratings={props.ratings} />
-            {props.ratings}
+            <StarRating rating={props.rating} />
+            {props.rating}
           </Text>
           <Text numberOfLine={1} style={styles.listAddress}>
             {props.address}

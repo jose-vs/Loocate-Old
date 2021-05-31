@@ -100,7 +100,7 @@ export default ListScreen = ({ route, navigation }) => {
               key={index}
               title={item.title}
               address={item.address}
-              ratings={item.rating}
+              rating={item.rating}
               reviews={item.reviews}
               item={item}
               navigation={navigation}

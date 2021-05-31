@@ -11,8 +11,8 @@ const StarRating = (props) => {
   for (var i = 1; i <= 5; i++) {
     // set the path to filled stars
     let name = "ios-star";
-    // If ratings is lower, set the path to unfilled stars
-    if (i > props.ratings) {
+    // If rating is lower, set the path to unfilled stars
+    if (i > props.rating) {
       name = "ios-star-outline";
     }
 

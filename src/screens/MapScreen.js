@@ -215,6 +215,7 @@ export default MapScreen = ({ navigation }) => {
   const [editReview, setEditReview] = useState(null); //used for conditional rendering of edit textInput vs place review textInput
   const [reviewToEdit, setReviewToEdit] = useState(null); //used in edit review process
   const [editReviewText, setEditReviewText] = useState(null)
+  const [trigger, setTrigger] = useState(0); //shouldn't use this probably, but an independent use state used to trigger useEffects when I want
 
 
 
@@ -249,7 +250,7 @@ export default MapScreen = ({ navigation }) => {
     })();
   }, []);
 
-  /* Triggers on setToilet which only happens on marker press, retrieves toilet reviews, 
+  /* Triggers on toilet changes, which only happens on marker press, retrieves toilet reviews, 
      overwrites existing google reviews/ratings to be loocate reviews and ratings
   */
   useEffect(() => {
@@ -258,8 +259,9 @@ export default MapScreen = ({ navigation }) => {
 
     if (mounted.current) {
       var addToReviewsArray = [];
-      var loocateOverallRating = 0.0;
+      var loocateOverallRating = 0;
       var numberOfReviews = 0;
+      var updatedToilet = toilet;
 
       const reviewsRef = firebase.firestore().collection("reviews");
       reviewsRef.get().then((querySnapshot) => {
@@ -271,16 +273,25 @@ export default MapScreen = ({ navigation }) => {
           }
         } 
       )
-        loocateOverallRating = loocateOverallRating / numberOfReviews;   
+        updatedToilet.rating = (loocateOverallRating / numberOfReviews).toFixed(2);   
+        updatedToilet.reviews = numberOfReviews;
+  
+        if (isNaN(updatedToilet.rating)) {
+          updatedToilet.rating = 0;
+          setToilet(updatedToilet); 
+        }
+        else if (!isNaN(updatedToilet.rating)) {
+          setToilet(updatedToilet);  
+        }       
         setReviewsArray(addToReviewsArray);
-        setIsLoading(false);         
+        setIsLoading(false);                  
       });
     }
     else if (!mounted.current) {      
       mounted.current = true;   
       setIsLoading(true)  
     }
-  }, [toilet]);
+  }, [toilet, trigger]);
 
   toiletApiFetch = async (lat, lng) => {
     const fetchedToilets = [];
@@ -512,7 +523,8 @@ export default MapScreen = ({ navigation }) => {
   };
 
   //Submit review on selected toilet if logged in. If not logged in, alert and do nothing.
-  const onSubmitReviewPress = () => {      
+  const onSubmitReviewPress = () => {  
+  
     const usersRef = firebase.firestore().collection("users"); 
     const reviewsRef = firebase.firestore().collection('reviews');
     firebase.auth().onAuthStateChanged((user) => {
@@ -537,7 +549,8 @@ export default MapScreen = ({ navigation }) => {
       })
             
       setReviewsArray([...reviewsArray , {title: review, name: data.fullName, address: toilet.address, toiletID: toilet.id, 
-        userID: data.id, reviewID: id, rating: toilet.rating}]); 
+        userID: data.id, reviewID: id, rating: toilet.rating, reviews: toilet.reviews}]); 
+      setTrigger(trigger + 1);
     })
 
     Alert.alert(
@@ -572,7 +585,8 @@ export default MapScreen = ({ navigation }) => {
 
             //add updated review to local array..
             setReviewsArray([...reviewsArray]);          
-          } 
+          }
+          setTrigger(trigger + 1); 
       }
     )});
 
@@ -627,7 +641,7 @@ export default MapScreen = ({ navigation }) => {
               style={{ flexDirection: "row", marginVertical: 8, left: 10 }}
             >
               <Text style={{ color: "#777", right: 6 }}>{toilet.rating}</Text>
-              <StarRating ratings={toilet.rating} />
+              <StarRating rating={toilet.rating} />
               <Text style={{ color: "#777" }}>({toilet.reviews})</Text>
             </View>
             <TouchableOpacity
@@ -695,23 +709,23 @@ export default MapScreen = ({ navigation }) => {
         editedReview = item;
         return (
           <ReviewCard
-          name={item.name}                   
-          title={item.title}  
-          userID={item.userID}
-          key={index}
-          rating={item.rating}  
-          item={item}  
-          navigation={navigation} 
-          setEditReview={setEditReview}
-          setReviewToEdit={setReviewToEdit}  
-          setEditReviewText={setEditReviewText}
+            key={index}
+            name={item.name}                   
+            title={item.title}  
+            userID={item.userID}         
+            rating={item.rating}  
+            item={item}  
+            navigation={navigation} 
+            setEditReview={setEditReview}
+            setReviewToEdit={setReviewToEdit}  
+            setEditReviewText={setEditReviewText}
           />
         );
       })}
       </View>}
     </ScrollView>}
     {isLoading ? <ActivityIndicator style={styles.loading} 
-      size="large" color="#007965"/> : <View>    
+      size="large" color="#007965"/> : <View>   
       {editReview ? <TextInput       
           style={styles.reviewTextInputContainer}
           multiline={true}        
