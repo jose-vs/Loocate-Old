@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button should render without issues 1`] = `
+<Pressable
+  onPress={[Function]}
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "#74B3CE",
+        "borderRadius": 4,
+        "height": 50,
+        "justifyContent": "center",
+        "marginVertical": 10,
+        "width": "100%",
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "white",
+          "fontSize": 16,
+        }
+      }
+    />
+  </View>
+</Pressable>
+`;

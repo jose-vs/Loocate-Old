@@ -303,7 +303,7 @@ export default MapScreen = ({ navigation }) => {
             duration: null,
             open:
               toiletData.opening_hours === undefined
-                ? "N/A"
+                ? "Opening hours not available"
                 : toiletData.opening_hours.open_now == true
                 ? "Open now"
                 : "Closed",
