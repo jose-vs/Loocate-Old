@@ -21,4 +21,4 @@ expo start
 This will then open your own unique web browser window of Metro Bundler.
 It will also display a unique QR code to within the ExpoGo Application - On android scan this within the application
 
-![assets/pancake.jpg] (assets/pancake.jpg)
+![assets/loocate_icon.png] (assets/loocate_icon.png)
