@@ -39,6 +39,8 @@ It will also display a unique QR code to sca within the ExpoGo Application - On 
 
 - React-native 0.63.4
 
+- Expo 41.0.1
+
 # Features
 
 ## creating a Loocate Account
