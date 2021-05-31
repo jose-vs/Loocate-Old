@@ -158,9 +158,9 @@ export const styles = StyleSheet.create({
   },
   directionsButton: {
     right: 0,
-    marginRight: 5,
-    marginLeft: 5,
-    width: 150,
+    marginRight: 25,
+    marginLeft: 25,
+    width: 130,
     height: 38,
     borderRadius: 20,
     flexDirection: "row",
@@ -265,6 +265,16 @@ export const styles = StyleSheet.create({
     marginBottom: 5,
     height: 25,
     borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row"
+  },
+  starRatingButton: {
+    //using for directions screen
+    marginLeft: 100,
+    marginRight: 100,
+    marginBottom: 5,
+    height: 25,
     alignItems: "center",
     justifyContent: "center",
   },

@@ -27,7 +27,8 @@ import toiletApi from "../../api/googlePlaces";
 import distanceMatrixApi from "../../api/distanceMatrixApi";
 import { initialMapState, toilet } from "./model/MapData";
 import { styles } from "./model/MapStyles";
-import StarRating from "./components/StarRating";
+//import StarRating from "./components/StarRating";
+import StarRating from 'react-native-star-rating';
 import { CARD_WIDTH } from "./model/Constants";
 import BottomSheet from "reanimated-bottom-sheet";
 import * as Location from "expo-location";
@@ -214,8 +215,11 @@ export default MapScreen = ({ navigation }) => {
   const [reviewsArray, setReviewsArray] = useState([]); 
   const [editReview, setEditReview] = useState(null); //used for conditional rendering of edit textInput vs place review textInput
   const [reviewToEdit, setReviewToEdit] = useState(null); //used in edit review process
-  const [editReviewText, setEditReviewText] = useState(null)
+  const [editReviewText, setEditReviewText] = useState(null);
+  const [starRating, setStarRating] = useState(-1);
   const [trigger, setTrigger] = useState(0); //shouldn't use this probably, but an independent use state used to trigger useEffects when I want
+  
+
 
 
 
@@ -273,11 +277,12 @@ export default MapScreen = ({ navigation }) => {
           }
         } 
       )
-        updatedToilet.rating = (loocateOverallRating / numberOfReviews).toFixed(2);   
+        updatedToilet.rating = Number(Math.round(parseFloat((loocateOverallRating / numberOfReviews) + 'e' + 2)) + 'e-' + 2)
+        //updatedToilet.rating = Math.ceil(loocateOverallRating / numberOfReviews);  
         updatedToilet.reviews = numberOfReviews;
   
         if (isNaN(updatedToilet.rating)) {
-          updatedToilet.rating = 2;
+          updatedToilet.rating = 0;
           setToilet(updatedToilet); 
         }
         else if (!isNaN(updatedToilet.rating)) {
@@ -523,80 +528,121 @@ export default MapScreen = ({ navigation }) => {
   };
 
   //Submit review on selected toilet if logged in. If not logged in, alert and do nothing.
-  const onSubmitReviewPress = () => {  
-  
-    const usersRef = firebase.firestore().collection("users"); 
-    const reviewsRef = firebase.firestore().collection('reviews');
-    firebase.auth().onAuthStateChanged((user) => {
-    if (user) {       
-      usersRef
-      .doc(user.uid)
-      .get()
-      .then((document) => {
-      const data = document.data();
-        
-      //get reviews db, create blank doc, get its id, add the following fields to that new doc via set
-      const reviewsRef = firebase.firestore().collection('reviews')
-      const id = firebase.firestore().collection('reviews').doc().id
-      firebase.firestore().collection('reviews').doc(id).set({
-        title: review,
-        name: data.fullName,
-        address: toilet.address,
-        toiletID: toilet.id,
-        userID: data.id,
-        rating: toilet.rating,
-        reviewID: id,
-      })
-            
-      setReviewsArray([...reviewsArray , {title: review, name: data.fullName, address: toilet.address, toiletID: toilet.id, 
-        userID: data.id, reviewID: id, rating: toilet.rating, reviews: toilet.reviews}]); 
-      setTrigger(trigger + 1);
-    })
-
-    Alert.alert(
-      'Submission success',
-      'Your review has been placed.'); 
-      this.textInput.clear()
-      return;
-    } 
-    else {
+  const onSubmitReviewPress = () => {
+    
+    if (starRating == -1 ) {
       Alert.alert(
-        'Authentication required',
-        'You must be logged in to place a review.');  
-      return;      
-    }
-    });
+        'Rating required',
+        'Please rate your review before submitting it.');
+        setStarRating(-1);
+        return;   
+      }
+      else if (review == "") {
+        Alert.alert(
+          'Input required',
+          'Please input text to submit a review.'); 
+          return;   
+      }
+      else if (starRating != -1) {
+        const usersRef = firebase.firestore().collection("users"); 
+        const reviewsRef = firebase.firestore().collection('reviews');
+        firebase.auth().onAuthStateChanged((user) => {
+        if (user) {       
+          usersRef
+          .doc(user.uid)
+          .get()
+          .then((document) => {
+          const data = document.data();
+            
+          //get reviews db, create blank doc, get its id, add the following fields to that new doc via set
+          const reviewsRef = firebase.firestore().collection('reviews')
+          const id = firebase.firestore().collection('reviews').doc().id
+          firebase.firestore().collection('reviews').doc(id).set({
+            title: review,
+            name: data.fullName,
+            address: toilet.address,
+            toiletID: toilet.id,
+            userID: data.id,
+            rating: starRating,
+            reviewID: id,
+          })
+                
+          setReviewsArray([...reviewsArray , {title: review, name: data.fullName, address: toilet.address, toiletID: toilet.id, 
+            userID: data.id, reviewID: id, rating: toilet.rating, reviews: toilet.reviews}]); 
+          setStarRating(-1);
+          setTrigger(trigger + 1);
+        })
+    
+        Alert.alert(
+          'Submission success',
+          'Your review has been placed.'); 
+          this.textInput.clear()
+          return;
+        } 
+        else {
+          Alert.alert(
+            'Authentication required',
+            'You must be logged in to place a review.');  
+          return;      
+        }
+        });
+
+      }
   }
 
   //Update edited review text in database, then change text input back to submit review.
   const onEditReviewPress = () => { 
       
-    //first, update local review with the correct field
-    reviewToEdit.title = editReviewText;
-
-    //then iterate through the reviews collection till we find the matching review, and update title field with editReviewText
-    const reviewsRef = firebase.firestore().collection('reviews');
-    reviewsRef.get().then((querySnapshot) => {
-      querySnapshot.forEach(snapshot => {
-          if (snapshot.data().reviewID == reviewToEdit.reviewID){
-            reviewsRef.doc(snapshot.data().reviewID).update({
-              "title": reviewToEdit.title,
-            })
-
-            //add updated review to local array..
-            setReviewsArray([...reviewsArray]);          
-          }
-          setTrigger(trigger + 1); 
+    if (starRating == -1 ) { //probably wont ever run
+      Alert.alert(
+        'Rating required',
+        'Please rate your review before submitting your edit.');
+        setStarRating(-1);
+        return;   
       }
-    )});
+      else if (review == "") {
+        Alert.alert(
+          'Input required',
+          'Please input text to submit your edit.'); 
+          return;   
+      }
+    else if (starRating != -1) {
+      //first, update local review with the correct field
+      reviewToEdit.title = editReviewText;
+      reviewToEdit.rating = starRating;
 
-    Alert.alert(
-      'Edit success',
-      'Your review has been updated.'); 
-      this.textInput.clear();
-      setEditReview(false);
-      return;   
+      //then iterate through the reviews collection till we find the matching review, and update title field with editReviewText
+      const reviewsRef = firebase.firestore().collection('reviews');
+      reviewsRef.get().then((querySnapshot) => {
+        querySnapshot.forEach(snapshot => {
+            if (snapshot.data().reviewID == reviewToEdit.reviewID){
+              reviewsRef.doc(snapshot.data().reviewID).update({
+                "title": reviewToEdit.title,
+                "rating": reviewToEdit.rating,
+              })
+
+              //add updated review to local array..
+              setReviewsArray([...reviewsArray]);          
+            }
+            setStarRating(-1);
+            setTrigger(trigger + 1); 
+        }
+      )});
+
+      Alert.alert(
+        'Edit success',
+        'Your review has been updated.'); 
+        this.textInput.clear();
+        setEditReview(false);
+        return;  
+    }
   }
+
+  const onStarRatingPress = (starcount) => { 
+    setStarRating(starcount);
+    return;
+  }
+  
 
 
   /**
@@ -641,8 +687,12 @@ export default MapScreen = ({ navigation }) => {
               style={{ flexDirection: "row", marginVertical: 8, left: 10 }}
             >
               <Text style={{ color: "#777", right: 6 }}>{toilet.rating}</Text>
-              <StarRating rating={toilet.rating} />
-              <Text style={{ color: "#777" }}>({toilet.reviews})</Text>
+              <StarRating 
+                starSize={15} fullStar={'ios-star'} emptyStar={'ios-star-outline'} halfStar={'ios-star-half'} iconSet={'Ionicons'} disabled={false} 
+                fullStarColor={'#FFD704'} emptyStarColor={'#FFD704'} halfStarColor={'#FFD704'} maxStars={5} 
+                rating={toilet.rating}
+              />
+              <Text style={{ color: "#777" }}>({toilet.reviews}) reviews</Text>
             </View>
             <TouchableOpacity
               onPress={() => {
@@ -654,7 +704,7 @@ export default MapScreen = ({ navigation }) => {
                   name="directions"
                   size={24}
                   color="#fff"
-                  style={{ top: 6, left: 6 }}
+                  style={{ top: 6, left: 5 }}
                 />
                 <Text style={{ left: 20, top: 7, color: "#fff" }}>
                   Directions
@@ -725,7 +775,8 @@ export default MapScreen = ({ navigation }) => {
       </View>}
     </ScrollView>}
     {isLoading ? <ActivityIndicator style={styles.loading} 
-      size="large" color="#007965"/> : <View>   
+      size="large" color="#007965"/> : <View
+      style={styles.reviewButtonContainer}>   
       {editReview ? <TextInput       
           style={styles.reviewTextInputContainer}
           multiline={true}        
@@ -744,7 +795,18 @@ export default MapScreen = ({ navigation }) => {
           onChangeText={(userInput) => review = (userInput)}
           ref={input => { this.textInput = input }} 
           underlineColorAndroid="transparent"
-        />} 
+        />}
+        <TouchableOpacity
+          style={styles.starRatingButton}
+          onPress={() => onStarRatingPress()}>
+          <Text>
+            <StarRating 
+            starSize={20} fullStar={'ios-star'} emptyStar={'ios-star-outline'} halfStar={'ios-star-half'} iconSet={'Ionicons'} disabled={false} 
+            fullStarColor={'#FFD704'} emptyStarColor={'#FFD704'} halfStarColor={'#FFD704'} maxStars={5} 
+            selectedStar={(rating) => onStarRatingPress(rating)} rating={starRating}
+            />
+          </Text>  
+        </TouchableOpacity>  
         {editReview ? <TouchableOpacity
           style={styles.reviewButton}
           onPress={() => onEditReviewPress()}> 
@@ -753,7 +815,7 @@ export default MapScreen = ({ navigation }) => {
           style={styles.reviewButton}
           onPress={() => onSubmitReviewPress()}> 
           <Text style={styles.reviewButtonTitle}>Submit review</Text>    
-        </TouchableOpacity>} 
+        </TouchableOpacity>}
       </View>}
     </KeyboardAvoidingView>
   );
