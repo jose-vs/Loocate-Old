@@ -1,6 +1,6 @@
 # Loocate
 
-Loocate is a dedicated toilet finding application for android devices.
+Loocate is a dedicated toilet finding application for android device users. The application allows users to search and gain directions to public toilets as well as leave and edit reviews on toilets.
 
 ## Table of Contents
 
@@ -10,7 +10,7 @@ Loocate is a dedicated toilet finding application for android devices.
 
 # Installation
 
-Please use [Expo](https://play.google.com/store/apps/details?id=host.exp.exponent&hl=en_NZ&gl=US) to run Loocate
+Please use [Expo](https://play.google.com/store/apps/details?id=host.exp.exponent&hl=en_NZ&gl=US) to run Loocate.
 
 In the terminal run
 
@@ -35,7 +35,7 @@ It will also display a unique QR code to scan within the ExpoGo Application - On
 
 # Features
 
-## creating a Loocate Account
+## Creating a Loocate Account
 
 To create a Looacte account you need to tap the bottom right icon once the application loads, this will take you to an account page where you are to sign in with an existing acount or 'Sign up' for a new account.
 
@@ -70,7 +70,7 @@ You are able to edit these reviews by pressing the pencil icon on your review (y
 
 To change the style of the map between dark and light there is an icon located at the top of the map that represents a sun and moon, pressing this will swap between each style.
 
-## Hybrid and street map
+## Hybrid and Street map
 
 To change the style of the map between hybrid and street view there is an icon located at the top of the map that represents map layers, pressing this will swap between each style.
 
