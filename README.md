@@ -5,16 +5,8 @@ Loocate is a dedicated toilet finding application for android devices.
 ## Table of Contents
 
 - [Installation](#installation)
-
-* [Technologies](#technologies)
-* [Features](#features)
-* [Searching](#searhing)
-* [Getting Directions](#getting-directions)
-* [Direction Mode](#direction-mode)
-* [Reviews](#reviews)
-* [Dark Style Map](#dark-style-map)
-* [Hybrid Map Style](#hybrid-map-style)
-* [Current Location](#current-location)
+- [Technologies](#technologies)
+- [Features](#features)
 
 # Installation
 
@@ -33,7 +25,7 @@ expo start
 ```
 
 This will then open your own unique web browser window of Metro Bundler.
-It will also display a unique QR code to sca within the ExpoGo Application - On android scan this within the application.
+It will also display a unique QR code to scan within the ExpoGo Application - On android scan this from within the application.
 
 # Technologies
 
@@ -45,7 +37,7 @@ It will also display a unique QR code to sca within the ExpoGo Application - On 
 
 ## creating a Loocate Account
 
-To create a Looacte account you need to tap the bottom right icon once the application loads, this will take you to an acconut page where you are to sign in with an existing acount or 'Sign up' for a new account.
+To create a Looacte account you need to tap the bottom right icon once the application loads, this will take you to an account page where you are to sign in with an existing acount or 'Sign up' for a new account.
 
 ## Searching
 
@@ -64,13 +56,13 @@ To get directions to a toilet you must select the 'Directions' button once you h
 
 Once a destination has been selected you are able to change the mode of transport to that destination.
 
-This can been done by pressing either the 'car', 'walking' or 'cycling' icon located top right of the map. This will provided the fastest route based off that mode of transportation.
+This can be done by pressing either the 'car', 'walking' or 'cycling' icon located top right of the map. This will provided the fastest route based off that mode of transportation.
 
 ## Reviews
 
 To leave reviews on a toilet you must be logged into a valid Loocate account.
 
-If you are logged into a Looacte account you can leave a review on a toilet by scolling to the bottom of the pop-up card for a selected toilet and typing a review and then pressing 'Submit review'.
+If you are logged into a Looacte account you can leave a review on a toilet by scrolling to the bottom of the pop-up card for a selected toilet and typing a review and then pressing 'Submit review'.
 
 You are able to edit these reviews by pressing the pencil icon on your review (you can only do this on your own reviews).
 
