@@ -44,4 +44,24 @@ To get directions to a toilet you must select 'Directions' Button once you have 
 
 Once a destionation has been selected you are able to change the mode of transport to that destination.
 
-This can been done by pressing either the 'car', 'walking' or 'cycling', icon located top right of the map. This will provided the fastest route based off that mode of transportation.
+This can been done by pressing either the 'car', 'walking' or 'cycling' icon located top right of the map. This will provided the fastest route based off that mode of transportation.
+
+## Reviews
+
+To leave reviews on a toilet you must be logged into a valid Loocate account.
+
+If you are logged into a Looacte account you can leave a review on a toilet by scolling to the bottom of the pop-up card for a selected toilet and typing a review and then pressing 'Submit review'.
+
+You are able to edit these reviews by pressing the pencil icon on your review (you can onnly do this on your own reviews).
+
+## Dark Style Map
+
+To change the style of the map between dark and light there is an icon located at the top of the map that represents a sun and moon, pressing this will swap between each style.
+
+## Hybrid and street map
+
+To change the style of the map between hybrid and street view there is an icon located at the top of the map that represents map layers, pressing this will swap between each style.
+
+## Current Location
+
+To snap to your devices current location on the map there is a button located at the top right of the map that represents a location icon, pressing this will snap the map view to the devices current location.
