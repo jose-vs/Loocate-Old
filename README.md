@@ -1,8 +1,15 @@
 # Loocate
 
-Best way to test app:
+Loocate is a dedicated toilet finding application for android devices
 
-Plz try on an android phone with the Expo Go app installed. Run the app on a PC in a terminal, type npm install. After that finishes, enter "expo start" (not npm start!) to get the QR code for Expo Go to scan. Scan it and the app will run.
+## Installation
 
-Thanks,
-Loocate team
+Plaese use [Expo] (https://play.google.com/store/apps/details?id=host.exp.exponent&hl=en_NZ&gl=US) to run Loocate
+
+```bash
+npm install
+```
+
+```bash
+expo start
+```
