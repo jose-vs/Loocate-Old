@@ -249,22 +249,29 @@ export default MapScreen = ({ navigation }) => {
     })();
   }, []);
 
-  //triggers on setToilet which only happens on marker press, retrieves toilet reviews
+  /* Triggers on setToilet which only happens on marker press, retrieves toilet reviews, 
+     overwrites existing google reviews/ratings to be loocate reviews and ratings
+  */
   useEffect(() => {
     setEditReview(false); //done so that if a review in the process of being edited, this is switched back to submitReview
     setIsLoading(true); //activity indicator set to load at all times, unless the toilet marker is mounted in the if below
 
     if (mounted.current) {
       var addToReviewsArray = [];
-      const reviewsRef = firebase.firestore().collection("reviews");
+      var loocateOverallRating = 0.0;
+      var numberOfReviews = 0;
 
+      const reviewsRef = firebase.firestore().collection("reviews");
       reviewsRef.get().then((querySnapshot) => {
         querySnapshot.forEach((snapshot) => {
           if (snapshot.data().toiletID == toilet.id) {
             addToReviewsArray = [...addToReviewsArray, snapshot.data()];
+            loocateOverallRating = snapshot.data().rating + loocateOverallRating; //will get overall rating of all reviews for toilet
+            numberOfReviews = numberOfReviews + 1; //will give us a counter for number of reviews for toilet
           }
-        }
-      )  
+        } 
+      )
+        loocateOverallRating = loocateOverallRating / numberOfReviews;   
         setReviewsArray(addToReviewsArray);
         setIsLoading(false);         
       });

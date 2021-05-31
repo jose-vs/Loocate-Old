@@ -7,10 +7,7 @@ import { firebase } from "../firebase/config";
 
 export default function DisplayReviewsScreen({ route, navigation }) {
 
-//this page should only be for reviews viewed on a specific toilet. Viewing reviews on account needs to be done differently...
-
-  //I want to fetch each review that are of the current toilet being looked at, and add them to their own array. I then want to 
-  //use the map in the reviewcard section to iterate through these and display them on the cards, similar to listscreen.
+//Page used for displaying own reviews on existing account
 
 const [reviewsArray, setReviewsArray] = useState(route.params);
 
