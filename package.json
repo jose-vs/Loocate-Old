@@ -64,11 +64,13 @@
   },
   "jest": {
     "preset": "react-native",
-    "setupFilesAfterEnv":["jest-enzyme"],
+    "setupFilesAfterEnv": [
+      "jest-enzyme"
+    ],
     "testEnvironment": "enzyme",
     "testEnvironmentOptions": {
       "enzymeAdapter": "react16"
-    }  
+    }
   },
   "private": true,
   "name": "Loocate",

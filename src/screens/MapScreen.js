@@ -277,7 +277,7 @@ export default MapScreen = ({ navigation }) => {
         updatedToilet.reviews = numberOfReviews;
   
         if (isNaN(updatedToilet.rating)) {
-          updatedToilet.rating = 0;
+          updatedToilet.rating = 2;
           setToilet(updatedToilet); 
         }
         else if (!isNaN(updatedToilet.rating)) {
