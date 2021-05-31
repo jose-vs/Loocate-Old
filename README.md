@@ -6,6 +6,16 @@ Loocate is a dedicated toilet finding application for android devices.
 
 - [Installation](#installation)
 
+* [Technologies](#technologies)
+* [Features](#features)
+* [Searching](#searhing)
+* [Getting Directions](#getting-directions)
+* [Direction Mode](#direction-mode)
+* [Reviews](#reviews)
+* [Dark Style Map](#dark-style-map)
+* [Hybrid Map Style](#hybrid-map-style)
+* [Current Location](#current-location)
+
 ## Installation
 
 Please use [Expo](https://play.google.com/store/apps/details?id=host.exp.exponent&hl=en_NZ&gl=US) to run Loocate
