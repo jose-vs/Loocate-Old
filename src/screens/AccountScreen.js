@@ -11,6 +11,20 @@ export default function AccountScreen({ navigation }) {
   const [userId, setUserId] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const reviewsFetched = useRef(false);
+  const [userr, setUserr] = useState();
+
+  //clean up useEffect, unmounting on auth changed listener...
+  useEffect(() => {
+    const unsubscribe = firebase.auth().onAuthStateChanged((user) => { // detaching the listener 
+      if (user) {
+        setUserr(user);
+      }
+      else {
+        setUserr(null);
+      }
+    });
+    return () => unsubscribe(); // unsubscribing from the listener when the component is unmounting
+  }, []);
 
   // Create a useEffect [with no dependencies] that runs once to get the userId
   useEffect(() => {   
@@ -105,57 +119,7 @@ export default function AccountScreen({ navigation }) {
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => onLogOutPress()}>
           <Text style={styles.buttonTitle}>Log out</Text>
-        </TouchableOpacity>
-
-        {/* FOOTER */}
-      <View style={styles.footer}>
-        {/* MAP BUTTON */}
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("Map");
-          }}
-        >
-          <Entypo
-            name="map"
-            size={24}
-            color="white"
-            style={styles.footerButton}
-          />
-        </TouchableOpacity>
-        {/* LIST SCREEN */}
-        <TouchableOpacity
-          onPress={() => {
-            //navigation.navigate("List");
-          }}
-        >
-          <Entypo
-            name="list"
-            size={24}
-            color="white"
-            style={styles.footerButton}
-          />
-        </TouchableOpacity>
-        {/* USER SCREEN */}
-        <TouchableOpacity
-          onPress={() => {
-              //if there is a user logged in, retrieve them and skip having to go through login screen again
-              firebase.auth().onAuthStateChanged((user) => {
-              if (user) {
-                navigation.navigate("Account");
-              } else {
-                navigation.navigate("Login");
-              }
-            });
-          }}
-        >
-          <FontAwesome
-            name="user"
-            size={24}
-            color="white"
-            style={styles.footerButton}
-          />
-        </TouchableOpacity>
-      </View>       
+        </TouchableOpacity>       
       </KeyboardAwareScrollView>}     
     </View>
   );

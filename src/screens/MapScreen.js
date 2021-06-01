@@ -218,11 +218,8 @@ export default MapScreen = ({ navigation }) => {
   const [editReviewText, setEditReviewText] = useState(null);
   const [starRating, setStarRating] = useState(-1);
   const [trigger, setTrigger] = useState(0); //shouldn't use this probably, but an independent use state used to trigger useEffects when I want
+  const [userr, setUserr] = useState(false);
   
-
-
-
-
   const _map = React.useRef(null);
   Geocoder.init(MAP_API_KEY);
   /**
@@ -254,6 +251,20 @@ export default MapScreen = ({ navigation }) => {
     })();
   }, []);
 
+  
+  //clean up useEffect, unmounting on auth changed listener...
+  useEffect(() => {
+    const unsubscribe = firebase.auth().onAuthStateChanged((user) => { // detaching the listener 
+      if (user) {
+        setUserr(user);
+      } else {       
+        setUserr(null);      
+      }
+  });
+  console.log("Cancel auth subscription..")
+  return () => unsubscribe(); // unsubscribing from the listener when the component is unmounting
+}, [userr]);
+
   /* Triggers on toilet changes, which only happens on marker press, retrieves toilet reviews, 
      overwrites existing google reviews/ratings to be loocate reviews and ratings
   */
@@ -278,7 +289,6 @@ export default MapScreen = ({ navigation }) => {
         } 
       )
         updatedToilet.rating = Number(Math.round(parseFloat((loocateOverallRating / numberOfReviews) + 'e' + 2)) + 'e-' + 2)
-        //updatedToilet.rating = Math.ceil(loocateOverallRating / numberOfReviews);  
         updatedToilet.reviews = numberOfReviews;
   
         if (isNaN(updatedToilet.rating)) {
@@ -392,15 +402,11 @@ export default MapScreen = ({ navigation }) => {
   };
 
   const onLoginPress = () => {
-    //if there is a user logged in, retrieve them and skip having to go through login screen again
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
+      if (userr)
         navigation.navigate("Account");
-      } else {
+      else if (!userr)
         navigation.navigate("Login");
-      }
-    });
-  };
+    };
 
   /**
    * saves the current selected toilets coordinates
@@ -546,10 +552,10 @@ export default MapScreen = ({ navigation }) => {
       else if (starRating != -1) {
         const usersRef = firebase.firestore().collection("users"); 
         const reviewsRef = firebase.firestore().collection('reviews');
-        firebase.auth().onAuthStateChanged((user) => {
-        if (user) {       
+
+        if (userr) {       
           usersRef
-          .doc(user.uid)
+          .doc(userr.uid)
           .get()
           .then((document) => {
           const data = document.data();
@@ -585,7 +591,6 @@ export default MapScreen = ({ navigation }) => {
             'You must be logged in to place a review.');  
           return;      
         }
-        });
 
       }
   }
@@ -600,7 +605,7 @@ export default MapScreen = ({ navigation }) => {
         setStarRating(-1);
         return;   
       }
-      else if (review == "") {
+      else if (editReviewText == "") {
         Alert.alert(
           'Input required',
           'Please input text to submit your edit.'); 
@@ -643,8 +648,6 @@ export default MapScreen = ({ navigation }) => {
     return;
   }
   
-
-
   /**
    * creates bottom sheet content
    */
