@@ -290,15 +290,15 @@ export default MapScreen = ({ navigation }) => {
       )
         updatedToilet.rating = Number(Math.round(parseFloat((loocateOverallRating / numberOfReviews) + 'e' + 2)) + 'e-' + 2)
         updatedToilet.reviews = numberOfReviews;
-  
+          setReviewsArray(addToReviewsArray);
+
         if (isNaN(updatedToilet.rating)) {
           updatedToilet.rating = 0;
           setToilet(updatedToilet); 
         }
         else if (!isNaN(updatedToilet.rating)) {
           setToilet(updatedToilet);  
-        }       
-        setReviewsArray(addToReviewsArray);
+        }             
         setIsLoading(false);                  
       });
     }
